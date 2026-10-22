@@ -23,8 +23,8 @@
   --text-body: #3d3d3d;
   --text-muted: #6e6e6e;   /* source #7a7a7a is 4.3:1 on white; darkened to 5.1:1 for small text */
   --on-dark: #ffffff;
-  --white: #ffffff;
-  --black: #000000;
+  --design-white: #ffffff;
+  --design-black: #000000;
 
   /* Orange is the CTA fill only, with black text; accents are forest */
   --primary: #ff643b;
@@ -61,8 +61,37 @@
   --shadow-header: 0 1px 0 0 rgba(0, 0, 0, 0.06);
 }
 
+:root {
+  /* Orange stays on CTA fills: links, active menu items and slider dots use the forest accent */
+  --link-hover-color: var(--accent);
+  --menu-primary: var(--accent);
+  --menu-active-color: var(--accent);
+  --swiper-bullet-active-bg: var(--accent);
+  --swiper-theme-color: var(--accent);
+}
+
 body {
   font-feature-settings: "ss03";
+}
+
+/* Uploaded SVG icons (images.iconMask) take the forest accent instead of the
+   colour baked into the file. */
+[data-icon-mask] {
+  position: relative;
+}
+[data-icon-mask] > img {
+  opacity: 0;
+}
+[data-icon-mask]::after {
+  content: "";
+  position: absolute;
+  inset: var(--icon-inset, 0);
+  background-color: var(--accent);
+  -webkit-mask: var(--icon-url) center / contain no-repeat;
+  mask: var(--icon-url) center / contain no-repeat;
+}
+.service-card-icon[data-icon-mask] {
+  --icon-inset: 12px;
 }
 
 [data-theme="dark"] {
