@@ -1,0 +1,71 @@
+/* =========================================
+   Canopy design (designs/canopy/DESIGN.md)
+   Built with: DESIGN=canopy npx vite build --config vite.design.mjs (in frontend/)
+   Everything Editorial ships, with Canopy's role tokens on top. Templates
+   only use role utilities (bg-surface, text-strong …), so the tokens below
+   re-skin them; designs/canopy/templates overrides what tokens can't.
+   ========================================= */
+@import '../../../../frontend/src/css/app.css';
+@import '../../../../frontend/node_modules/@fontsource-variable/dm-sans/index.css';
+
+@source '../../templates/**/*.twig';
+
+:root {
+  /* Surfaces: white canvas, flat light-grey cards, forest dark sections */
+  --surface: #ffffff;
+  --surface-alt: #f2f2f2;
+  --surface-dark: #0a3922;
+  --surface-dark-hover: #0f4a2d;
+  --line: #d4d4d4;
+
+  /* Text */
+  --text-strong: #000000;
+  --text-body: #3d3d3d;
+  --text-muted: #6e6e6e;   /* source #7a7a7a is 4.3:1 on white; darkened to 5.1:1 for small text */
+  --on-dark: #ffffff;
+  --white: #ffffff;
+  --black: #000000;
+
+  /* Orange is the CTA fill only, with black text; accents are forest */
+  --primary: #ff643b;
+  --on-primary: #000000;
+  --accent: #0a3922;
+
+  /* Neutral ramp: true greys */
+  --neutral-50: #fafafa;
+  --neutral-100: #f2f2f2;
+  --neutral-200: #e5e5e5;
+  --neutral-300: #d4d4d4;
+  --neutral-400: #a6a6a6;
+  --neutral-500: #737373;
+  --neutral-600: #525252;
+  --neutral-700: #3d3d3d;
+  --neutral-800: #262626;
+  --neutral-900: #171717;
+  --neutral-950: #0a0a0a;
+
+  /* One sans family: DM Sans, bold and tight headlines, no italic emphasis */
+  --body-font-family: "DM Sans Variable", "DM Sans", system-ui, sans-serif;
+  --heading-font-family: "DM Sans Variable", "DM Sans", system-ui, sans-serif;
+  --btn-font-family: "DM Sans Variable", "DM Sans", system-ui, sans-serif;
+  --body-tracking: normal;
+  --heading-weight: 700;
+  --heading-tracking: -0.028em;
+  --heading-em-style: normal;
+  --heading-em-weight: inherit;
+
+  /* Shape: same pills and cards, 8px inputs; depth from colour, not shadow */
+  --form-border-radius: 8px;
+  --shadow-float: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+  --shadow-header: 0 1px 0 0 rgba(0, 0, 0, 0.06);
+}
+
+body {
+  font-feature-settings: "ss03";
+}
+
+[data-theme="dark"] {
+  --menu-dropdown-bg: var(--surface-dark);
+  --menu-mob-panel-bg: var(--surface-dark);
+}
