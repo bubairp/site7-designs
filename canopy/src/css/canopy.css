@@ -38,7 +38,7 @@
   --neutral-200: #e5e5e5;
   --neutral-300: #d4d4d4;
   --neutral-400: #a6a6a6;
-  --neutral-500: #737373;
+  --neutral-500: #6b6b6b;   /* #737373 is 4.2:1 on the #f2f2f2 cards; this is 4.8:1 */
   --neutral-600: #525252;
   --neutral-700: #3d3d3d;
   --neutral-800: #262626;
@@ -55,6 +55,9 @@
   --heading-em-style: normal;
   --heading-em-weight: inherit;
   --quote-weight: 500;              /* quotes read calmer in medium than in the 700 headline weight */
+  --quote-style: normal;            /* no italics anywhere */
+  --pullquote-weight: 500;
+  --lead-weight: 400;               /* DM Sans body weight; Editorial's light leads look washed out in it */
 
   /* Shape: same pills and cards, 8px inputs; depth from colour, not shadow */
   --form-border-radius: 8px;
@@ -99,4 +102,43 @@ body {
 [data-theme="dark"] {
   --menu-dropdown-bg: var(--surface-dark);
   --menu-mob-panel-bg: var(--surface-dark);
+}
+
+/* Forest areas: the forest accent can't show on forest, so accent text and
+   icons turn white there. Accent fills (announcement bar, badges) stay forest. */
+:is([data-theme="dark"], .product-quote, .pricingCompare .tw-card.ring-2) :is(.text-accent, .text-success, .testimonial-mark) {
+  color: var(--on-dark);
+}
+:is([data-theme="dark"], .product-quote, .pricingCompare .tw-card.ring-2) [data-icon-mask]::after {
+  background-color: var(--on-dark);
+}
+
+/* Orange is never text on white (2.9:1): outline buttons are black with a
+   black hairline and fill orange on hover; white on forest. */
+.tw-btn-outline-primary {
+  color: var(--text-strong);
+  border-color: var(--text-strong);
+}
+.tw-btn-outline-primary:hover {
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+:where([data-theme="dark"]) .tw-btn-outline-primary {
+  color: var(--on-dark);
+  border-color: var(--on-dark);
+}
+
+/* Big quotes: no lone last word in a bold sans */
+:is(.product-quote blockquote, .portfolio-lead, .team-drawer-quote, .tw-rich-text blockquote) {
+  text-wrap: balance;
+}
+
+/* AI Chat sets Inter on its widget: Canopy has one family */
+html #ai-chat-widget {
+  font-family: var(--body-font-family);
+}
+
+/* Icons on the orange fill follow its black text (white on orange is 2.9:1) */
+.tw-btn-primary .text-white {
+  color: var(--on-primary);
 }

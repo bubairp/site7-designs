@@ -47,5 +47,13 @@ CMS colour names map by role: Aged Paper → Off White, Ink → Forest, Parchmen
 
 ## Changelog
 
+- Next (polish, 2026-10-22):
+  - Heading weight everywhere. Service list titles, card and step headings, prices, stats and testimonial marks were 400. They inherited Editorial's never-bold rule or set the heading font with no weight. They are now 700.
+  - Leads are 400 instead of 300 (`--lead-weight`). Pull quotes and the team quote are upright DM Sans 500 (`--quote-style`, `--pullquote-weight`), with balanced lines.
+  - Forest areas: accent text, icons and testimonial marks are white there. Accent fills stay forest. This fixed the invisible icons on the recommended pricing card and the product quote.
+  - Outline buttons are black with a black hairline and fill orange on hover. Orange is never text on white.
+  - Icons on orange are black. `--neutral-500` is `#6b6b6b` (4.8:1 on Off White). The AI chat widget uses DM Sans.
+  - Uploaded SVG icons in the process timelines and icon-top cards take the forest accent (`images.iconMask`).
+
 - 0.1.1: release-process test version (no visual change): update and version change verified on site7-qa.
 - 0.1.0: first version.
