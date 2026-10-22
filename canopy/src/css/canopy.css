@@ -53,6 +53,7 @@
   --heading-tracking: -0.028em;
   --heading-em-style: normal;
   --heading-em-weight: inherit;
+  --quote-weight: 500;              /* quotes read calmer in medium than in the 700 headline weight */
 
   /* Shape: same pills and cards, 8px inputs; depth from colour, not shadow */
   --form-border-radius: 8px;
