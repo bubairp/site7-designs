@@ -44,3 +44,8 @@ CMS colour names map by role: Aged Paper → Off White, Ink → Forest, Parchmen
 | `text-muted` `#6e6e6e` instead of `#7a7a7a` | Craft: 4.5:1 for small text | Source grey is 4.3:1 on white |
 | 8px inputs, 40px buttons, 24px cards | Style: radius tokens | Same soft geometry family |
 | 1px 5% shadow only | Style: shadows | Depth from colour blocks |
+
+## Changelog
+
+- 0.1.1: release-process test version (no visual change): update and version change verified on site7-qa.
+- 0.1.0: first version.

@@ -8,6 +8,7 @@
 @import '../../../../frontend/src/css/app.css';
 @import '../../../../frontend/node_modules/@fontsource-variable/dm-sans/index.css';
 
+/* 0.1.1: unchanged look; release-process test version. */
 @source '../../templates/**/*.twig';
 
 :root {
