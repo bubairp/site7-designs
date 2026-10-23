@@ -1,0 +1,112 @@
+{#- Harbor: portfolio project (overrides templates/_layouts/detail/portfolio.twig; contract: DESIGN.md "Detail layouts").
+	A graphite stage like Harbor's home hero (client logo pill, title, tag chips, lead), the
+	cover in a rounded frame overlapping the band's lower edge, the spec table as stat
+	tiles, then the story blocks and the "More work" slider as in the default layout.
+	Reads the same fields; no new ones. Tailwind role utilities only. -#}
+{% import "_macros/images" as images %}
+{% set pageStyle = entry.pageStyle.one() %}
+
+{% if portfolio %}
+	{% embed "_components/page-style" with { owner: entry, pageClass: 'portfolio-page' } %}{% block body %}
+		{% import "_macros/images" as images %}
+		{% import "_macros/utils" as utils %}
+		{% set cats = portfolio.portfolioCategories.all() %}
+		{% set tags = portfolio.tags.all() %}
+		{% set clientLogo = portfolio.clientLogo.one() ?? null %}
+		{% set covers = portfolio.featureImage.all() %}
+		{% set width = (pageStyle ? pageStyle.SingleMatrixContainerWidth.value : 'container')|replace({'container-small': 'max-w-4xl mx-auto px-4', 'container': 'container mx-auto px-4'}) %}
+
+		{# Spec table (Client / Industry / Services / Year …): a value's first line is the
+		   headline, further lines sit underneath in a smaller size (as the default) #}
+		{% set facts = [] %}
+		{% for row in portfolio.featureItemTable ?? [] %}
+			{% set label = (row.item ?? row.col1 ?? '')|trim|trim(':', 'right') %}
+			{% set lines = (row.quantity ?? row.col2 ?? '')|striptags|split("
+")|map(l => l|trim|trim(',', 'right'))|filter(l => l|length) %}
+			{% if label|length and lines|length %}
+				{% set facts = facts|merge([{ label: label, lines: lines }]) %}
+			{% endif %}
+		{% endfor %}
+		{% set factCols = { 1: 'md:grid-cols-1', 2: 'md:grid-cols-2', 3: 'md:grid-cols-3' }[facts|length] ?? 'md:grid-cols-4' %}
+
+		{# Stage #}
+		<header class="relative bg-surface-dark bg-[radial-gradient(50%_60%_at_100%_0%,rgba(33,66,231,0.35),transparent_70%)] pt-12 text-on-dark {{ covers|length ? 'pb-40 md:pb-56' : 'pb-16' }}" data-theme="dark">
+			<div class="{{ width }}">
+				{# The breadcrumb bar above comes from _layouts/entry (portfolios have no banner) #}
+				{% if clientLogo %}
+					<div class="mb-6 inline-flex h-11 items-center rounded-full border border-white/15 bg-white px-4">{{ images.singleImg(clientLogo, 240, {}, 'h-6 w-auto', { alt: portfolio.title }) }}</div>
+				{% endif %}
+				<h1 class="m-0 max-w-[18ch] text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.04] font-bold tracking-[-0.03em] text-on-dark">{{ portfolio.title }}</h1>
+				{% if portfolio.shortDescription|length %}
+					<p class="mt-6 max-w-[58ch] text-lg leading-relaxed text-on-dark/75 md:text-xl">{{ portfolio.shortDescription }}</p>
+				{% endif %}
+				{% if tags|length %}
+					<ul class="m-0 mt-8 flex list-none flex-wrap gap-2 p-0" aria-label="{{ 'Tags'|t }}">
+						{% for tag in tags %}<li class="rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-sm font-medium text-on-dark/85">{{ tag.title }}</li>{% endfor %}
+					</ul>
+				{% endif %}
+			</div>
+		</header>
+
+		{% cache using key 'hb-phd-' ~ portfolio.id ~ '-' ~ portfolio.dateUpdated.timestamp %}
+		<div class="{{ width }}">
+			{% for image in covers %}
+				<figure class="m-0 {{ loop.first ? '-mt-28 md:-mt-44' : 'mt-6' }} relative overflow-hidden rounded-[var(--radius-card-lg)] border border-line bg-surface-alt shadow-lg">
+					{{ images.singleImg(image, 1600, {'ratio': 1.94}, 'block w-full') }}
+				</figure>
+			{% endfor %}
+
+			{% if facts|length %}
+				<dl class="m-0 mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-[var(--radius-card)] border border-line bg-line {{ factCols }}">
+					{% for fact in facts %}
+						<div class="bg-surface px-6 py-5">
+							<dt class="text-xs font-semibold uppercase tracking-[0.06em] text-muted">{{ fact.label }}</dt>
+							<dd class="m-0 mt-2 text-lg font-semibold text-strong">{{ fact.lines|first }}</dd>
+							{% if fact.lines|length > 1 %}
+								<dd class="m-0 mt-1 text-sm text-muted">{{ fact.lines|slice(1)|join(' · ') }}</dd>
+							{% endif %}
+						</div>
+					{% endfor %}
+				</dl>
+			{% endif %}
+
+			{% if portfolio.date|length %}
+				<p class="mt-4 text-sm text-muted">{{ portfolio.date|date('M d, Y') }}</p>
+			{% endif %}
+		</div>
+		{% endcache %}
+
+		<div class="portfolio-story">
+			{% include "_includes/matrix-container" with { entry: portfolio, cache_key: 'entry-' ~ portfolio.id } %}
+		</div>
+
+		{# More work: same category first, then the rest, up to six; hidden when there is none #}
+		{% cache using key 'hb-pf-more-' ~ portfolio.id %}
+		{% set catIds = cats|map(c => c.id) %}
+		{% set sameCat = catIds|length ? craft.entries().section('portfolios').relatedTo({ targetElement: catIds, field: 'portfolioCategories' }).id(['and', 'not ' ~ portfolio.id]).with(['image', 'portfolioCategories']).limit(6).all() : [] %}
+		{% set moreIds = [portfolio.id]|merge(sameCat|map(p => p.id)) %}
+		{% set others = sameCat|length < 6 ? craft.entries().section('portfolios').id(['and']|merge(moreIds|map(i => 'not ' ~ i))).with(['image', 'portfolioCategories']).limit(6 - sameCat|length).all() : [] %}
+		{% set more = sameCat|merge(others) %}
+		{% if more|length %}
+			<section class="article-related portfolio-more">
+				<div class="container mx-auto px-4">
+					<div class="section-head is-left related-head">
+						<span class="section-eyebrow">{{ 'Keep looking'|t }}</span>
+						<h2 class="block-heading-title section-title">{{ 'More work'|t }}</h2>
+					</div>
+					<div class="swiper" data-swiper-options='{{ utils.swiperConfig(3, 24, true, more|length > 3) }}'>
+						<div class="swiper-wrapper">
+							{% for item in more %}
+								<div class="swiper-slide h-auto">
+									{% include "_components/_portfolios/portfolioCard.twig" with { portfolio: item } %}
+								</div>
+							{% endfor %}
+						</div>
+						<div class="swiper-pagination relative bottom-0 mt-4 pt-2"></div>
+					</div>
+				</div>
+			</section>
+		{% endif %}
+		{% endcache %}
+	{% endblock %}{% endembed %}
+{% endif %}

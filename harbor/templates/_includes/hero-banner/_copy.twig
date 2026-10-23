@@ -1,0 +1,22 @@
+{#- Harbor: hero copy (overrides templates/_includes/hero-banner/_copy.twig; same fields).
+	Eyebrow pill with a blue dot, a bold sans heading (<em> stays upright), lead, the
+	check list or stats (_list.twig) unless the layout places it, and the buttons.
+	Expects: slide, headingTag, eyebrowClass (unused here), withList (default true),
+	align ('center' or 'start', default 'start'). Light and dark through dark: variants. -#}
+{% import '_components/ctaButton' as buttons %}
+{% set center = (align ?? 'start') == 'center' %}
+{% if slide.displayTitle and slide.subtitle|length %}
+	<span class="mb-6 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-[13px] font-medium text-body dark:border-white/15 dark:bg-white/5 dark:text-on-dark/85">
+		<span class="size-1.5 rounded-full bg-primary" aria-hidden="true"></span>{{ slide.subtitle }}
+	</span>
+{% endif %}
+<{{ headingTag }} class="hero-title m-0 text-[clamp(2.5rem,6vw,4.5rem)] font-bold leading-[1.04] tracking-[-0.03em] text-strong dark:text-on-dark [&_em]:not-italic {{ center ? 'mx-auto max-w-[18ch]' : 'max-w-[16ch]' }}">{{ slide.heading|raw }}</{{ headingTag }}>
+{% if slide.switchOffDes and slide.description|length %}
+	<div class="hero-lead mt-6 max-w-[58ch] text-lg leading-relaxed text-body md:text-xl dark:text-on-dark/75 {{ center ? 'mx-auto' }}">{{ slide.description }}</div>
+{% endif %}
+{% if withList ?? true %}
+	<div class="mt-8">{% include "_includes/hero-banner/_list" with { items: (slide.displayCheckList ?? false) ? (slide.checkListShowTable ?? []) : [], center: center } %}</div>
+{% endif %}
+{% if slide.button|length %}
+	<div class="hero-actions mt-9 flex flex-wrap gap-3 {{ center ? 'justify-center' }}">{{ buttons.renderButton(slide.button.all()) }}</div>
+{% endif %}

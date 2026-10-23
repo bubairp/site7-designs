@@ -1,0 +1,32 @@
+{#- Harbor: hero layout 2 (overrides templates/_includes/hero-banner/sliderLayout2.twig).
+	Half and half: the copy in the left half, the slide's media edge to edge in the right
+	half with one rounded inner corner. On phones the media sits below the copy, full
+	width. Light or dark per slide's "Theme dark"; the slide's colour, when set, replaces
+	the background. Same fields, slides and autoplay as the default. -#}
+{% set multi = heroBannerSliders|length > 1 %}
+{% set firstDark = (heroBannerSliders|first).themeDark ?? false %}
+<section class="hero-layout {{ firstDark ? 'is-dark' : 'is-light' }} relative w-full overflow-hidden">
+	<div class="{{ multi ? 'swiper' : '' }}" {% if multi %}data-swiper-options='{"effect": "fade","fadeEffect": {"crossFade": true},"speed": 800,"autoplay": {"delay": 7000,"disableOnInteraction": false},"pagination": {"el": ".swiper-pagination","clickable": true}}'{% endif %}>
+		<div class="{{ multi ? 'swiper-wrapper' : '' }}">
+			{% for slide in heroBannerSliders %}
+				{% set dark = slide.themeDark ?? false %}
+				{% set bgColor = (slide.colorLibrary.one().colorcode ?? null)|roleColor %}
+				{% set hasMedia = slide.imageVideo|length or slide.bgImageVideoMobile|length %}
+				<div class="{{ multi ? 'swiper-slide' : '' }} relative bg-surface-alt lg:min-h-[86vh] dark:bg-surface-dark" data-theme="{{ dark ? 'dark' : 'light' }}" {% if bgColor %}style="background-color: {{ bgColor }};"{% endif %}>
+					<div class="container mx-auto px-4">
+						<div class="pt-[calc(var(--header-height,96px)+3rem)] pb-14 lg:flex lg:min-h-[86vh] lg:items-center lg:pb-20 {{ hasMedia ? 'lg:w-1/2 lg:pe-16' }}">
+							<div>{% include "_includes/hero-banner/_copy" with { headingTag: loop.first ? 'h1' : 'h2' } %}</div>
+						</div>
+					</div>
+					{% if hasMedia %}
+						{# Below the header (it floats over the banner), so the menu never sits on the photo #}
+						<div class="relative aspect-[4/3] w-full overflow-hidden lg:absolute lg:top-[var(--header-height,96px)] lg:bottom-0 lg:end-0 lg:aspect-auto lg:w-1/2 lg:rounded-s-[var(--radius-card-lg)]">
+							{% include "_includes/hero-banner/_media-pair" with { width: 1440, eager: loop.first } %}
+						</div>
+					{% endif %}
+				</div>
+			{% endfor %}
+		</div>
+		{% if multi %}<div class="swiper-pagination swiper-pagination-overlay hero-pagination"></div>{% endif %}
+	</div>
+</section>

@@ -15,6 +15,19 @@ Same paths as `templates/` (DESIGN.md at the project root, "Detail layouts"); st
 | `_layouts/detail/blog.twig` | Left-aligned header on Whisper Grey (pills, date, reading time), wide rounded cover, sticky aside (author, topics, share) beside the story; on phones the aside follows the story |
 | `_layouts/detail/casestudy.twig` | Split hero (copy and calls to action beside the cover), sticky facts card and a graphite call to action beside the story |
 | `_components/listing-filter.twig` | Blog and shop filter: one white card, search button inside the field, categories as chips (a select above 8) |
+| `_layouts/detail/portfolio.twig` | Graphite stage (client logo pill, title, lead, tag chips), cover overlapping the band, spec table as stat tiles |
+| `_includes/hero-banner/sliderLayout1/2/3.twig`, `_copy.twig`, `_list.twig` | Home hero: layout 3 a graphite stage with the media framed below and a stats grid; layout 1 split with a glowing media frame; layout 2 copy beside an edge-to-edge media half below the header |
+| `_includes/footer/basicFooter.twig` | Graphite footer (unless the CMS sets a footer colour or image), small uppercase column labels, the company name as a faint wordmark |
+
+Restyled in `src/css/harbor.css` with Tailwind `@apply`, Theme markup kept (CMS options, data handling and JS stay the Theme's):
+
+| Area | Harbor |
+|---|---|
+| Header, all five layouts | Full-width bar on a hairline, frosted over banners (white 75% / graphite 55% + blur), graphite announcement strip, hover tiles without underline, blue CTA. In the components layer: the Theme's glass rules there are `!important` |
+| Page banners (`standard-banner`) | Cover (layout 3) on desktop: graphite band with a blue glow, copy left, photo inset right in a rounded frame; phones and centred covers keep the photo behind a graphite wash. Split and wide media in rounded framed cards |
+| Cards (blog, case study, portfolio, product, service) | White card on a hairline, inset image, square chips, no lift: blue-tinted border and float shadow on hover |
+| Product page | Gallery in a framed light panel, buying details in a sticky card, specs on a grey panel |
+| Category pills, footer labels | 8px chips (current one blue); small uppercase labels in every footer layout |
 
 ## Reference lock
 

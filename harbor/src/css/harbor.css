@@ -149,6 +149,216 @@ div.sm\:rounded-full:has(input[type="email"]) input[type="email"].rounded-full {
   color: color-mix(in srgb, var(--accent) 45%, var(--surface));
 }
 
+/* =========================================
+   Header, all five layouts (Theme markup, restyled with Tailwind @apply).
+   CMS options (layout, positioning, glass, spacing, colours) and the menu JS stay.
+   ========================================= */
+
+/* In the components layer, like the Theme's header.css: !important rules in a layer beat
+   unlayered ones, so Harbor's must sit in the same layer to win by specificity. */
+@layer components {
+  /* Announcement bar: a graphite strip instead of an accent band */
+  .headerMain .header-top {
+    @apply bg-surface-dark! text-[13px] font-medium text-on-dark/90 border-b border-white/10;
+  }
+
+  /* Menu: medium links that get a soft tile on hover; the current page in blue */
+  .simple-rp-menu > .menu-ul > li > .menu-link {
+    @apply rounded-lg font-medium;
+  }
+  /* No hover underline (Editorial's DESIGN.md §6 rule, header-menu.css): Harbor marks
+     hover and the open dropdown with the tile only. Doubled class beats the Theme's. */
+  .headerMain .simple-rp-menu.simple-rp-menu .menu-ul > li :is(a, span).menu-link {
+    @apply no-underline!;
+  }
+  .headerMain {
+    --menu-hover-bg: var(--surface-alt);
+    --menu-sub-hover-bg: var(--surface-alt);
+    --menu-hover-color: var(--text-strong);
+  }
+
+  /* Over a banner ("Floating glass"): Harbor drops the pill. The bar spans the container
+     on a hairline, transparent over the banner, and turns solid white once scrolled. */
+  #header.has-header-banner .headerMain.header-floating-glass:not(.scrolled, .menu-open) {
+    --glass-tint: transparent;
+    --glass-blur: none;
+    --glass-gutter: 0px;
+    --glass-pad-x: 0px;
+  }
+  /* ...but frosted, so whatever scrolls under it (banner copy, photo) never runs through
+     the links: white 75% over light banners, graphite 55% over dark ones and photos.
+     Same selector as the Theme's transparent rule, later in the layer, so it wins. */
+  #header.has-header-banner .headerMain.header-floating-glass:not(.scrolled, .menu-open) {
+    @apply bg-surface/75! backdrop-blur-xl! backdrop-saturate-150!;
+  }
+  #header.has-header-banner .headerMain.header-floating-glass:not(.scrolled, .menu-open) .header-main {
+    @apply border-b border-line;
+  }
+  #header.has-header-banner .headerMain.header-floating-glass:not(.scrolled, .menu-open) .header-panel {
+    @apply w-full! px-4!;
+  }
+  #header.has-header-banner .headerMain.header-floating-glass:not(.scrolled, .menu-open) .simple-rp-menu .dropdown-menu {
+    --menu-dropdown-bg: var(--surface);
+    --menu-dropdown-border: var(--line);
+    @apply shadow-lg! backdrop-blur-none;
+  }
+
+  /* Over a dark banner or photo: white links on a white/10 hairline, blue call to action */
+  #header.has-banner-photo .headerMain.header-floating-glass:not(.scrolled, .menu-open) {
+    --menu-hover-bg: rgb(255 255 255 / 0.08);
+    @apply bg-surface-dark/55!;
+  }
+  /* The Theme turns menu text white over a photo; inside Harbor's white dropdown it goes
+     back to body text, or the items would be white on white */
+  #header.has-banner-photo .headerMain.header-floating-glass:not(.scrolled, .menu-open) .simple-rp-menu .dropdown-menu {
+    --menu-text: var(--text-body);
+    --menu-hover-color: var(--text-strong);
+    --menu-active-color: var(--accent);
+    --menu-sub-text: var(--text-body);
+  }
+  #header.has-banner-photo .headerMain.header-floating-glass:not(.scrolled, .menu-open) .header-main {
+    @apply border-white/10;
+  }
+  /* (one class more than the Theme's Parchment-CTA rule, header.css, so it wins) */
+  #header.has-banner-photo .headerMain.header-floating-glass:not(.scrolled, .menu-open) .header-main .header-cta.tw-btn-primary {
+    @apply border-primary! bg-primary! text-on-primary!;
+  }
+  #header.has-banner-photo .headerMain.header-floating-glass:not(.scrolled, .menu-open) .dropdown-menu {
+    --menu-sub-hover-color: var(--text-strong);
+    --menu-sub-hover-bg: var(--surface-alt);
+  }
+}
+
+/* =========================================
+   Page banners (_includes/page-banner/standard-banner.twig, Theme markup): standard
+   pages, contact, services, team members, authors, product categories.
+   ========================================= */
+.page-hero {
+  @apply border-line bg-surface-alt;
+}
+.page-hero-title {
+  @apply font-bold tracking-[-0.03em];
+}
+/* Body text on light bands; on a cover (graphite or photo) the lead stays light */
+.page-hero-slide:not(.is-cover) .page-hero-lead {
+  @apply text-body;
+}
+.page-hero-slide.is-cover .page-hero-lead {
+  @apply text-on-dark/80;
+}
+/* Split (layout 1) and wide (layout 2): the media in Harbor's rounded frame with the float shadow */
+:is(.page-hero-media, .page-hero-wide) {
+  @apply rounded-[var(--radius-card-lg)] border border-line bg-surface shadow-lg;
+}
+
+/* Cover (layout 3), the arrangement most pages use. Phones and centred covers keep the
+   photo behind the copy, under a graphite wash instead of Editorial's warm one. */
+.page-hero-cover-overlay {
+  @apply bg-[linear-gradient(90deg,rgb(17_24_39/0.82)_0%,rgb(17_24_39/0.45)_60%,rgb(17_24_39/0.25)_100%)];
+}
+/* Desktop: Harbor's stage, like its home hero. A graphite band with a blue glow, the copy
+   in the left half, the photo inset on the right in a rounded frame. */
+@media (min-width: 1024px) {
+  .page-hero-slide.is-cover:not(:has(.is-center)) {
+    @apply bg-surface-dark bg-[radial-gradient(50%_70%_at_100%_0%,rgba(33,66,231,0.35),transparent_70%),radial-gradient(40%_50%_at_0%_100%,rgba(33,66,231,0.14),transparent_70%)];
+  }
+  .page-hero-slide.is-cover:not(:has(.is-center)) .page-hero-cover-overlay {
+    @apply hidden;
+  }
+  .page-hero-slide.is-cover:not(:has(.is-center)) .page-hero-cover-media {
+    @apply inset-auto end-8 top-[calc(var(--header-height,96px)+2rem)] bottom-12 w-[min(46%,40rem)] overflow-hidden rounded-[var(--radius-card-lg)] border border-white/10 shadow-[0_40px_120px_-24px_rgba(0,0,0,0.65)];
+  }
+  .page-hero-slide.is-cover:not(:has(.is-center)) .page-hero-grid {
+    @apply min-h-[min(78vh,660px)] max-w-[50%] content-center pt-[calc(var(--header-height,96px)+3rem)] pb-16;
+  }
+}
+
+/* =========================================
+   Cards, one system for every listing and block that uses them (Theme markup):
+   a white card on a hairline, the image inset with its own radius, no lift on hover -
+   the border tints blue and the float shadow comes in. Editorial's are borderless.
+   ========================================= */
+:is(.post-card, .work-card, .project-card, .product-card):not(.post-card--row, .work-card--row) {
+  @apply rounded-[var(--radius-card)] border border-line bg-surface p-2 transition-[border-color,box-shadow] duration-300 hover:translate-y-0 hover:border-accent/30 hover:shadow-lg;
+}
+:is(.post-card, .work-card, .project-card, .product-card):not(.post-card--row, .work-card--row) :is(.post-card-media, .work-card-media, .project-card-media, .product-card-media) {
+  @apply rounded-[calc(var(--radius-card)-8px)];
+}
+:is(.post-card-body, .project-card-body, .product-card-body) {
+  @apply px-3 pt-5 pb-3;
+}
+:is(.post-card-title, .work-card-title, .project-card-title, .product-card-title) {
+  @apply font-semibold tracking-[-0.015em];
+}
+.post-card-title {
+  @apply text-xl;
+}
+/* Tags and meta: small square chips instead of uppercase pills */
+:is(.post-card-tag, .product-card-tag, .work-card-tags li) {
+  @apply rounded-md border-0 bg-surface-alt px-2 py-0.5 text-xs font-semibold tracking-normal normal-case;
+}
+.post-card-tag,
+.product-card-tag {
+  @apply text-accent;
+}
+
+/* Service cards: the icon on a soft blue tile instead of a circle */
+.service-card {
+  @apply border border-line bg-surface transition-[border-color,box-shadow] duration-300 hover:border-accent/30 hover:shadow-lg;
+}
+.service-card-icon {
+  @apply rounded-xl border-0 bg-accent/8;
+}
+
+/* =========================================
+   Product page (_layouts/detail/product.twig, Theme markup: its shop logic stays the
+   Theme's). The gallery in a framed light panel, the buying details as a sticky card.
+   ========================================= */
+.product-gallery {
+  @apply rounded-[var(--radius-card-lg)] border border-line bg-surface-alt p-3;
+}
+.product-gallery :is(img, picture) {
+  @apply rounded-[calc(var(--radius-card-lg)-8px)];
+}
+@media (min-width: 1024px) {
+  .product-info {
+    @apply sticky top-28 self-start rounded-[var(--radius-card-lg)] border border-line bg-surface p-8 shadow-lg;
+  }
+}
+.product-specs {
+  @apply rounded-[var(--radius-card)] bg-surface-alt px-5 py-4;
+}
+.product-tags :is(a, span, li) {
+  @apply rounded-md;
+}
+.product-title {
+  @apply tracking-[-0.03em];
+}
+
+/* Category pills (product categories, listings): Harbor's 8px chips, the current one blue,
+   like the blog/shop filter (_components/listing-filter.twig) */
+.filter-pill {
+  @apply rounded-lg border-line bg-surface text-sm font-medium text-body hover:border-accent hover:text-accent;
+}
+.filter-pill.active {
+  @apply border-primary bg-primary text-on-primary hover:text-on-primary;
+}
+.page-hero-slide.is-cover .filter-pill {
+  @apply border-white/15 bg-white/5 text-on-dark/85 backdrop-blur-none hover:border-white/40 hover:bg-white/10 hover:text-on-dark;
+}
+.page-hero-slide.is-cover .filter-pill.active {
+  @apply border-primary bg-primary text-on-primary;
+}
+
+/* Footer column headings in every footer layout (boxed, mega, minimal too): small
+   uppercase labels instead of the Theme's heading font. Same layer as the Theme's rule
+   (blocks.css, utilities) and later, so it wins. */
+@layer utilities {
+  .footer-main :is(h2, h3, h4, h5, h6, button > span) {
+    @apply font-sans text-[13px] font-semibold uppercase tracking-[0.08em];
+  }
+}
+
 /* Big quotes: no lone last word */
 :is(.product-quote blockquote, .portfolio-lead, .team-drawer-quote, .tw-rich-text blockquote) {
   text-wrap: balance;

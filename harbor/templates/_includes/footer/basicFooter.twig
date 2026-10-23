@@ -1,0 +1,111 @@
+{#- Harbor: basic footer (overrides templates/_includes/footer/basicFooter.twig; same options).
+	Graphite by default with a blue glow; a footer colour or image set in the CMS wins,
+	together with its "Theme dark" switch. Brand column (logo, description, CTA, social),
+	two CMS menus, contact info, office timing; a bottom bar with the copyright and the
+	accepted cards; the company name as a large faint wordmark. On phones each column
+	collapses (Alpine, like the default). Tailwind role utilities only.
+	Expects the variables _includes/footer/index.twig sets. -#}
+{% import "_macros/images" as images %}
+{% import '_macros/utils' as utils %}
+{% import '_components/ctaButton' as buttons %}
+{% set ownBackground = footerBackgroundColorCode or footerBackgroundImage %}
+{% set dark = ownBackground ? themeSwitche : true %}
+{% set colHead = 'flex w-full items-center justify-between border-b border-line bg-transparent py-4 text-start text-[13px] font-semibold uppercase tracking-[0.08em] text-strong sm:pointer-events-none sm:mb-5 sm:cursor-default sm:border-0 sm:py-0 dark:border-white/10 dark:text-on-dark' %}
+{# The Theme's blocks.css styles .footer-main button > span as a heading, in the same layer: the label needs ! #}
+{% set colLabel = 'font-sans! text-[13px]! font-semibold! uppercase! tracking-[0.08em]!' %}
+{% set colLink = 'inline-block py-1 text-[15px] text-body no-underline transition-colors hover:text-accent dark:text-on-dark/70 dark:hover:text-on-dark' %}
+{% set chevron = '<svg :class="{\'rotate-180\': open}" class="size-5 text-muted transition-transform sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>' %}
+
+<div class="footer-main {{ footerClasses }} relative overflow-hidden {{ ownBackground ? '' : 'bg-surface-dark bg-[radial-gradient(45%_60%_at_100%_0%,rgba(33,66,231,0.28),transparent_70%)]' }} pt-16 pb-6 text-body lg:pt-20 dark:text-on-dark" data-theme="{{ dark ? 'dark' : 'light' }}">
+	<div class="{{ footerContainerWidth }} relative">
+		<div class="grid gap-10 border-b border-line pb-12 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,2fr)] lg:gap-16 dark:border-white/10 {{ footerVerticalAlign }}">
+			{# Brand #}
+			<div>
+				{% set siteFooterLogo = generalEntry.footerLogo.one() ?? generalEntry.logo.one() ?? null %}
+				{% if footerDisplayLogo and siteFooterLogo %}
+					<a class="mb-6 inline-block no-underline" href="/">{% include '_includes/footer/_logo' with { sizeClass: 'h-9 md:h-10' } %}</a>
+				{% endif %}
+				{% if footerEntry.description %}
+					{# Rich text (its own <p>), so a div: a <p> inside a <p> would end the outer one #}
+					<div class="mb-7 max-w-sm text-[15px] leading-relaxed text-body dark:text-on-dark/70 [&_p]:m-0">{{ footerEntry.description }}</div>
+				{% endif %}
+				<div class="flex flex-wrap items-center gap-4">
+					{% if footerDisplayCTA is defined and footerButton is defined and footerDisplayCTA and footerButton %}
+						{{ buttons.renderButton(footerButton, {}, 'tw-btn-sm') }}
+					{% endif %}
+					{% if footerDisplaySocial %}
+						<div class="flex [&_a]:border-line dark:[&_a]:border-white/15">{% include '_components/social' %}</div>
+					{% endif %}
+				</div>
+
+				{% if footerDisplayOfficeTiming and officeTiming and officeTiming|length > 0 %}
+					<div class="mt-10 max-w-sm" x-data="{ open: false }">
+						<button @click="open = !open" :aria-expanded="open.toString()" class="{{ colHead }}" type="button"><span class="{{ colLabel }}">{{ 'Office Timing'|t }}</span>{{ chevron|raw }}</button>
+						<ul :class="{'hidden': !open}" class="m-0 hidden list-none flex-col p-0 pt-4 pb-6 sm:flex sm:p-0">
+							{% for officeTime in officeTiming %}
+								<li class="flex items-center justify-between border-b border-line py-2 text-sm last:border-0 dark:border-white/10">
+									<span class="font-medium text-strong dark:text-on-dark/85">{{ officeTime.day }}</span>
+									<span class="text-muted dark:text-on-dark/60">{{ utils.formatTime24Hour(officeTime.startTime) }} – {{ utils.formatTime24Hour(officeTime.endTime) }}</span>
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				{% endif %}
+			</div>
+
+			{# Menus and contact #}
+			<div class="grid sm:grid-cols-3 sm:gap-8">
+				{% for col in [
+					{ handle: footerEntry.footerMenuCol1 ?: 'company', picked: footerEntry.footerMenuCol1, id: 'footerMenuCol1', fallback: 'Page links' },
+					{ handle: footerEntry.footerMenuCol2 ?: 'support', picked: footerEntry.footerMenuCol2, id: 'footerMenuCol2', fallback: 'Useful links' },
+				] %}
+					{% set menuObj = col.picked ? craft.simplerpmenu.getMenu(col.handle) : null %}
+					<div x-data="{ open: false }">
+						<button @click="open = !open" class="{{ colHead }}" type="button"><span class="{{ colLabel }}">{{ menuObj ? menuObj.name|t : col.fallback|t }}</span>{{ chevron|raw }}</button>
+						<div :class="{'hidden': !open}" class="hidden pt-4 pb-6 sm:block sm:p-0">
+							{{ craft.simplerpmenu.getRpMenuHTML(col.handle, { 'menu-id': col.id, 'menu-class': '', 'ul-class': 'flex flex-col p-0 m-0 gap-1', 'li-class': 'list-none', 'link-class': colLink }) }}
+						</div>
+					</div>
+				{% endfor %}
+				{% if footerDisplayContactInfo %}
+					<div x-data="{ open: false }">
+						<button @click="open = !open" class="{{ colHead }}" type="button"><span class="{{ colLabel }}">{{ 'Contact Info'|t }}</span>{{ chevron|raw }}</button>
+						<ul :class="{'hidden': !open}" class="m-0 hidden list-none flex-col gap-1 p-0 pt-4 pb-6 sm:flex sm:p-0">
+							{% if generalEntry.Description %}
+								<li class="mb-2 text-[15px] leading-relaxed text-body dark:text-on-dark/70">{{ generalEntry.Description }}</li>
+							{% endif %}
+							{% if generalEntry.email %}
+								<li><a class="{{ colLink }} [overflow-wrap:anywhere]" href="mailto:{{ generalEntry.email }}">{{ generalEntry.email }}</a></li>
+							{% endif %}
+							{% if generalEntry.phoneNumber %}
+								<li><a class="{{ colLink }}" href="tel:{{ generalEntry.phoneNumber }}">{{ generalEntry.phoneNumber }}</a></li>
+							{% endif %}
+						</ul>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+
+		{# Bottom bar #}
+		<div class="flex flex-col items-center justify-between gap-4 pt-6 sm:flex-row">
+			<p class="m-0 text-sm text-muted dark:text-on-dark/55">
+				&copy; {{ now|date('Y') }} {{ generalEntry.companyName ?? siteName }} · {{ 'Made by'|t }}
+				<a class="text-strong no-underline hover:text-accent dark:text-on-dark dark:hover:text-on-dark/80" href="https://remoteprogrammer.com/" target="_blank" rel="noopener">RP</a>
+			</p>
+			{% set cardImg = generalEntry.acceptedCards.one() ?? null %}
+			{% if cardImg %}
+				<div class="flex items-center gap-3 text-sm text-muted dark:text-on-dark/55">
+					<span>{{ 'Cards accepted'|t }}</span>
+					{% set imgWidth = cardImg.width ?: 187 %}
+					{% set imgHeight = cardImg.height ?: 28 %}
+					<span class="inline-flex rounded-md bg-white px-2 py-1">{{ images.singleImg(cardImg, imgWidth, {ratio: (imgWidth / imgHeight)}, 'h-5 w-auto') }}</span>
+				</div>
+			{% endif %}
+		</div>
+
+		{# Wordmark #}
+		{% if generalEntry.companyName ?? false %}
+			<div class="pointer-events-none mt-10 select-none overflow-hidden whitespace-nowrap text-center text-[clamp(3.5rem,11vw,12rem)] leading-[0.85] font-bold tracking-[-0.05em] text-strong/5 dark:text-on-dark/[0.06]" aria-hidden="true">{{ generalEntry.companyName }}</div>
+		{% endif %}
+	</div>
+</div>

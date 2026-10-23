@@ -1,0 +1,29 @@
+{#- Harbor: the slide's check list or stats (overrides templates/_includes/hero-banner/_list.twig).
+	Every item written "figure | label" makes a stats grid of tiles split by hairlines;
+	otherwise a row of ticks (an item's icon replaces the tick).
+	Expects: items (check list rows), center (optional). -#}
+{% if items|length %}
+	{% set isStats = items|filter(i => '|' in (i.title ?? ''))|length == items|length %}
+	{% if isStats %}
+		{# Literal class names: Tailwind only builds the classes it can read in this file #}
+		{% set cols = { 1: 'md:grid-cols-1', 2: 'md:grid-cols-2', 3: 'md:grid-cols-3' }[items|length] ?? 'md:grid-cols-4' %}
+		<ul class="hero-stats m-0 grid list-none grid-cols-2 gap-px overflow-hidden rounded-[var(--radius-card)] border border-line bg-line p-0 {{ cols }} dark:border-white/10 dark:bg-white/10">
+			{% for stat in items %}
+				{% set parts = stat.title|split('|') %}
+				<li class="flex flex-col gap-1 bg-surface px-6 py-5 text-start dark:bg-surface-dark">
+					<span class="text-3xl font-bold tracking-[-0.02em] text-strong dark:text-on-dark">{{ parts[0]|trim }}</span>
+					<span class="text-sm text-muted dark:text-on-dark/60">{{ parts|slice(1)|join('|')|trim }}</span>
+				</li>
+			{% endfor %}
+		</ul>
+	{% else %}
+		<ul class="hero-check-list m-0 flex list-none flex-wrap gap-x-6 gap-y-2.5 p-0 {{ (center ?? false) ? 'justify-center' }}">
+			{% for item in items %}
+				<li class="flex items-center gap-2 text-[15px] text-body dark:text-on-dark/80">
+					<i class="{{ (item.iconClass ?? false) ? item.iconClass|icon : 'ti ti-circle-check' }} text-lg text-accent" aria-hidden="true"></i>
+					{{ item.title }}
+				</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+{% endif %}

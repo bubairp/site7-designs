@@ -1,0 +1,36 @@
+{#- Harbor: hero layout 1 (overrides templates/_includes/hero-banner/sliderLayout1.twig).
+	Split: copy on the left, the slide's media on the right in a rounded frame with a soft
+	blue glow behind it. Light (white) or dark (graphite) per slide's "Theme dark"; the
+	slide's colour, when set, replaces the background. On phones the media follows the
+	copy. Same fields, slides and autoplay as the default. -#}
+{% set multi = heroBannerSliders|length > 1 %}
+{% set firstDark = (heroBannerSliders|first).themeDark ?? false %}
+<section class="hero-layout {{ firstDark ? 'is-dark' : 'is-light' }} relative w-full overflow-hidden">
+	<div class="{{ multi ? 'swiper' : '' }}" {% if multi %}data-swiper-options='{"effect": "fade","fadeEffect": {"crossFade": true},"speed": 800,"autoplay": {"delay": 7000,"disableOnInteraction": false},"pagination": {"el": ".swiper-pagination","clickable": true}}'{% endif %}>
+		<div class="{{ multi ? 'swiper-wrapper' : '' }}">
+			{% for slide in heroBannerSliders %}
+				{% set dark = slide.themeDark ?? false %}
+				{% set bgColor = (slide.colorLibrary.one().colorcode ?? null)|roleColor %}
+				{% set hasMedia = slide.imageVideo|length or slide.bgImageVideoMobile|length %}
+				<div class="{{ multi ? 'swiper-slide' : '' }} bg-surface pt-[calc(var(--header-height,96px)+3rem)] pb-16 lg:pb-24 dark:bg-surface-dark" data-theme="{{ dark ? 'dark' : 'light' }}" {% if bgColor %}style="background-color: {{ bgColor }};"{% endif %}>
+					<div class="container mx-auto px-4">
+						<div class="grid items-center gap-12 {{ hasMedia ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-16' }}">
+							<div>
+								{% include "_includes/hero-banner/_copy" with { headingTag: loop.first ? 'h1' : 'h2' } %}
+							</div>
+							{% if hasMedia %}
+								<div class="relative">
+									<div class="absolute -inset-8 -z-0 rounded-[3rem] bg-[radial-gradient(closest-side,rgba(33,66,231,0.35),transparent)] blur-2xl" aria-hidden="true"></div>
+									<div class="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card-lg)] border border-line shadow-lg dark:border-white/10">
+										{% include "_includes/hero-banner/_media-pair" with { width: 1200, eager: loop.first } %}
+									</div>
+								</div>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+		{% if multi %}<div class="swiper-pagination swiper-pagination-overlay hero-pagination"></div>{% endif %}
+	</div>
+</section>
