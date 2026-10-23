@@ -1,0 +1,155 @@
+/* =========================================
+   Harbor design (designs/harbor/DESIGN.md)
+   Built with: DESIGN=harbor npx vite build --config vite.design.mjs (in frontend/)
+   Everything Editorial ships, with Harbor's role tokens on top. Templates
+   only use role utilities (bg-surface, text-strong …), so the tokens below
+   re-skin them; designs/harbor/templates overrides what tokens can't.
+   Inter is already loaded by the site's own CSS (base/fonts.css).
+   ========================================= */
+@import '../../../../frontend/src/css/app.css';
+
+@source '../../templates/**/*.twig';
+
+:root {
+  /* Surfaces: white canvas, whisper-grey alternates, graphite dark sections */
+  --surface: #ffffff;
+  --surface-alt: #f9fafb;
+  --surface-dark: #111827;
+  --surface-dark-hover: #1f2937;
+  --line: #e5e7eb;
+
+  /* Text */
+  --text-strong: #111827;
+  --text-body: #4b5563;
+  --text-muted: #6b7280;   /* 4.8:1 on white, 4.6:1 on #f9fafb */
+  --on-dark: #ffffff;
+  --design-white: #ffffff;
+  --design-black: #111827;
+
+  /* One vivid blue: CTA fill (white text 7.0:1) and accents on light surfaces */
+  --primary: #2142e7;
+  --primary-hover: #182fa5;
+  --on-primary: #ffffff;
+  --accent: #2142e7;
+
+  /* Neutral ramp: cool greys */
+  --neutral-50: #f9fafb;
+  --neutral-100: #f3f4f6;
+  --neutral-200: #e5e7eb;
+  --neutral-300: #d1d5db;
+  --neutral-400: #9ca3af;
+  --neutral-500: #6b7280;
+  --neutral-600: #4b5563;
+  --neutral-700: #374151;
+  --neutral-800: #1f2937;
+  --neutral-900: #111827;
+  --neutral-950: #030712;
+
+  /* One sans family: Inter, bold and tight headlines, no italic emphasis */
+  --body-font-family: "Inter Variable", "Inter", system-ui, sans-serif;
+  --heading-font-family: "Inter Variable", "Inter", system-ui, sans-serif;
+  --btn-font-family: "Inter Variable", "Inter", system-ui, sans-serif;
+  --body-tracking: normal;
+  --heading-weight: 700;
+  --heading-tracking: -0.025em;
+  --heading-em-style: normal;
+  --heading-em-weight: inherit;
+  --quote-weight: 500;
+  --quote-style: normal;
+  --pullquote-weight: 600;
+  --lead-weight: 400;
+
+  /* Shape: 12px buttons and inputs, 16px cards; soft layered shadows */
+  --radius-sm: 0.5rem;
+  --radius-base: 0.75rem;
+  --radius-card: 1rem;
+  --radius-card-lg: 1.5rem;
+  --btn-border-radius: 0.75rem;
+  --form-border-radius: 0.75rem;
+  --menu-radius: 0.75rem;
+  --shadow-float:
+    0 0 0 1px rgba(17, 24, 39, 0.06),
+    0 2px 2px -2px rgba(17, 24, 39, 0.03),
+    0 8px 8px 0 rgba(17, 24, 39, 0.03),
+    0 24px 32px -8px rgba(17, 24, 39, 0.08);
+  --shadow-glow: 0 0 0 1px rgba(17, 24, 39, 0.06), 0 8px 24px -8px rgba(17, 24, 39, 0.12);
+  --shadow-header: 0 1px 0 0 rgba(17, 24, 39, 0.08);
+}
+
+:root {
+  --link-hover-color: var(--accent);
+  --menu-primary: var(--accent);
+  --menu-active-color: var(--accent);
+  --swiper-bullet-active-bg: var(--accent);
+  --swiper-theme-color: var(--accent);
+}
+
+/* Uploaded SVG icons (images.iconMask) take the blue accent instead of the
+   colour baked into the file. */
+[data-icon-mask] {
+  position: relative;
+}
+[data-icon-mask] > img {
+  opacity: 0;
+}
+[data-icon-mask]::after {
+  content: "";
+  position: absolute;
+  inset: var(--icon-inset, 0);
+  background-color: var(--accent);
+  -webkit-mask: var(--icon-url) center / contain no-repeat;
+  mask: var(--icon-url) center / contain no-repeat;
+}
+.service-card-icon[data-icon-mask] {
+  --icon-inset: 12px;
+}
+
+[data-theme="dark"] {
+  --menu-dropdown-bg: var(--surface-dark);
+  --menu-mob-panel-bg: var(--surface-dark);
+}
+
+/* Harbor's signature: graphite sections carry a soft blue glow in one corner.
+   An inline background image (a CMS photo) still wins over it. */
+section[data-theme="dark"] {
+  background-image:
+    radial-gradient(60% 80% at 100% 0%, rgba(33, 66, 231, 0.28), transparent 70%),
+    radial-gradient(40% 60% at 0% 100%, rgba(33, 66, 231, 0.12), transparent 70%);
+}
+
+/* Graphite areas: blue accents are 2.5:1 on #111827, so accent text and
+   icons turn white there. Blue fills (buttons, badges) stay blue. */
+:is([data-theme="dark"], .product-quote, .pricingCompare .tw-card.ring-2) :is(.text-accent, .text-success, .testimonial-mark) {
+  color: var(--on-dark);
+}
+:is([data-theme="dark"], .product-quote, .pricingCompare .tw-card.ring-2) [data-icon-mask]::after {
+  background-color: var(--on-dark);
+}
+
+/* Outline buttons are white on graphite */
+:where([data-theme="dark"]) .tw-btn-outline-primary {
+  color: var(--on-dark);
+  border-color: var(--on-dark);
+}
+
+/* Newsletter form (_components/newsletter-form.twig): its pill wrapper and
+   field are fixed rounded-full classes; Harbor squares them to its 12px shape
+   (wrapper = button radius + its 6px padding). */
+div.sm\:rounded-full:has(input[type="email"]) input[type="email"].rounded-full {
+  border-radius: var(--form-border-radius);
+}
+@media (min-width: 640px) {
+  div.sm\:rounded-full:has(input[type="email"]) {
+    border-radius: calc(var(--btn-border-radius) + 6px);
+  }
+}
+
+/* 0.1.1: testimonial quote marks in a lighter blue, so the quote text leads */
+.testimonial-mark {
+  color: color-mix(in srgb, var(--accent) 45%, var(--surface));
+}
+
+/* Big quotes: no lone last word */
+:is(.product-quote blockquote, .portfolio-lead, .team-drawer-quote, .tw-rich-text blockquote) {
+  text-wrap: balance;
+}
