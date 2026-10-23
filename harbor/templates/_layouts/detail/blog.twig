@@ -1,0 +1,111 @@
+{#- Harbor: blog post (overrides templates/_layouts/detail/blog.twig; contract: DESIGN.md "Detail layouts").
+	Left-aligned header on Whisper Grey (pills, date, reading time, title, lead), a wide
+	rounded cover, then two columns: a sticky aside (author, tags, share, back) beside the
+	story; on phones the aside follows the story. Comments, closing CTA and related posts
+	as in the default layout. Styled with Tailwind role utilities; reads the same fields. -#}
+{% set pageStyle = entry.pageStyle.one() %}
+
+{% if blog %}
+	{% set listing = craft.entries().section('standardPages').slug('blogs').one() %}
+	{% set listingUrl = listing.url ?? siteUrl('blogs') %}
+
+	{% embed "_components/page-style" with { owner: entry, pageClass: 'article-page' } %}{% block body %}
+		{% import "_macros/images" as images %}
+		{% set byline = (blog.postAuthor ?? null) ? blog.postAuthor.one() : null %}
+		{% set photo = byline and (byline.image ?? null) ? byline.image.one() : null %}
+		{% set cover = blog.image.one() %}
+		{% set tags = blog.tags.all() %}
+		{% set bodyHtml %}{% include "_includes/matrix-container" with { entry: blog, cache_key: 'entry-' ~ blog.id } %}{% endset %}
+		{% set words = bodyHtml|striptags|split(' ')|filter(w => w|trim|length)|length %}
+		{% set minutes = max(1, (words / 220)|round(0, 'ceil')) %}
+		{% set label = 'block mb-2 text-xs font-semibold uppercase tracking-[0.06em] text-muted' %}
+
+		<header class="bg-surface-alt border-b border-line pt-10 {{ cover ? 'pb-40' : 'pb-14' }}">
+			<div class="container mx-auto px-4">
+				<div class="mb-6">{% include "_components/breadcrumbs" with { inline: true, element: blog } %}</div>
+				<div class="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted">
+					{% for cat in blog.blogCategories.all() %}
+						<a class="article-pill" href="{{ listingUrl }}?category={{ cat.slug }}">{{ cat.title }}</a>
+					{% endfor %}
+					{% if blog.postDate %}<time datetime="{{ blog.postDate|date('Y-m-d') }}">{{ blog.postDate|date('F j, Y') }}</time>{% endif %}
+					<span class="size-[3px] rounded-full bg-current" aria-hidden="true"></span>
+					<span>{{ minutes }} {{ 'min read'|t }}</span>
+				</div>
+				<h1 class="m-0 max-w-[20ch] text-[clamp(2.25rem,4.6vw,3.75rem)] leading-[1.07] tracking-[-0.025em] text-strong">{{ blog.title }}</h1>
+				{% if blog.shortDescription %}
+					<p class="mt-5 max-w-[62ch] text-xl leading-relaxed text-body">{{ blog.shortDescription }}</p>
+				{% endif %}
+			</div>
+		</header>
+
+		{% if cover %}
+			<div class="container mx-auto px-4">
+				<figure class="-mt-30 mb-0 aspect-[3/2] overflow-hidden rounded-[var(--radius-card-lg)] bg-surface-alt shadow-lg md:aspect-[16/7]">
+					<img class="size-full object-cover" src="{{ images.bgImageUrl(cover, 1600)|trim }}" alt="{{ cover.alt ?? blog.title }}" fetchpriority="high">
+				</figure>
+			</div>
+		{% endif %}
+
+		<div class="container mx-auto px-4">
+			<div class="grid gap-10 pt-14 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-16 lg:pt-18">
+				<aside class="order-2 lg:order-none" aria-label="{{ 'About this article'|t }}">
+					<div class="grid content-start gap-6 lg:sticky lg:top-28">
+						{% if byline %}
+							<div class="flex items-center gap-3.5 rounded-[var(--radius-card)] bg-surface p-5 shadow-lg">
+								<span class="article-avatar size-12" aria-hidden="true">{% if photo %}{{ images.singleImg(photo, 96, {'ratio': 1}, 'w-full h-full object-cover', { alt: '' }) }}{% else %}{{ byline.title|slice(0, 1) }}{% endif %}</span>
+								<div>
+									<span class="{{ label }} mb-0.5">{{ 'Written by'|t }}</span>
+									<a class="font-semibold text-strong" href="{{ byline.url }}">{{ byline.title }}</a>
+								</div>
+							</div>
+						{% endif %}
+						{% if tags|length %}
+							<div>
+								<span class="{{ label }}">{{ 'Topics'|t }}</span>
+								<ul class="m-0 flex list-none flex-wrap gap-1.5 p-0">
+									{% for tag in tags %}<li class="rounded-lg border border-line bg-surface-alt px-2.5 py-1 text-[0.8125rem] text-body">{{ tag.title }}</li>{% endfor %}
+								</ul>
+							</div>
+						{% endif %}
+						<div>
+							<span class="{{ label }}">{{ 'Share'|t }}</span>
+							{% set shareLink = 'inline-flex size-10 items-center justify-center rounded-[var(--btn-border-radius)] border border-line text-lg text-strong transition-colors hover:border-accent hover:text-accent' %}
+							<div class="flex gap-2">
+								<a class="{{ shareLink }}" href="https://www.linkedin.com/sharing/share-offsite/?url={{ blog.url|url_encode }}" target="_blank" rel="noopener" aria-label="{{ 'Share on LinkedIn'|t }}"><i class="ti ti-brand-linkedin" aria-hidden="true"></i></a>
+								<a class="{{ shareLink }}" href="https://twitter.com/intent/tweet?url={{ blog.url|url_encode }}&amp;text={{ blog.title|url_encode }}" target="_blank" rel="noopener" aria-label="{{ 'Share on X'|t }}"><i class="ti ti-brand-x" aria-hidden="true"></i></a>
+								<a class="{{ shareLink }}" href="mailto:?subject={{ blog.title|url_encode }}&amp;body={{ blog.url|url_encode }}" aria-label="{{ 'Share by email'|t }}"><i class="ti ti-mail" aria-hidden="true"></i></a>
+							</div>
+						</div>
+						<a href="{{ listingUrl }}" class="article-back max-lg:hidden"><i class="ti ti-arrow-left" aria-hidden="true"></i>{{ 'All articles'|t }}</a>
+					</div>
+				</aside>
+
+				<div>
+					{# Blocks keep their own spacing, without a second container inside the column #}
+					<div class="article-body pt-0 lg:pt-0 [&_.container]:max-w-none [&_.container]:px-0">{{ bodyHtml }}</div>
+					{% if generalEntry.displayBlogReview is defined and generalEntry.displayBlogReview|length %}
+						<div class="article-comments">
+							{% include "_components/comments" with { commentHandler: 'blogReview', activeUserReply: generalEntry.activeUserReplyBlog, pageStyle: pageStyle } %}
+						</div>
+					{% endif %}
+					<div class="article-end mt-2">
+						<a href="{{ listingUrl }}" class="article-back"><i class="ti ti-arrow-left" aria-hidden="true"></i>{{ 'All articles'|t }}</a>
+						<div class="article-end-cta">
+							<span>{{ 'Enjoyed this?'|t }}</span>
+							<a href="#footer" class="tw-btn tw-btn-secondary tw-btn-sm" data-scroll>{{ 'Get the newsletter'|t }}</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		{% cache %}
+		{% set relatedHtml %}{% include "_components/_blog/relatedBlogsCarousel" with { blog: blog } %}{% endset %}
+		{% if relatedHtml|trim|length %}
+			<div class="article-related" style="background-color: {{ (generalEntry.blogBackgroundColor.one().colorcode ?? '')|roleColor }}">
+				<div class="{{ generalEntry.blogRelatedContainerWidth.value|replace({'container-small': 'max-w-4xl mx-auto px-4', 'container': 'container mx-auto px-4'}) }}">{{ relatedHtml }}</div>
+			</div>
+		{% endif %}
+		{% endcache %}
+	{% endblock %}{% endembed %}
+{% endif %}

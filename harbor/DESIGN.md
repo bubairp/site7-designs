@@ -6,6 +6,16 @@ A Site7 design: frontend only. It reads the same CMS fields as the default desig
 - **Files:** `src/css/harbor.css` (Tailwind role tokens), `templates/` (overrides, same paths as `templates/`), built into `web/designs/harbor/`.
 - **Preview:** `?design=harbor` (Dev Mode). Build: `DESIGN=harbor npx vite build --config vite.design.mjs` in `frontend/`.
 
+## Templates it overrides
+
+Same paths as `templates/` (DESIGN.md at the project root, "Detail layouts"); styled with Tailwind role utilities.
+
+| File | Harbor's version |
+|---|---|
+| `_layouts/detail/blog.twig` | Left-aligned header on Whisper Grey (pills, date, reading time), wide rounded cover, sticky aside (author, topics, share) beside the story; on phones the aside follows the story |
+| `_layouts/detail/casestudy.twig` | Split hero (copy and calls to action beside the cover), sticky facts card and a graphite call to action beside the story |
+| `_components/listing-filter.twig` | Blog and shop filter: one white card, search button inside the field, categories as chips (a select above 8) |
+
 ## Reference lock
 
 | Keep | Rule |

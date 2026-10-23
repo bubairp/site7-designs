@@ -1,0 +1,84 @@
+{#- Harbor: case study (overrides templates/_layouts/detail/casestudy.twig; contract: DESIGN.md "Detail layouts").
+	Split hero (copy and calls to action beside the cover), then two columns: a sticky
+	facts card with a graphite call to action beside the story. Related case studies as
+	in the default layout. Styled with Tailwind role utilities; reads the same fields. -#}
+{% set pageStyle = entry.pageStyle.one() %}
+
+{% if casestudy %}
+	{% set listing = craft.entries().section('standardPages').slug('casestudies').one() %}
+	{% set listingUrl = listing.url ?? siteUrl('casestudies') %}
+
+	{% embed "_components/page-style" with { owner: entry, pageClass: 'article-page' } %}{% block body %}
+		{% import "_macros/images" as images %}
+		{% set tags = casestudy.tags.all() %}
+		{% set cover = casestudy.featureImage.one() ?? casestudy.image.one() ?? null %}
+		{% set lead = (casestudy.projectLead ?? null) ? casestudy.projectLead.one() : null %}
+		{% set factLabel = 'text-xs font-semibold uppercase tracking-[0.06em] text-muted' %}
+
+		<header class="bg-surface-alt border-b border-line pt-10 pb-14">
+			<div class="container mx-auto px-4">
+				<div class="grid items-center gap-10 {{ cover ? 'lg:grid-cols-2 lg:gap-16' }}">
+					<div>
+						<div class="mb-6">{% include "_components/breadcrumbs" with { inline: true, element: casestudy } %}</div>
+						<div class="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted">
+							<span class="article-pill">{{ 'Case study'|t }}</span>
+							{% if casestudy.industry %}<span>{{ casestudy.industry }}</span>{% endif %}
+						</div>
+						<h1 class="m-0 max-w-[20ch] text-[clamp(2.25rem,4.6vw,3.75rem)] leading-[1.07] tracking-[-0.025em] text-strong">{{ casestudy.title }}</h1>
+						{% if casestudy.shortDescription %}
+							<p class="mt-5 max-w-[62ch] text-xl leading-relaxed text-body">{{ casestudy.shortDescription }}</p>
+						{% endif %}
+						<div class="mt-8 flex flex-wrap gap-3">
+							<a href="{{ siteUrl('contact') }}" class="tw-btn tw-btn-primary">{{ 'Start a project'|t }}</a>
+							<a href="{{ listingUrl }}" class="tw-btn tw-btn-outline-primary">{{ 'All case studies'|t }}</a>
+						</div>
+					</div>
+					{% if cover %}
+						<figure class="m-0 aspect-[4/3] overflow-hidden rounded-[var(--radius-card-lg)] shadow-lg">
+							<img class="size-full object-cover" src="{{ images.bgImageUrl(cover, 1400)|trim }}" alt="{{ cover.alt ?? casestudy.title }}" fetchpriority="high">
+						</figure>
+					{% endif %}
+				</div>
+			</div>
+		</header>
+
+		<div class="container mx-auto px-4">
+			<div class="grid gap-10 pt-14 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-16 lg:pt-18">
+				<aside aria-label="{{ 'Project facts'|t }}">
+					<div class="grid content-start gap-6 lg:sticky lg:top-28">
+						<dl class="m-0 grid gap-4 rounded-[var(--radius-card)] bg-surface p-5 shadow-lg [&>div+div]:border-t [&>div+div]:border-line [&>div+div]:pt-4 [&_dd]:mt-1 [&_dd]:mb-0 [&_dd]:font-semibold [&_dd]:text-strong">
+							<div><dt class="{{ factLabel }}">{{ 'Client'|t }}</dt><dd>{{ casestudy.title }}</dd></div>
+							{% if casestudy.industry %}<div><dt class="{{ factLabel }}">{{ 'Industry'|t }}</dt><dd>{{ casestudy.industry }}</dd></div>{% endif %}
+							{% if tags|length %}<div><dt class="{{ factLabel }}">{{ 'Skills'|t }}</dt><dd>{{ tags|map(t => t.title)|join(', ') }}</dd></div>{% endif %}
+							<div><dt class="{{ factLabel }}">{{ 'Year'|t }}</dt><dd>{{ casestudy.postDate|date('Y') }}</dd></div>
+							{% if lead %}<div><dt class="{{ factLabel }}">{{ 'Project lead'|t }}</dt><dd><a class="text-accent" href="{{ lead.url }}">{{ lead.title }}</a></dd></div>{% endif %}
+						</dl>
+						<div class="rounded-[var(--radius-card)] bg-surface-dark bg-[radial-gradient(80%_100%_at_100%_0%,rgba(33,66,231,0.35),transparent_70%)] p-6 text-on-dark" data-theme="dark">
+							<p class="m-0 mb-4 text-xl font-bold leading-snug tracking-[-0.01em] text-on-dark">{{ 'Want results like these?'|t }}</p>
+							<a href="{{ siteUrl('contact') }}" class="tw-btn tw-btn-primary tw-btn-sm">{{ 'Start a project'|t }}</a>
+						</div>
+					</div>
+				</aside>
+
+				<div>
+					{# Blocks keep their own spacing, without a second container inside the column #}
+					<div class="article-body pt-0 lg:pt-0 [&_.container]:max-w-none [&_.container]:px-0">
+						{% include "_includes/matrix-container" with { entry: casestudy, cache_key: 'entry-' ~ casestudy.id } %}
+					</div>
+					<div class="article-end mt-2">
+						<a href="{{ listingUrl }}" class="article-back"><i class="ti ti-arrow-left" aria-hidden="true"></i>{{ 'All case studies'|t }}</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		{% cache %}
+		{% set relatedHtml %}{% include "_components/_casestudies/relatedCaseStudyCarousel.twig" with { casestudy: casestudy } %}{% endset %}
+		{% if relatedHtml|trim|length %}
+			<div class="article-related" style="background-color: {{ (generalEntry.caseStudyBackgroundColor.one().colorcode ?? '')|roleColor }}">
+				<div class="{{ generalEntry.caseRelatedContainerWidth.value|replace({'container-small': 'max-w-4xl mx-auto px-4', 'container': 'container mx-auto px-4'}) }}">{{ relatedHtml }}</div>
+			</div>
+		{% endif %}
+		{% endcache %}
+	{% endblock %}{% endembed %}
+{% endif %}
