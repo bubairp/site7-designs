@@ -309,9 +309,6 @@ div.sm\:rounded-full:has(input[type="email"]) input[type="email"].rounded-full {
 :is(.card-hover, a.service-card, .work-card, .post-card, .project-card, .product-card, a.ucard, .post-list > *, .team-card, .award-card, .testimonial-card):hover {
   @apply transform-none;
 }
-.heroBannerItem li.rounded-xl:hover {
-  @apply translate-none;
-}
 
 /* Service cards: the icon on a soft blue tile instead of a circle */
 .service-card {
@@ -786,25 +783,25 @@ div.sm\:rounded-full:has(input[type="email"]) input[type="email"].rounded-full {
   /* List view (one column, image left or right), in the Services list language: rows on
      hairlines, a modest framed photo, the text beside it. Default look only: the other
      looks keep their card frames. */
-  .universalCard .grid.grid-cols-1.gap-y-6:has(> div > .ucard-look--default:is(.ucard--imageLeft, .ucard--imageRight)) {
+  .universalCard .ucard-list:has(> div > .ucard-look--default:is(.ucard--imageLeft, .ucard--imageRight)) {
     @apply gap-y-0 border-t border-line;
   }
-  .universalCard .grid.grid-cols-1.gap-y-6 .ucard-look--default:is(.ucard--imageLeft, .ucard--imageRight) {
+  .universalCard .ucard-list .ucard-look--default:is(.ucard--imageLeft, .ucard--imageRight) {
     @apply rounded-none! border-0! border-b! border-line! bg-transparent! py-6 shadow-none! md:items-center md:py-8;
   }
-  .universalCard .grid.grid-cols-1.gap-y-6 .ucard-look--default:is(.ucard--imageLeft, .ucard--imageRight) .img-zoom-wrapper {
+  .universalCard .ucard-list .ucard-look--default:is(.ucard--imageLeft, .ucard--imageRight) .img-zoom-wrapper {
     @apply md:w-72!;
   }
-  .universalCard .grid.grid-cols-1.gap-y-6 .ucard-look--default:is(.ucard--imageLeft, .ucard--imageRight) .img-zoom-wrapper > div {
+  .universalCard .ucard-list .ucard-look--default:is(.ucard--imageLeft, .ucard--imageRight) .img-zoom-wrapper > div {
     @apply aspect-[4/3]! rounded-[var(--radius-card)]! border border-line;
   }
-  .universalCard .grid.grid-cols-1.gap-y-6 .ucard-look--default.ucard--imageLeft .img-zoom-wrapper + div {
+  .universalCard .ucard-list .ucard-look--default.ucard--imageLeft .img-zoom-wrapper + div {
     @apply px-0! pt-5! pb-0! md:py-0! md:pr-0! md:pl-10!;
   }
-  .universalCard .grid.grid-cols-1.gap-y-6 .ucard-look--default.ucard--imageRight .img-zoom-wrapper + div {
+  .universalCard .ucard-list .ucard-look--default.ucard--imageRight .img-zoom-wrapper + div {
     @apply px-0! pt-5! pb-0! md:py-0! md:pr-10! md:pl-0!;
   }
-  .universalCard .grid.grid-cols-1.gap-y-6 .ucard-look--default:is(.ucard--imageLeft, .ucard--imageRight) .universalCard-title {
+  .universalCard .ucard-list .ucard-look--default:is(.ucard--imageLeft, .ucard--imageRight) .universalCard-title {
     @apply text-2xl lg:text-[1.75rem];
   }
 
@@ -1116,9 +1113,9 @@ div.sm\:rounded-full:has(input[type="email"]) input[type="email"].rounded-full {
   #comments > .tw-card.mb-6 > .tw-card-body {
     @apply px-0 py-8;
   }
-  /* Avatar: a blue-tint square instead of the hard-coded warm gradient (inline style) */
-  #comments .rounded-full.shadow-sm[style*="gradient"] {
-    @apply size-12! rounded-xl! bg-none! bg-accent/10! text-base! text-accent! shadow-none;
+  /* Avatar: a blue-tint square (the Theme's is a round Whisper Grey initial) */
+  #comments .rounded-full.border-line.text-accent {
+    @apply size-12! rounded-xl border-0 bg-accent/10 text-base;
   }
   #comments h6 {
     @apply text-base font-semibold;
@@ -1205,13 +1202,6 @@ div.sm\:rounded-full:has(input[type="email"]) input[type="email"].rounded-full {
 }
 
 @layer utilities {
-  /* CTA banner with an image: copy from the first column (the Theme starts it one column
-     in, which left a dead gap on the left), copy and image half and half */
-  @media (min-width: 1024px) {
-    .cta-box .lg\:col-start-2.lg\:col-span-5 {
-      @apply col-span-6 col-start-1;
-    }
-  }
   /* Graphite CTA: the image on a faint white edge with a deep shadow, the same dot texture
      as the product quote fading out towards the copy */
   .cta-box[data-theme="dark"] .cta-image {
