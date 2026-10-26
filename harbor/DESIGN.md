@@ -84,5 +84,5 @@ CMS colour names map by role: Aged Paper → Whisper Grey, Ink → Graphite, Par
 | Single blue for CTA and accents | Style: "Arcade Blue exclusively for primary CTAs and active states" | The style's only colour; contrast holds on white |
 | Graphite dark sections with a corner glow | Style: dark gradient base + blue gradient accent in heroes | Gives the design one memorable move without a second colour |
 | Inter, 700, −0.025em | Style type scale | Already shipped with the site: no extra font download |
-| 12px / 16px radii | Style radii | Separates Harbor from Editorial's and Canopy's pills |
-| Accents white on graphite | Contrast (2.5:1) | Same rule as Canopy's forest areas |
+| 12px / 16px radii | Style radii | Separates Harbor from Editorial's pills |
+| Accents white on graphite | Contrast (2.5:1) | Blue on graphite fails contrast |
