@@ -65,7 +65,7 @@
   --radius-card: 1rem;
   --radius-card-lg: 1.5rem;
   --btn-border-radius: 0.75rem;
-  --form-border-radius: 0.75rem;
+  --form-border-radius: 1rem;     /* Arcade: inputs 16px, buttons 12px */
   --menu-radius: 0.75rem;
   --shadow-float:
     0 0 0 1px rgba(17, 24, 39, 0.06),
@@ -110,8 +110,9 @@
 }
 
 /* Harbor's signature: graphite sections carry a soft blue glow in one corner.
-   An inline background image (a CMS photo) still wins over it. */
-section[data-theme="dark"] {
+   An inline background image (a CMS photo) still wins over it. The CTA banner is left
+   out: its section stays light round the box, and the box carries the glow. */
+section[data-theme="dark"]:not(.cta-section) {
   background-image:
     radial-gradient(60% 80% at 100% 0%, rgba(33, 66, 231, 0.28), transparent 70%),
     radial-gradient(40% 60% at 0% 100%, rgba(33, 66, 231, 0.12), transparent 70%);
@@ -172,6 +173,7 @@ div.sm\:rounded-full:has(input[type="email"]) input[type="email"].rounded-full {
     @apply no-underline!;
   }
   .headerMain {
+    --menu-text: var(--neutral-700); /* Arcade nav links: #374151, weight 500 */
     --menu-hover-bg: var(--surface-alt);
     --menu-sub-hover-bg: var(--surface-alt);
     --menu-hover-color: var(--text-strong);
@@ -279,7 +281,7 @@ div.sm\:rounded-full:has(input[type="email"]) input[type="email"].rounded-full {
    the border tints blue and the float shadow comes in. Editorial's are borderless.
    ========================================= */
 :is(.post-card, .work-card, .project-card, .product-card):not(.post-card--row, .work-card--row) {
-  @apply rounded-[var(--radius-card)] border border-line bg-surface p-2 transition-[border-color,box-shadow] duration-300 hover:translate-y-0 hover:border-accent/30 hover:shadow-lg;
+  @apply rounded-[var(--radius-card)] border border-line bg-surface p-2 transition-[border-color,box-shadow] duration-300 hover:border-accent/30 hover:shadow-lg;
 }
 :is(.post-card, .work-card, .project-card, .product-card):not(.post-card--row, .work-card--row) :is(.post-card-media, .work-card-media, .project-card-media, .product-card-media) {
   @apply rounded-[calc(var(--radius-card)-8px)];
@@ -302,6 +304,15 @@ div.sm\:rounded-full:has(input[type="email"]) input[type="email"].rounded-full {
   @apply text-accent;
 }
 
+/* No card lifts on hover anywhere: the Theme moves these with transform (translateY), which
+   translate utilities don't reset. Harbor cards answer with the border and shadow only. */
+:is(.card-hover, a.service-card, .work-card, .post-card, .project-card, .product-card, a.ucard, .post-list > *, .team-card, .award-card, .testimonial-card):hover {
+  @apply transform-none;
+}
+.heroBannerItem li.rounded-xl:hover {
+  @apply translate-none;
+}
+
 /* Service cards: the icon on a soft blue tile instead of a circle */
 .service-card {
   @apply border border-line bg-surface transition-[border-color,box-shadow] duration-300 hover:border-accent/30 hover:shadow-lg;
@@ -312,27 +323,62 @@ div.sm\:rounded-full:has(input[type="email"]) input[type="email"].rounded-full {
 
 /* =========================================
    Product page (_layouts/detail/product.twig, Theme markup: its shop logic stays the
-   Theme's). The gallery in a framed light panel, the buying details as a sticky card.
+   Theme's). Open like the default design, no boxes: the photo large in Harbor's 24px
+   frame, square-cornered thumbnails, the buying column sticky beside it. Category and
+   tags as chips, the price in Inter 700, specs as hairline rows.
    ========================================= */
-.product-gallery {
-  @apply rounded-[var(--radius-card-lg)] border border-line bg-surface-alt p-3;
+.product-main {
+  @apply rounded-[var(--radius-card-lg)] border border-line bg-surface-alt;
 }
-.product-gallery :is(img, picture) {
-  @apply rounded-[calc(var(--radius-card-lg)-8px)];
+.product-gallery :is(.product-main img, .product-main picture) {
+  @apply rounded-none;
+}
+.product-thumb {
+  @apply rounded-[var(--radius-base)]! border border-line opacity-70 transition-[opacity,border-color] hover:opacity-100;
+}
+.product-thumb.swiper-slide-thumb-active {
+  @apply border-2 border-primary! opacity-100;
+}
+/* Same layer as the Theme's !important arrow rules (swiper.css is unlayered) */
+@layer components {
+  .product-gallery .product-nav:is(.swiper-button-next, .swiper-button-prev) {
+    @apply rounded-[var(--radius-base)]! bg-surface/90! text-strong shadow-lg backdrop-blur-sm;
+  }
 }
 @media (min-width: 1024px) {
   .product-info {
-    @apply sticky top-28 self-start rounded-[var(--radius-card-lg)] border border-line bg-surface p-8 shadow-lg;
+    @apply sticky top-28 self-start;
   }
 }
-.product-specs {
-  @apply rounded-[var(--radius-card)] bg-surface-alt px-5 py-4;
-}
-.product-tags :is(a, span, li) {
-  @apply rounded-md;
+.product-info .article-pill {
+  @apply rounded-md border-0 bg-accent/8 px-2.5 py-1 text-[13px] font-semibold tracking-normal normal-case text-accent;
 }
 .product-title {
-  @apply tracking-[-0.03em];
+  @apply tracking-[-0.035em];
+}
+.product-price .price-now {
+  @apply font-sans font-bold tracking-[-0.03em];
+}
+.product-price .price-badge {
+  @apply rounded-md;
+}
+.product-lead {
+  @apply text-body;
+}
+.product-share {
+  @apply rounded-[var(--radius-base)] border-line hover:border-primary hover:bg-primary hover:text-on-primary;
+}
+.product-tags :is(a, span, li) {
+  @apply rounded-md border-0 bg-surface-alt font-medium text-body;
+}
+.product-specs-title {
+  @apply text-[13px] font-semibold tracking-normal normal-case text-strong;
+}
+.product-specs dt {
+  @apply text-muted;
+}
+.product-specs dd {
+  @apply font-medium text-strong;
 }
 
 /* Category pills (product categories, listings): Harbor's 8px chips, the current one blue,
@@ -362,4 +408,816 @@ div.sm\:rounded-full:has(input[type="email"]) input[type="email"].rounded-full {
 /* Big quotes: no lone last word */
 :is(.product-quote blockquote, .portfolio-lead, .team-drawer-quote, .tw-rich-text blockquote) {
   text-wrap: balance;
+}
+
+/* =========================================
+   Blocks (phase 3): the Theme's block markup restyled with Tailwind @apply, so every CMS
+   option and JS hook stays. In the components layer, after the Theme's rules, so they win
+   by order while the CMS's own utilities (block style spacing, colours) still win over them.
+   Rules that beat the Theme's blocks.css sit in its utilities layer.
+   Round 1: section heads, buttons, CTA banner, services, our process, image with text,
+   image and images.
+   ========================================= */
+@layer components {
+  /* Section head: the eyebrow is a small blue chip instead of tracked capitals */
+  .section-eyebrow {
+    @apply mb-4 rounded-md bg-accent/8 px-2.5 py-1 text-[13px] font-semibold tracking-normal normal-case text-accent;
+  }
+  [data-theme="dark"] .section-eyebrow {
+    @apply bg-white/10 text-on-dark;
+  }
+  :is(.section-title, .heading-content-title, .split-title, .cta-title) {
+    @apply text-balance;
+  }
+  .section-lead {
+    @apply text-body;
+  }
+  [data-theme="dark"] .section-lead {
+    @apply text-on-dark/75;
+  }
+
+  /* Buttons: primary keeps its blue with a faint top highlight; the neutral buttons are
+     white on a hairline (Editorial's are ink outlines), translucent on graphite */
+  /* Arcade's button shadows: layered 4% graphite depth; the primary carries a Deep Blue
+     (#182fa5) ring, the neutral ones a 16% graphite ring in place of a border */
+  .tw-btn-primary {
+    @apply shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_0_0_1px_#182fa5,0_2px_2px_-1px_rgb(17_24_39/0.04),0_4px_4px_-2px_rgb(17_24_39/0.04),0_8px_8px_0_rgb(17_24_39/0.04),0_16px_16px_0_rgb(17_24_39/0.04)];
+  }
+  :is(.tw-btn-secondary, .tw-btn-outline-dark, .tw-btn-outline-secondary) {
+    @apply border-transparent bg-surface text-strong shadow-[0_0_0_1px_rgb(17_24_39/0.16),0_2px_2px_-1px_rgb(17_24_39/0.04),0_4px_4px_-2px_rgb(17_24_39/0.04),0_8px_8px_0_rgb(17_24_39/0.04)] hover:bg-surface-alt hover:text-strong;
+  }
+  [data-theme="dark"] :is(.tw-btn-secondary, .tw-btn-outline-dark, .tw-btn-outline-secondary) {
+    @apply border-white/15 bg-white/5 text-on-dark shadow-none hover:border-white/30 hover:bg-white/10 hover:text-on-dark;
+  }
+  :is(.tw-btn-light, .tw-btn-white) {
+    @apply bg-surface text-strong shadow-xs hover:bg-neutral-100 hover:text-strong;
+  }
+
+  /* CTA banner: a Whisper Grey panel on a hairline with a faint blue glow in one corner;
+     graphite with the stronger glow in a dark section. A CMS box colour (inline, has-bg)
+     replaces both. */
+  .cta-box {
+    @apply border border-line bg-surface-alt bg-[radial-gradient(45%_80%_at_100%_0%,rgb(33_66_231/0.09),transparent_70%)];
+  }
+  .cta-box.is-rounded {
+    @apply rounded-[var(--radius-card-lg)];
+  }
+  .cta-section[data-theme="dark"] .cta-box:not(.has-bg) {
+    @apply border-white/10 bg-surface-dark bg-none;
+  }
+  /* Graphite boxes, the Theme's or a CMS colour, carry Harbor's blue glow on a layer of
+     their own: a CMS colour is an inline background shorthand that would wipe it */
+  .cta-box[data-theme="dark"]::before {
+    @apply pointer-events-none absolute inset-0 bg-[radial-gradient(50%_80%_at_100%_0%,rgb(33_66_231/0.35),transparent_70%),radial-gradient(40%_60%_at_0%_100%,rgb(33_66_231/0.14),transparent_70%)] content-[''];
+  }
+  .cta-title {
+    @apply tracking-[-0.035em];
+  }
+  .cta-text {
+    @apply text-body;
+  }
+  .cta-image {
+    @apply rounded-[var(--radius-card)] border border-line shadow-lg;
+  }
+
+  /* Services: the card eyebrow as a chip; list view rows with the number in a chip and
+     the arrow in a square tile that fills blue on hover */
+  .service-card-eyebrow {
+    @apply self-start rounded-md bg-accent/8 px-2.5 py-1 text-[13px] tracking-normal normal-case;
+  }
+  .service-list-index {
+    @apply self-center justify-self-start rounded-md bg-surface-alt px-2 py-0.5 font-sans text-xs font-semibold tabular-nums;
+  }
+  .service-list-title {
+    @apply tracking-[-0.025em];
+  }
+  .service-list-arrow {
+    @apply grid size-10 place-items-center self-center rounded-[var(--radius-base)] border border-line text-lg transition-colors;
+  }
+  a.service-list-row:hover .service-list-arrow {
+    @apply transform-none border-primary bg-primary text-on-primary;
+  }
+
+  /* Image with text: square ticks on a soft blue tile; the photo in Harbor's frame */
+  :is(.split-text ul li, .check-list li)::before {
+    @apply rounded-md border-0 bg-accent/10;
+  }
+  .split-image.is-rounded,
+  .split-media picture:has(.is-rounded) {
+    @apply rounded-[var(--radius-card-lg)];
+  }
+  .split-media picture:has(.is-rounded) {
+    @apply border border-line shadow-lg;
+  }
+
+  /* Hero banner item as a block: a graphite wash that clears towards the photo instead of
+     a flat grey multiply, and room between the text and the buttons */
+  .heroBannerItem .bg-dark\/60 {
+    @apply bg-[linear-gradient(90deg,rgb(17_24_39/0.88)_0%,rgb(17_24_39/0.55)_55%,rgb(17_24_39/0.2)_100%)] mix-blend-normal;
+  }
+  .heroBannerItem .block-description.text-gray-200 {
+    @apply mb-8 text-on-dark/80;
+  }
+}
+
+@layer utilities {
+  /* Our process (blocks.css draws Editorial's Parchment circles here): the step is a soft
+     blue tile with the blue icon, the number a small blue chip on its corner */
+  .ourProcess .w-20.h-20.bg-primary.bg-primary {
+    @apply rounded-[var(--radius-card)] border border-accent/15 bg-[color-mix(in_srgb,var(--accent)_8%,var(--surface))]! shadow-none;
+  }
+  .ourProcess .w-20.h-20.w-20 > .rounded-full {
+    @apply size-7 translate-x-1/4 -translate-y-1/4 rounded-md border-2 border-surface bg-primary font-sans text-xs font-semibold shadow-none;
+  }
+  /* Cards: white on a hairline, no resting shadow; blue-tinted border and the float shadow
+     on hover, like every Harbor card */
+  .ourProcess :is(.rounded-2xl, .rounded-xl).border-gray-200 {
+    @apply rounded-[var(--radius-card)] border-line shadow-none hover:border-accent/30 hover:shadow-lg;
+  }
+  /* Duration labels: square chips */
+  .ourProcess :is(.rounded-full, .rounded-lg).bg-gray-100 {
+    @apply rounded-md border-0 bg-accent/8 px-2.5 py-1 tracking-normal normal-case;
+  }
+  /* Vertical and zigzag cards: below desktop the duration sits above the title instead of
+     in the corner, where it ran into long titles */
+  .ourProcess span.absolute.top-5.bg-gray-100 {
+    @apply max-lg:static max-lg:mb-3 max-lg:inline-block;
+  }
+  /* Vertical steps and zigzag: the marker is a white tile on a hairline */
+  .ourProcess .shrink-0.border-\[3px\] {
+    @apply rounded-[var(--radius-card)] border! border-line! shadow-xs;
+  }
+  .ourProcess .shrink-0.border-\[3px\] > span {
+    @apply font-sans text-lg font-semibold;
+  }
+}
+
+/* =========================================
+   Blocks, round 2: image gallery, video, accordion, testimonials, team, client logos,
+   awards.
+   ========================================= */
+
+/* Accordion, every display style (_blocks/_nested/accordion/expandableContent.twig):
+   - Flat / Bordered: rows between hairlines (item .rounded-none)
+   - none set: Whisper Grey cards (item .bg-gray-100); Card style: the same on a hairline
+   - Card header: each question a white card (button .bg-white), the answer below it
+   The chevron sits in a square tile, left or right as the CMS sets it, and fills blue when
+   open. The CMS colours, border width and radius are !important inline rules and still win.
+   In the utilities layer: blocks.css sizes the questions there. */
+@layer utilities {
+  .tw-accordion .tw-accordion-heading-title.font-semibold {
+    @apply font-sans text-lg leading-snug font-semibold tracking-[-0.015em] text-strong sm:text-xl;
+  }
+  .tw-accordion .tw-accordion-button.is-open {
+    @apply text-strong;
+  }
+  .tw-accordion .tw-accordion-button:hover {
+    @apply text-accent;
+  }
+  .tw-accordion .tw-accordion-button > svg {
+    @apply box-content size-4 rounded-lg border border-line bg-surface p-1.5 text-strong transition-[transform,background-color,border-color,color] duration-300;
+  }
+  .tw-accordion .tw-accordion-button.is-open > svg {
+    @apply border-primary bg-primary text-on-primary;
+  }
+  .tw-accordion .tw-accordion-body {
+    @apply text-base leading-relaxed text-body;
+  }
+
+  /* Flat and bordered rows */
+  .tw-accordion .tw-accordion-item.rounded-none .tw-accordion-heading-title.font-semibold {
+    @apply py-5;
+  }
+  .tw-accordion .tw-accordion-item.rounded-none .tw-accordion-body {
+    @apply pb-6;
+  }
+
+  /* Cards (no style set, and Card style) */
+  .tw-accordion .tw-accordion-item.bg-gray-100 {
+    @apply rounded-[var(--radius-card)] bg-surface-alt transition-[border-color,box-shadow,background-color] duration-300;
+  }
+  .tw-accordion .tw-accordion-item.bg-gray-100.border {
+    @apply border-line bg-surface;
+  }
+  .tw-accordion .tw-accordion-item.bg-gray-100.border:has(.is-open) {
+    @apply border-accent/30 shadow-lg;
+  }
+  .tw-accordion .tw-accordion-item.bg-gray-100 .tw-accordion-heading-title.font-semibold {
+    @apply px-5 py-4 text-base sm:text-lg;
+  }
+  .tw-accordion .tw-accordion-item.bg-gray-100 .tw-accordion-body {
+    @apply px-5 pt-0 pb-5;
+  }
+  /* On a coloured section the plain grey cards step up to white */
+  .bg-\[var\(--cms-bg\)\]:not([data-theme="dark"]) .tw-accordion .tw-accordion-item.bg-gray-100 {
+    @apply bg-surface;
+  }
+
+  /* Card styles: no hairline over the first card (the Theme's rule for rows) */
+  .tw-accordion:has(> .tw-accordion-item.bg-gray-100, > .tw-accordion-item > .tw-accordion-button.bg-white) {
+    @apply border-t-0;
+  }
+
+  /* Card header: the question is the card */
+  .tw-accordion .tw-accordion-button.bg-white {
+    @apply rounded-[var(--radius-card)] border-line bg-surface px-5 py-4 text-base transition-[border-color,box-shadow] duration-300 sm:text-lg;
+  }
+  .tw-accordion .tw-accordion-button.bg-white.is-open {
+    @apply border-accent/30 shadow-lg;
+  }
+  .tw-accordion .tw-accordion-item:has(> .tw-accordion-button.bg-white) {
+    @apply rounded-none;
+  }
+  .tw-accordion .tw-accordion-item:has(> .tw-accordion-button.bg-white) .tw-accordion-body {
+    @apply px-5 pt-4 pb-2;
+  }
+
+  /* On graphite: white text, translucent tiles and cards */
+  [data-theme="dark"] .tw-accordion :is(.tw-accordion-heading-title.font-semibold, .tw-accordion-button.is-open) {
+    @apply text-on-dark;
+  }
+  [data-theme="dark"] .tw-accordion .tw-accordion-body {
+    @apply text-on-dark/75;
+  }
+  [data-theme="dark"] .tw-accordion .tw-accordion-button > svg {
+    @apply border-white/15 bg-white/5 text-on-dark;
+  }
+  [data-theme="dark"] .tw-accordion .tw-accordion-button.is-open > svg {
+    @apply border-primary bg-primary text-on-primary;
+  }
+  [data-theme="dark"] .tw-accordion :is(.tw-accordion-item.bg-gray-100, .tw-accordion-button.bg-white) {
+    @apply border-white/10 bg-white/5;
+  }
+
+  /* With an image: the photo in Harbor's frame */
+  .accordion :is(.binded-item, .lg\:sticky) > :is(picture, img),
+  .accordion :is(.binded-item, .lg\:sticky) picture img {
+    @apply rounded-[var(--radius-card-lg)];
+  }
+  .accordion :is(.binded-item, .lg\:sticky) > picture {
+    @apply block overflow-hidden rounded-[var(--radius-card-lg)] border border-line shadow-lg;
+  }
+}
+
+@layer components {
+  /* Slider arrows (gallery, awards, the gallery's thumbs slider): square tiles on a
+     hairline instead of circles, filling blue on hover. !important where the Theme's are,
+     against the lazy-loaded vendor swiper.css. */
+  :is(.gallery-section .tw-btn-icon.rounded-full, .slider-nav-btn) {
+    @apply size-11 rounded-[var(--radius-base)]! border border-line bg-surface p-0 text-strong shadow-xs hover:border-primary hover:bg-primary hover:text-on-primary;
+  }
+  .gallery-section :is(.swiper-button-next, .swiper-button-prev) {
+    @apply rounded-[var(--radius-base)]! bg-surface/90! text-strong! shadow-lg backdrop-blur-sm hover:bg-surface!;
+  }
+  [data-theme="dark"] :is(.gallery-section .tw-btn-icon.rounded-full, .slider-nav-btn) {
+    @apply border-white/15 bg-white/5 text-on-dark;
+  }
+
+  /* Card eyebrows (gallery albums, awards): blue sentence case, not tracked capitals */
+  :is(.work-card-eyebrow, .award-card-eyebrow) {
+    @apply text-[13px] font-semibold tracking-normal normal-case;
+  }
+  .album-card-title {
+    @apply font-semibold tracking-[-0.015em];
+  }
+
+  /* Video: the play button a rounded square; the frame on a hairline */
+  .video-content-block .tw-btn-icon.rounded-full {
+    @apply rounded-[var(--radius-card)]! shadow-[0_12px_32px_-8px_rgb(33_66_231/0.55)];
+  }
+  .video-content-block .aspect-video.overflow-hidden {
+    @apply rounded-[var(--radius-card-lg)] border border-line;
+  }
+
+  /* Testimonials: white cards on a hairline (Editorial's are grey, borderless) */
+  .testimonial-card {
+    @apply border border-line bg-surface;
+  }
+  [data-theme="dark"] .testimonial-card {
+    @apply border-white/10 bg-white/5;
+  }
+
+  /* Team: the Harbor card (white on a hairline, photo inset), square social buttons */
+  .team-card {
+    @apply rounded-[var(--radius-card)] border border-line bg-surface p-2 transition-[border-color,box-shadow] duration-300 hover:border-accent/30 hover:shadow-lg;
+  }
+  .team-card .team-card-photo {
+    @apply rounded-[calc(var(--radius-card)-8px)];
+  }
+  .team-card .team-card-body {
+    @apply px-3 pt-4 pb-3;
+  }
+  .team-card-name {
+    @apply font-semibold tracking-[-0.015em];
+  }
+  .social-dot {
+    @apply rounded-lg;
+  }
+  [data-theme="dark"] .team-card {
+    @apply border-white/10 bg-white/5;
+  }
+
+  /* Client logos: titles in sentence case */
+  .logo-title {
+    @apply text-[13px] font-medium tracking-normal normal-case;
+  }
+
+  /* Awards: cards are white on a hairline with the photo inset; list rows keep hairlines */
+  .award-card--card {
+    @apply rounded-[var(--radius-card)] border border-line bg-surface p-2 transition-[border-color,box-shadow] duration-300 hover:border-accent/30 hover:shadow-lg;
+  }
+  .award-card--card .award-card-media {
+    @apply overflow-hidden rounded-[calc(var(--radius-card)-8px)];
+  }
+  .award-card--card .award-card-body {
+    @apply px-3 pt-5 pb-3;
+  }
+  .award-card-title {
+    @apply font-semibold tracking-[-0.015em];
+  }
+  [data-theme="dark"] .award-card--card {
+    @apply border-white/10 bg-white/5;
+  }
+}
+
+/* =========================================
+   Blocks, round 3 (part): pricing and universal cards.
+   ========================================= */
+@layer components {
+  /* Universal card (_components/_universal-card). Every card look stays distinct:
+     default = Harbor's card (white on a hairline, image inset); Outlined = the hairline on
+     the section colour; Soft shadow = white with the float shadow, no line; Highlighted =
+     a blue line. Default and Minimal variants stay frameless. */
+  .ucard:is(.ucard--imageTop, .ucard--imageBottom, .ucard--iconTop, .ucard--imageLeft, .ucard--imageRight).ucard-look--default {
+    @apply border! border-line! bg-surface!;
+  }
+  .ucard.ucard-look--outlined {
+    @apply border-line!;
+  }
+  .ucard.ucard-look--softShadow {
+    @apply bg-surface! shadow-lg!;
+  }
+  .ucard.ucard-look--highlighted {
+    @apply border-primary! bg-surface!;
+  }
+  a.ucard:not(.ucard--default, .ucard--minimal, .ucard--imageOverlay):hover {
+    @apply border-accent/30! shadow-lg;
+  }
+  a.ucard.ucard-look--highlighted:hover {
+    @apply border-primary!;
+  }
+  .ucard .universalCard-title {
+    @apply text-xl font-semibold tracking-[-0.02em];
+  }
+  a.ucard:hover .universalCard-title {
+    @apply text-accent;
+  }
+  .ucard--imageOverlay:hover .universalCard-title {
+    @apply text-on-dark;
+  }
+  .ucard .universalCard-content {
+    @apply text-body;
+  }
+  /* Read more: Harbor's smaller button */
+  .ucard .tw-btn {
+    @apply px-4 py-2 text-sm;
+  }
+
+  /* List view (one column, image left or right), in the Services list language: rows on
+     hairlines, a modest framed photo, the text beside it. Default look only: the other
+     looks keep their card frames. */
+  .universalCard .grid.grid-cols-1.gap-y-6:has(> div > .ucard-look--default:is(.ucard--imageLeft, .ucard--imageRight)) {
+    @apply gap-y-0 border-t border-line;
+  }
+  .universalCard .grid.grid-cols-1.gap-y-6 .ucard-look--default:is(.ucard--imageLeft, .ucard--imageRight) {
+    @apply rounded-none! border-0! border-b! border-line! bg-transparent! py-6 shadow-none! md:items-center md:py-8;
+  }
+  .universalCard .grid.grid-cols-1.gap-y-6 .ucard-look--default:is(.ucard--imageLeft, .ucard--imageRight) .img-zoom-wrapper {
+    @apply md:w-72!;
+  }
+  .universalCard .grid.grid-cols-1.gap-y-6 .ucard-look--default:is(.ucard--imageLeft, .ucard--imageRight) .img-zoom-wrapper > div {
+    @apply aspect-[4/3]! rounded-[var(--radius-card)]! border border-line;
+  }
+  .universalCard .grid.grid-cols-1.gap-y-6 .ucard-look--default.ucard--imageLeft .img-zoom-wrapper + div {
+    @apply px-0! pt-5! pb-0! md:py-0! md:pr-0! md:pl-10!;
+  }
+  .universalCard .grid.grid-cols-1.gap-y-6 .ucard-look--default.ucard--imageRight .img-zoom-wrapper + div {
+    @apply px-0! pt-5! pb-0! md:py-0! md:pr-10! md:pl-0!;
+  }
+  .universalCard .grid.grid-cols-1.gap-y-6 .ucard-look--default:is(.ucard--imageLeft, .ucard--imageRight) .universalCard-title {
+    @apply text-2xl lg:text-[1.75rem];
+  }
+
+  /* Pricing: plans are Harbor cards; the recommended plan stays graphite (blocks.css) with
+     the blue glow; the badge is a square chip */
+  .pricingCompare .tw-card:not(.ring-2) {
+    @apply border border-line bg-surface shadow-none;
+  }
+  .pricingCompare .tw-card {
+    @apply rounded-[var(--radius-card-lg)];
+  }
+  .pricingCompare .tw-card.ring-2 {
+    @apply bg-[radial-gradient(70%_60%_at_100%_0%,rgb(33_66_231/0.35),transparent_70%)] shadow-[0_30px_80px_-24px_rgb(17_24_39/0.5)];
+  }
+  .pricingCompare .tw-card .rounded-full.uppercase {
+    @apply rounded-md! tracking-normal! normal-case!;
+  }
+  .pricingCompare .tw-card h4 {
+    @apply text-xl font-semibold;
+  }
+  .pricingCompare .pricing-plan-text {
+    @apply text-body;
+  }
+  .pricingCompare .tw-card.ring-2 .pricing-plan-text {
+    @apply text-on-dark/75;
+  }
+
+  /* Compare table: a framed white table, plan names over a Whisper Grey head, group labels
+     as blue chips, the toggle as a quiet button */
+  #comparePlans table {
+    @apply rounded-[var(--radius-card-lg)] border-line shadow-none;
+  }
+  #comparePlans thead th {
+    @apply bg-surface-alt;
+  }
+  #comparePlans thead th:not(:first-child) div {
+    @apply text-base font-semibold;
+  }
+  #comparePlans tbody .uppercase.text-accent {
+    @apply inline-block rounded-md bg-accent/8 px-2.5 py-1 text-[13px] font-semibold tracking-normal! normal-case!;
+  }
+  #comparePlans tbody tr:hover {
+    @apply bg-surface-alt;
+  }
+  .compare-toggle {
+    @apply border border-line bg-surface text-sm font-semibold text-strong shadow-xs hover:bg-surface-alt;
+  }
+}
+
+/* =========================================
+   Blocks, round 3: listings (case studies, blogs), forms, newsletter, contact, map.
+   ========================================= */
+@layer components {
+  /* Case study and blog list views, in the Services list language: rows between
+     hairlines (Editorial boxes each one), a framed 4:3 photo, the title turning blue and
+     the read link an arrow tile that fills blue with the row. The link text stays in the
+     markup for screen readers; the whole row is the link (title ::after). */
+  :is(.work-list, .post-list) {
+    @apply gap-0 border-t border-line;
+  }
+  .post-list > *,
+  .work-list .work-card--row {
+    @apply rounded-none border-0 border-b border-line bg-transparent px-0 py-8 shadow-none hover:border-line hover:shadow-none;
+  }
+  .work-list > * {
+    @apply border-b border-line;
+  }
+  .work-list .work-card--row {
+    @apply border-b-0;
+  }
+  @media (min-width: 768px) {
+    :is(.work-card--row, .post-card--row) {
+      @apply grid-cols-[18rem_minmax(0,1fr)] gap-10;
+    }
+    .post-list > *,
+    .work-list .work-card--row {
+      @apply px-0 py-8;
+    }
+  }
+  :is(.work-card--row .work-card-media, .post-card--row .post-card-media) {
+    @apply aspect-[4/3] rounded-[var(--radius-card)] border border-line;
+  }
+  :is(.work-card--row .work-card-title, .post-card--row .post-card-title) {
+    @apply text-2xl font-semibold tracking-[-0.025em] transition-colors lg:text-[1.75rem];
+  }
+  :is(.work-card--row, .post-card--row):hover :is(.work-card-title, .post-card-title) {
+    @apply text-accent;
+  }
+  .work-card--row .work-card-eyebrow {
+    @apply rounded-md border-0 bg-accent/8 px-2.5 py-1 text-[13px];
+  }
+  :is(.work-card--row .work-card-link, .post-card--row .post-card-link) {
+    @apply inline-flex size-10 shrink-0 items-center justify-center gap-0 rounded-[var(--radius-base)] border border-line p-0 text-[0px] leading-none text-strong transition-colors;
+  }
+  :is(.work-card--row .work-card-link, .post-card--row .post-card-link) i {
+    @apply text-lg leading-none;
+  }
+  .post-card--row .post-card-body {
+    @apply px-0! pb-0!;
+  }
+  :is(.work-card--row, .post-card--row):hover :is(.work-card-link, .post-card-link) {
+    @apply border-primary bg-primary text-on-primary;
+  }
+  :is(.work-card--row, .post-card--row):hover :is(.work-card-link, .post-card-link) i {
+    @apply transform-none;
+  }
+}
+
+@layer components {
+  /* Cards (.tw-card: contact boxes, form panels): white on a hairline, not Aged Paper */
+  .tw-card {
+    @apply border border-line bg-surface;
+  }
+  [data-theme="dark"] .tw-card {
+    @apply border-white/10 bg-white/5;
+  }
+
+  /* Form fields: a quiet grey line that turns blue on focus (Editorial's are darker),
+     12px corners on the textarea too */
+  :is(.tw-form-control, .tw-form-select) {
+    @apply border-neutral-300 shadow-xs;
+  }
+  textarea.tw-form-control {
+    @apply rounded-[var(--form-border-radius)];
+  }
+  .newsletter-form > div.border-gray-400 {
+    @apply border-neutral-300 shadow-xs;
+  }
+}
+
+@layer utilities {
+  /* Contact block: small sentence-case labels instead of tracked capitals; square icon
+     tiles; the form panel on a hairline without the resting shadow */
+  .contact :is(.uppercase.tracking-wider) {
+    @apply tracking-normal normal-case font-semibold;
+  }
+  .contact .w-10.h-10.rounded-full.bg-primary\/10 {
+    @apply rounded-[var(--radius-base)];
+  }
+  .contact :is(.form-style, .contentBox-style).border-gray-100 {
+    @apply border-line shadow-none;
+  }
+  .contact .contentBox-style.hover\:shadow-xl:hover {
+    @apply border-accent/30 shadow-lg;
+  }
+  .map .border-gray-100 {
+    @apply border-line shadow-none;
+  }
+}
+
+@layer components {
+  /* Testimonials, slider view only (the grid stays as it is): a featured-quote card. The
+     mark is a blue tile, the quote larger in Inter, roomier card, avatars squared. */
+  .testimonials-section .swiper .testimonial-card {
+    @apply rounded-[var(--radius-card-lg)] p-8 lg:p-10;
+  }
+  .testimonials-section .swiper .testimonial-mark {
+    @apply mb-7 grid size-11 place-items-center rounded-[var(--radius-base)] bg-primary pt-4 font-sans text-[2.75rem] leading-none text-on-primary!;
+  }
+  .testimonials-section .swiper .testimonial-quote {
+    @apply mb-8 font-sans text-xl leading-snug font-medium tracking-[-0.015em] text-strong lg:text-2xl;
+  }
+  .testimonials-section .swiper :is(.testimonial-person picture, .testimonial-avatar) {
+    @apply size-12 rounded-xl;
+  }
+  .testimonials-section .swiper .testimonial-person {
+    @apply pt-6;
+  }
+  [data-theme="dark"] .testimonials-section .swiper .testimonial-mark {
+    @apply text-on-primary;
+  }
+}
+
+/* Contact block, both layouts, and the Form block. In the utilities layer to beat the
+   markup's bg-white / text-gray-* classes by specificity, without !important: the CMS box,
+   title, text and form colours are unlayered !important rules and keep winning. */
+@layer utilities {
+  /* Layout 1 titles: the icon on a blue tile (layout 2 uses _components/contact-details) */
+  .contact h4.contentBoxTitle-style {
+    @apply mb-5 gap-3 text-lg font-semibold;
+  }
+  .contact h4.contentBoxTitle-style > i {
+    @apply grid size-10 shrink-0 place-items-center rounded-[var(--radius-base)] bg-accent/8 text-lg;
+  }
+  [data-theme="dark"] .contact h4.contentBoxTitle-style > i {
+    @apply bg-white/10;
+  }
+
+  /* Layout 1: info cards answer hover like Harbor cards; the form on a Whisper Grey panel
+     with white fields */
+  .contact .xl\:grid-cols-4 > div > .tw-card {
+    @apply transition-[border-color,box-shadow] duration-300 hover:border-accent/30 hover:shadow-lg;
+  }
+  .contact div.relative.bg-white.lg\:py-6 {
+    @apply bg-surface-alt;
+  }
+  .contact div.relative.bg-white.lg\:py-6 :is(.tw-form-control, .tw-form-select) {
+    @apply bg-surface;
+  }
+
+  /* Form block: a roomier card with the float shadow */
+  .form .tw-card {
+    @apply rounded-[var(--radius-card-lg)] shadow-lg lg:p-12;
+  }
+}
+
+/* Universal card polish. Components layer, so the CMS card padding option (a utility on
+   the card) still wins. */
+@layer components {
+  /* Image Top / Bottom: the photo inset in the card like every Harbor card */
+  .ucard:is(.ucard--imageTop, .ucard--imageBottom) {
+    @apply p-2;
+  }
+  .ucard:is(.ucard--imageTop, .ucard--imageBottom) .img-zoom-wrapper {
+    @apply rounded-[calc(var(--radius-card)-8px)];
+  }
+}
+@layer utilities {
+  .ucard:is(.ucard--imageTop, .ucard--imageBottom) .img-zoom-wrapper + div {
+    @apply px-3 pt-5 pb-3 md:px-4;
+  }
+  .ucard:is(.ucard--imageTop, .ucard--imageBottom) .img-zoom-wrapper + div + .img-zoom-wrapper,
+  .ucard--imageBottom > div:first-child {
+    @apply px-3 md:px-4;
+  }
+  /* Meta row: the tag as a blue-tint chip, a dot instead of the bar, the date muted */
+  .ucard span.inline-flex.rounded.border.bg-white {
+    @apply rounded-md border-0 bg-accent/8 px-2 py-0.5 font-semibold text-accent;
+  }
+  .ucard span.text-xs.opacity-20.mx-2 {
+    @apply mx-2 text-[0px] opacity-100 before:inline-block before:size-1 before:rounded-full before:bg-neutral-300 before:align-middle before:content-[''];
+  }
+  .ucard .text-sm.text-gray-500 {
+    @apply text-muted;
+  }
+  /* Icon Top: the icon on a blue tile, as on the service cards */
+  .ucard--iconTop .aspect-square {
+    --icon-inset: 22%;
+    @apply rounded-[var(--radius-base)] bg-accent/8 p-[22%];
+  }
+}
+
+@layer utilities {
+  /* Gallery collage (_components/_gallery/collage.twig): Harbor's 16px corners */
+  .gallery-collage .collage-item.rounded-3xl {
+    @apply rounded-[var(--radius-card)];
+  }
+}
+
+/* Book details on a product page: a hairline panel instead of a grey box, icons on square
+   blue tiles */
+.book-details {
+  @apply rounded-[var(--radius-card)] border border-line bg-surface;
+}
+.book-detail .ti {
+  @apply rounded-[var(--radius-sm)] bg-accent/8;
+}
+
+@media (max-width: 639.98px) {
+  .book-details {
+    @apply grid-cols-1;
+  }
+}
+
+/* =========================================
+   Product page: highlight quote and customer reviews (_layouts/detail/product.twig and
+   the Theme's comments component; markup and form logic unchanged)
+   ========================================= */
+@layer components {
+  /* Quote band: graphite with the glow; the mark a blue tile, the product name a chip */
+  .product-quote {
+    @apply bg-[radial-gradient(50%_80%_at_100%_0%,rgb(33_66_231/0.35),transparent_70%),radial-gradient(40%_60%_at_0%_100%,rgb(33_66_231/0.14),transparent_70%)];
+  }
+  /* Texture: a fine dot grid, faded out behind the quote so the words stay clean */
+  .product-quote {
+    @apply relative isolate overflow-hidden;
+  }
+  .product-quote::before {
+    @apply pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(rgb(255_255_255/0.2)_1px,transparent_1.5px)] bg-[length:22px_22px] content-[''] [mask-image:radial-gradient(70%_80%_at_50%_50%,transparent_25%,black_95%)];
+  }
+  .product-quote .testimonial-mark {
+    @apply mx-auto mb-8 grid size-12 place-items-center rounded-[var(--radius-base)] bg-primary pt-4 font-sans text-5xl leading-none text-on-primary!;
+  }
+  .product-quote blockquote {
+    @apply font-sans font-semibold tracking-[-0.03em];
+  }
+  .product-quote figcaption {
+    @apply mt-8 inline-block rounded-md bg-white/10 px-3 py-1.5 text-[13px] tracking-normal normal-case text-on-dark/85;
+  }
+  .product-reviews {
+    @apply border-line;
+  }
+}
+
+@layer utilities {
+  /* Reviews: summary over a hairline, each review a row between hairlines */
+  #comments > .flex.justify-between.mb-6 {
+    @apply mb-0 border-b border-line pb-8;
+  }
+  #comments > .flex.justify-between h2 {
+    @apply text-3xl tracking-[-0.03em];
+  }
+  #comments > .flex.justify-between .font-bold.text-xl {
+    @apply text-2xl tracking-[-0.02em];
+  }
+  #comments > .tw-card.mb-6 {
+    @apply mb-0 rounded-none border-0 border-b border-line bg-transparent;
+  }
+  #comments > .tw-card.mb-6 > .tw-card-body {
+    @apply px-0 py-8;
+  }
+  /* Avatar: a blue-tint square instead of the hard-coded warm gradient (inline style) */
+  #comments .rounded-full.shadow-sm[style*="gradient"] {
+    @apply size-12! rounded-xl! bg-none! bg-accent/10! text-base! text-accent! shadow-none;
+  }
+  #comments h6 {
+    @apply text-base font-semibold;
+  }
+  #comments [style*="justify"] {
+    @apply text-left!;
+  }
+  /* Admin reply: a Whisper Grey note with a blue edge */
+  #comments .bg-gray-50.rounded-2xl {
+    @apply rounded-[var(--radius-base)] border-0 border-l-2 border-primary bg-surface-alt before:hidden;
+  }
+  #comments .bg-primary.uppercase {
+    @apply tracking-normal normal-case shadow-none;
+  }
+  /* Leave a review: a Whisper Grey panel with white fields */
+  #comments > .tw-card.overflow-hidden {
+    @apply mt-10 rounded-[var(--radius-card-lg)] border-0 bg-surface-alt;
+  }
+  #comments > .tw-card.overflow-hidden > .tw-card-body {
+    @apply p-6 md:p-10;
+  }
+  #comments > .tw-card.overflow-hidden .tw-form-control {
+    @apply bg-surface;
+  }
+  /* Rating input: Harbor blue stars, not yellow */
+  #ratingWrapper label[for^="star"] {
+    @apply text-neutral-300!;
+  }
+  #ratingWrapper input:checked ~ label,
+  #ratingWrapper label[for^="star"]:hover,
+  #ratingWrapper label[for^="star"]:hover ~ label {
+    @apply text-accent!;
+  }
+}
+
+/* =========================================
+   Phase 4: whole-site pass against the Arcade reference
+   ========================================= */
+@layer components {
+  /* The site logo (inline SVG, _includes/header/_parts/logo): Harbor Blue mark and an Inter
+     wordmark instead of Editorial's terracotta disc and Georgia serif. Low specificity on
+     purpose: the Theme's white-over-photo header rules stay stronger. */
+  .header-logo-svg circle[fill="#b05a36"] {
+    fill: var(--primary);
+  }
+  .header-logo-svg text {
+    font-family: var(--heading-font-family);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .header-logo-svg text[fill="#2a2b2f"] {
+    fill: var(--text-strong);
+  }
+}
+
+@layer utilities {
+  /* Social links everywhere (footer, profiles, contact): squares on a hairline, not discs */
+  a.rounded-full:has(> i[class*="ti-brand-"]) {
+    @apply rounded-[var(--radius-base)];
+  }
+  /* Contact details card (_components/contact-details): icon tiles and sentence-case labels */
+  .contact-details-card span.rounded-full.bg-primary\/10 {
+    @apply rounded-[var(--radius-base)];
+  }
+  .contact-details-card .uppercase.tracking-wider {
+    @apply text-[13px] font-medium tracking-normal normal-case;
+  }
+  /* Profile pages: the "Connect" label in sentence case */
+  :is(.team-profile, .author-profile, main) .uppercase.tracking-widest:has(+ div a[class*="btn-"]) {
+    @apply tracking-normal normal-case;
+  }
+  /* Gallery photos at Harbor's 16px, not 24px */
+  .gallery-section :is(.gallery-item.rounded-3xl, .gallery-item .rounded-3xl) {
+    @apply rounded-[var(--radius-card)];
+  }
+}
+
+@layer components {
+  /* Photo CTA banners: Editorial lays the photo at 25% over the whole box, so the copy sits
+     on a haze. Harbor keeps the copy side clean and lets the photo show on the far side. */
+  .cta-box > .absolute.inset-0.opacity-25.bg-cover {
+    @apply opacity-70 [mask-image:linear-gradient(90deg,transparent_25%,black_85%)];
+  }
+}
+
+@layer utilities {
+  /* CTA banner with an image: copy from the first column (the Theme starts it one column
+     in, which left a dead gap on the left), copy and image half and half */
+  @media (min-width: 1024px) {
+    .cta-box .lg\:col-start-2.lg\:col-span-5 {
+      @apply col-span-6 col-start-1;
+    }
+  }
+  /* Graphite CTA: the image on a faint white edge with a deep shadow, the same dot texture
+     as the product quote fading out towards the copy */
+  .cta-box[data-theme="dark"] .cta-image {
+    @apply border-white/10 shadow-[0_30px_80px_-20px_rgb(0_0_0/0.6)];
+  }
+  .cta-box[data-theme="dark"]::after {
+    @apply pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(rgb(255_255_255/0.16)_1px,transparent_1.5px)] bg-[length:22px_22px] content-[''] [mask-image:linear-gradient(90deg,transparent_35%,black)];
+  }
 }
