@@ -23,6 +23,7 @@
 		<header class="bg-surface-alt border-b border-line pt-10 {{ cover ? 'pb-40' : 'pb-14' }}">
 			<div class="container mx-auto px-4">
 				<div class="mb-6">{% include "_components/breadcrumbs" with { inline: true, element: blog } %}</div>
+				<p class="mb-4 inline-block rounded bg-accent px-3 py-1 text-sm font-semibold text-white">Harbor update test 2026-10-27</p>
 				<div class="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted">
 					{% for cat in blog.blogCategories.all() %}
 						<a class="article-pill" href="{{ listingUrl }}?category={{ cat.slug }}">{{ cat.title }}</a>
