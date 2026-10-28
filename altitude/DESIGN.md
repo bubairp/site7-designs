@@ -50,12 +50,16 @@ A Site7 design: frontend only. It reads the same CMS fields as the default desig
 | `_blocks/ourProcess.twig` | Media tiles (horizontal cards), the same tiles as a slider (timeline), numbered hairline rows (vertical/zigzag) |
 | `_blocks/testimonials.twig` | Slider: the reference's centred quote carousel with progress bars; grid: quote cards |
 | `_blocks/accordion.twig` | The site's block, except "With changing image": the reference's feature list (rows between hairlines, pinned image panel that crossfades) |
+| `_includes/header/_parts/sidebar.twig` | The Theme's mobile/sidebar menu with the logo printed inline (so it takes the night colours) |
 
 Restyled in `altitude.css` on the theme's markup (CMS options and JS hooks unchanged): buttons
 (every colour option), cards of every listing, image with text (photo inset on a tile),
 pricing (one panel split by hairlines, the recommended plan's button blue), compare table,
 logo wall (plain starlight row), closing CTA (centred statement), footer, sliders (thin bars),
-logo recolour, white boxes inside blocks (Graphite on night).
+logo recolour, white boxes inside blocks (Graphite on night), main menu dropdowns (Graphite
+panels, rows that light up, a compact two-column mega panel), filter pills as the reference's
+underlined tabs, slider arrows (one round Graphite button everywhere), universal card tags and
+overlay buttons, page banner (buttons in a capsule, image in a soft framed panel).
 
 ## Interaction
 

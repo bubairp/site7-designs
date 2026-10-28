@@ -76,3 +76,7 @@
 {% include '_includes/header/_parts/sidebar' with { variant: 'light', showCta: true } %}
 </div>
 <div class="header-height" style="min-height: var(--header-height, 100px);"></div>
+{# Native wheel scrolling like the reference: the Theme's smooth scroll (Lenis, desktop only)
+   glides on for 1.2s after each wheel turn. Altitude only turns its wheel smoothing off;
+   Lenis keeps running, so header states and anchor scrolling still work. #}
+<script>window.addEventListener('load', function () { if (window.lenis && window.lenis.options) { window.lenis.options.smoothWheel = false; } });</script>

@@ -774,3 +774,457 @@
     fill: currentColor;
   }
 }
+
+/* =========================================
+   Round 2 fixes (block review, 2026-10-28)
+   ========================================= */
+
+/* Light interludes: the neutral ramp is the normal light-mode one again (the night design
+   inverts it), so gray-700 text is dark here. The --color-* aliases resolve at :root, so
+   they are set too. */
+.bg-\[var\(--cms-bg\)\][style*="--cms-bg:var(--surface-alt)"]:not([data-theme="dark"]) {
+  --neutral-50: #fafafb;
+  --color-gray-50: #fafafb;
+  --color-slate-50: #fafafb;
+  --color-zinc-50: #fafafb;
+  --color-neutral-50: #fafafb;
+  --neutral-100: #f3f3f6;
+  --color-gray-100: #f3f3f6;
+  --color-slate-100: #f3f3f6;
+  --color-zinc-100: #f3f3f6;
+  --color-neutral-100: #f3f3f6;
+  --neutral-200: #e6e6ec;
+  --color-gray-200: #e6e6ec;
+  --color-slate-200: #e6e6ec;
+  --color-zinc-200: #e6e6ec;
+  --color-neutral-200: #e6e6ec;
+  --neutral-300: #d1d1da;
+  --color-gray-300: #d1d1da;
+  --color-slate-300: #d1d1da;
+  --color-zinc-300: #d1d1da;
+  --color-neutral-300: #d1d1da;
+  --neutral-400: #9d9daa;
+  --color-gray-400: #9d9daa;
+  --color-slate-400: #9d9daa;
+  --color-zinc-400: #9d9daa;
+  --color-neutral-400: #9d9daa;
+  --neutral-500: #6a6a77;
+  --color-gray-500: #6a6a77;
+  --color-slate-500: #6a6a77;
+  --color-zinc-500: #6a6a77;
+  --color-neutral-500: #6a6a77;
+  --neutral-600: #4b4b58;
+  --color-gray-600: #4b4b58;
+  --color-slate-600: #4b4b58;
+  --color-zinc-600: #4b4b58;
+  --color-neutral-600: #4b4b58;
+  --neutral-700: #363642;
+  --color-gray-700: #363642;
+  --color-slate-700: #363642;
+  --color-zinc-700: #363642;
+  --color-neutral-700: #363642;
+  --neutral-800: #262631;
+  --color-gray-800: #262631;
+  --color-slate-800: #262631;
+  --color-zinc-800: #262631;
+  --color-neutral-800: #262631;
+  --neutral-900: #1e1e2a;
+  --color-gray-900: #1e1e2a;
+  --color-slate-900: #1e1e2a;
+  --color-zinc-900: #1e1e2a;
+  --color-neutral-900: #1e1e2a;
+  --neutral-950: #14141c;
+  --color-gray-950: #14141c;
+  --color-slate-950: #14141c;
+  --color-zinc-950: #14141c;
+  --color-neutral-950: #14141c;
+}
+
+/* Closing CTA: centre text and buttons on desktop (beats the lg:text-left / lg:justify-start
+   utilities, which a layered rule can't) unless the CMS set an alignment */
+@media (min-width: 1024px) {
+  .cta-section .text-center.lg\:text-left { text-align: center; }
+  .cta-section .justify-center.lg\:justify-start { justify-content: center; }
+}
+.cta-section .text-center.lg\:text-left > .mb-2 { display: flex; justify-content: center; }
+@media (max-width: 1023.98px) {
+  .cta-section .text-center.lg\:text-left > .mb-2 { justify-content: center; }
+}
+
+/* Left section heads: the hairline runs the full container width (the Theme caps the head
+   at 46rem); the text inside keeps its measure */
+.section-head.is-left {
+  max-width: none;
+}
+
+/* Page banner block: a night wash and starlight text whatever its dark switch */
+.block-section[class*="pageBanner"] .mix-blend-screen,
+.block-section[class*="pageBanner"] .mix-blend-multiply {
+  background-color: rgba(23, 23, 33, 0.62) !important;
+  mix-blend-mode: normal !important;
+}
+.block-section[class*="pageBanner"] :is(.block-heading-title, .block-description) {
+  color: var(--on-dark) !important;
+}
+.block-section[class*="pageBanner"] .block-description {
+  opacity: 0.8;
+}
+
+/* In the components layer on purpose: these override the Theme's !important rules, and
+   for !important a layered rule beats an unlayered one. */
+@layer components {
+/* Slider arrows, every slider: one round Graphite button with a hairline, as in the
+   reference; on a light interlude a white one with ink. Unlayered: several templates set
+   !text-white / bg-black/30 utilities on them. */
+:is(.swiper-button-next, .swiper-button-prev, .slider-nav-btn, .album-thumbs-nav, .product-nav) {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background-color: rgba(30, 30, 42, 0.78) !important;
+  color: #ededf3 !important;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: none !important;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+:is(.swiper-button-next, .swiper-button-prev, .slider-nav-btn, .album-thumbs-nav, .product-nav):hover {
+  background-color: #2f2f3f !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+}
+:is(.swiper-button-next, .swiper-button-prev)::after {
+  font-size: 14px !important;
+  font-weight: 600;
+  color: inherit !important;
+}
+:is(.swiper-button-next, .swiper-button-prev, .slider-nav-btn) i {
+  font-size: 16px;
+  color: inherit !important;
+}
+.bg-\[var\(--cms-bg\)\][style*="--cms-bg:var(--surface-alt)"]:not([data-theme="dark"]) :is(.swiper-button-next, .swiper-button-prev, .slider-nav-btn) {
+  background-color: #ffffff !important;
+  border-color: #e2e2e8 !important;
+  color: #1e1e2a !important;
+}
+}
+
+/* Scroll reveal: in place sooner and a shorter rise, so nothing waits for the reader */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    :is([data-reveal], .block-section .section-head, .block-section :is(.project-card, .post-card, .work-card, .service-card, .team-card, .award-card, .testimonial-card, .ucard)) {
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}
+@keyframes altitude-reveal {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* In the components layer on purpose: these override the Theme's !important rules, and
+   for !important a layered rule beats an unlayered one. */
+@layer components {
+/* Header: one height in every state, so switching from transparent (over a banner) to night
+   (scrolled) only changes colour. The Theme's glass state adds panel padding; Altitude has no
+   glass box, so it is zeroed, and the change is eased over 400ms. */
+.altitude-header.headerMain .header-main {
+  padding-block: 14px !important;
+}
+#header.has-header-banner .altitude-header.header-floating-glass:not(.scrolled, .menu-open) .header-panel {
+  padding-block: 0 !important;
+}
+.altitude-header.headerMain {
+  transition:
+    transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 0.4s ease,
+    border-color 0.4s ease,
+    -webkit-backdrop-filter 0.4s ease,
+    backdrop-filter 0.4s ease !important;
+}
+.altitude-header .menu-link,
+.altitude-header .header-cta {
+  transition: color 0.25s ease, background-color 0.25s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .altitude-header.headerMain { transition: none !important; }
+}
+}
+
+/* In the components layer on purpose: these override the Theme's !important rules, and
+   for !important a layered rule beats an unlayered one. */
+@layer components {
+/* =========================================
+   Main menu dropdowns (desktop; phones use the sidebar). Graphite panels on a hairline,
+   16px corners, rows that light up on hover, the open item without an underline, a short
+   fade-and-rise. A mega menu is a compact panel of link tiles centred under its item
+   instead of the Theme's full-width strip.
+   ========================================= */
+@media (min-width: 1024px) {
+  .altitude-header .simple-rp-menu > .menu-ul > li > .menu-group > .menu-link {
+    text-decoration: none !important;
+    border-radius: 9999px;
+    padding: 0.45rem 0.85rem;
+  }
+  .altitude-header .simple-rp-menu .dropdown > .dropdown-menu {
+    --menu-dropdown-w: 16rem;
+    background-color: color-mix(in srgb, var(--surface-alt) 96%, transparent) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
+    padding: 0.5rem !important;
+    box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.6) !important;
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    transform: translateY(6px);
+  }
+  .altitude-header .simple-rp-menu .dropdown:is(:hover, .is-open) > .dropdown-menu {
+    transform: translateY(0);
+  }
+  .altitude-header .simple-rp-menu .dropdown-menu .sub-menu-ul {
+    gap: 2px !important;
+  }
+  .altitude-header .simple-rp-menu .dropdown-menu .menu-link {
+    display: flex !important;
+    align-items: center;
+    width: 100%;
+    padding: 0.6rem 0.75rem !important;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+    color: rgba(237, 237, 243, 0.78) !important;
+    text-decoration: none !important;
+    background: transparent !important;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  .altitude-header .simple-rp-menu .dropdown-menu .menu-link:hover,
+  .altitude-header .simple-rp-menu .dropdown-menu .menu-link.active {
+    color: #ededf3 !important;
+    background-color: rgba(255, 255, 255, 0.06) !important;
+  }
+
+  /* Mega menu: anchored under its item, link tiles in two columns */
+  .altitude-header .simple-rp-menu > .menu-ul > li.has-mega-menu {
+    position: relative;
+  }
+  .altitude-header .simple-rp-menu > .menu-ul > li.has-mega-menu > .dropdown-menu {
+    left: 50% !important;
+    right: auto !important;
+    width: 30rem !important;
+    min-width: 0 !important;
+    padding: 0.5rem !important;
+    border-radius: 18px !important;
+    transform: translate(-50%, 6px) !important;
+  }
+  .altitude-header .simple-rp-menu > .menu-ul > li.has-mega-menu:is(:hover, .is-open) > .dropdown-menu {
+    transform: translate(-50%, 0) !important;
+  }
+  .altitude-header .simple-rp-menu .sub-menu-ul.mega-menu {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 4px !important;
+  }
+  .altitude-header .simple-rp-menu .sub-menu-ul.mega-menu > li > .menu-link {
+    padding: 0.9rem 1rem !important;
+    min-height: 3.25rem;
+    justify-content: space-between;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    font-size: 15px !important;
+  }
+  .altitude-header .simple-rp-menu .sub-menu-ul.mega-menu > li > .menu-link::after {
+    content: "→";
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .altitude-header .simple-rp-menu .sub-menu-ul.mega-menu > li > .menu-link:hover::after {
+    opacity: 1;
+    transform: none;
+  }
+}
+}
+
+@layer components {
+  @media (min-width: 1024px) {
+    /* One panel: the Theme frames the inner list too */
+    .altitude-header .simple-rp-menu .dropdown-menu > .sub-menu-ul {
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+    }
+    /* The open or current top item: the pill only, no underline */
+    .altitude-header .simple-rp-menu > .menu-ul > li > .menu-group > .menu-link::after,
+    .altitude-header .simple-rp-menu > .menu-ul > li > .menu-group > .menu-link::before {
+      display: none !important;
+    }
+    .altitude-header .simple-rp-menu > .menu-ul > li > .menu-group > .menu-link {
+      border-bottom: 0 !important;
+      box-shadow: none !important;
+    }
+  }
+}
+@layer components {
+  @media (min-width: 1024px) {
+    /* No hover/open underline (the Theme fades one in); the pill is the only state. The ID
+       outranks the Theme's long hover selectors. */
+    #header .altitude-header .simple-rp-menu .menu-link {
+      text-decoration-color: transparent !important;
+    }
+    /* The mega panel keeps its Graphite panel over a banner too (a glass-state rule with the
+       #header ID clears it) */
+    #header .altitude-header .simple-rp-menu > .menu-ul > li.has-mega-menu > .dropdown-menu {
+      background-color: color-mix(in srgb, var(--surface-alt) 96%, transparent) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.6) !important;
+    }
+  }
+}
+
+/* =========================================
+   Round 3 fixes (block review)
+   ========================================= */
+@layer components {
+  /* Filter pills and tabs (portfolio, shop, gallery): the reference's tabs, a centred row of
+     text tabs on a hairline, the active one in the strong colour with an underline */
+  .filter-pills {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+    margin: 0 auto 40px;
+    border-bottom: 1px solid var(--line);
+    background: transparent;
+    border-radius: 0;
+    width: fit-content;
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+  .filter-pill {
+    position: relative;
+    border: 0 !important;
+    border-radius: 0 !important;
+    padding: 10px 16px 12px;
+    font-weight: 400;
+    color: var(--text-muted);
+    background-color: transparent !important;
+  }
+  .filter-pill::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background-color: var(--text-strong);
+    transform: scaleX(0);
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .filter-pill:hover {
+    color: var(--text-strong);
+  }
+  .filter-pill.active {
+    color: var(--text-strong) !important;
+    background-color: transparent !important;
+  }
+  .filter-pill.active::before {
+    transform: scaleX(1);
+  }
+
+  /* Eyebrows everywhere (newsletter, CTA, cards): sentence case, no tracking */
+  .section-eyebrow {
+    text-transform: none !important;
+    letter-spacing: 0.01em !important;
+    font-weight: 400;
+  }
+
+  /* Universal card tags: a tint pill, not a bordered uppercase box */
+  .ucard span.border.bg-white,
+  .ucard span.rounded.border {
+    border: 0 !important;
+    border-radius: 9999px !important;
+    background-color: color-mix(in srgb, #cdddff 15%, transparent) !important;
+    color: var(--text-strong) !important;
+    text-transform: none !important;
+    letter-spacing: 0.01em !important;
+    font-weight: 400 !important;
+  }
+  /* Image overlay cards: the button reads on the photo */
+  .ucard--imageOverlay .tw-btn {
+    background-color: rgba(255, 255, 255, 0.16) !important;
+    color: #ffffff !important;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    position: relative;
+    z-index: 11;
+  }
+
+  /* Case-study skill tags */
+  .work-card-tags li {
+    border: 0 !important;
+    border-radius: 9999px;
+    background-color: color-mix(in srgb, #cdddff 12%, transparent);
+    color: var(--text-body);
+    font-size: 12px;
+    padding: 3px 10px;
+  }
+}
+
+/* Page banner, as the reference's inner pages: buttons in one translucent capsule, the image
+   inside a soft framed panel */
+@layer components {
+  .page-hero .page-hero-actions {
+    display: inline-flex;
+    gap: 6px;
+    padding: 6px;
+    border-radius: 9999px;
+    border: 1px solid var(--line);
+    background-color: color-mix(in srgb, var(--surface-alt) 70%, transparent);
+  }
+  .page-hero .page-hero-copy {
+    align-items: center;
+  }
+  .page-hero .page-hero-wide {
+    padding: clamp(14px, 3vw, 40px);
+    background: radial-gradient(120% 120% at 50% 0%, color-mix(in srgb, #cdddff 10%, var(--surface-alt)), var(--surface-alt));
+    border-radius: 20px;
+  }
+  .page-hero .page-hero-wide img {
+    border-radius: 12px;
+    aspect-ratio: 16 / 7;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+  .page-hero .page-hero-wide picture {
+    display: block;
+    height: 100%;
+  }
+}
+@layer components {
+  /* Banner spacing like the reference: the headline about 90px under the bar */
+  .page-hero.page-hero--sliderLayout2 {
+    padding-top: calc(var(--header-height, 96px) + 1rem);
+    border-bottom: 0;
+  }
+  .page-hero--sliderLayout2 .page-hero-grid {
+    padding-block: 40px 8px;
+  }
+  @media (min-width: 1024px) {
+    .page-hero--sliderLayout2 .page-hero-grid {
+      padding-block: 48px 8px;
+    }
+  }
+}
+@layer components {
+  /* The header spacer already holds the bar's height except when the header floats over the
+     banner; only then does the banner make room for it */
+  .page-hero.page-hero--sliderLayout2 {
+    padding-top: 1rem;
+  }
+  #header.has-header-banner:has(.header-floating-glass) .page-hero.page-hero--sliderLayout2 {
+    padding-top: calc(var(--header-height, 96px) + 1rem);
+  }
+  /* The Theme pads the banner grid for the header too (header.css, glass state): Altitude
+     already moved that room to the section, so the grid keeps its own spacing */
+  #header.has-header-banner:has(.header-floating-glass) > .header-banner .page-hero--sliderLayout2 .page-hero-grid {
+    padding-top: 40px !important;
+  }
+}
