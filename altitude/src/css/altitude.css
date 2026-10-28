@@ -1,0 +1,776 @@
+/* =========================================
+   Altitude design (designs/altitude/DESIGN.md)
+   Built with: bash scripts/design.sh build altitude
+   Everything Editorial ships, with Altitude's role tokens on top. Templates
+   only use role utilities (bg-surface, text-strong …), so the tokens below
+   re-skin them; designs/altitude/templates overrides what tokens can't.
+   Dark throughout: every section sits on the night canvas, one blue for
+   primary buttons only, light-weight Inter headlines, pills, no shadows.
+   ========================================= */
+@import '../../../../frontend/src/css/app.css';
+
+@source '../../templates/**/*.twig';
+
+:root {
+  /* Surfaces, three steps of night (DESIGN.md "Surfaces"): no shadows, depth is a step up */
+  --surface: #1e1e2a;          /* Midnight: the page, header, inputs */
+  --surface-alt: #272735;      /* Graphite: cards, alternate sections, interactive rows */
+  --surface-dark: #171721;     /* Abyss: "dark" sections and the footer, one step below the page */
+  --surface-dark-hover: #2f2f3f;
+  --line: #3a3a4a;             /* hairlines between rows and around cards */
+
+  /* Text: starlight, silver, lead */
+  --text-strong: #ededf3;      /* 13.9:1 on Midnight */
+  --text-body: #c3c3cc;        /* 9.6:1 */
+  --text-muted: #a2a3ae;       /* 6.6:1 on Midnight, 5.6:1 on Graphite */
+  --on-dark: #ededf3;
+  --design-white: #ededf3;     /* "white" text and marks stay starlight */
+  --design-black: #11111a;
+
+  /* One blue, primary buttons only (white text 4.9:1). Never text, never decoration. */
+  --primary: #5266eb;
+  --primary-hover: #6a7cf0;
+  --on-primary: #ffffff;
+  --accent: #c3c3cc;           /* eyebrows, active links, icon lines: silver, not blue */
+
+  /* Neutral ramp, inverted: light-grey backgrounds become night, dark-grey text becomes light */
+  --neutral-50: #1e1e2a;
+  --neutral-100: #232331;
+  --neutral-200: #2c2c3b;
+  --neutral-300: #3a3a4a;
+  --neutral-400: #5c5c6b;
+  --neutral-500: #8a8a97;
+  --neutral-600: #a2a3ae;
+  --neutral-700: #c3c3cc;
+  --neutral-800: #dcdce4;
+  --neutral-900: #ededf3;
+  --neutral-950: #f7f7fa;
+
+  /* Type: Inter throughout at a regular 450 for headings (the reference's display weight),
+     a little air between letters, nothing italic */
+  --body-font-family: "Inter Variable", "Inter", system-ui, sans-serif;
+  --heading-font-family: "Inter Variable", "Inter", system-ui, sans-serif;
+  --btn-font-family: "Inter Variable", "Inter", system-ui, sans-serif;
+  --body-tracking: 0.01em;
+  --heading-weight: 450;
+  --heading-tracking: 0.005em;
+  --heading-em-style: normal;  /* no italic word swaps */
+  --heading-em-weight: inherit;
+  --quote-weight: 400;
+  --quote-style: normal;
+  --pullquote-weight: 400;
+  --lead-weight: 400;
+
+  /* Shape: pill controls, 12px media and cards, no shadows */
+  --radius-sm: 0.5rem;
+  --radius-base: 0.75rem;
+  --radius-card: 0.75rem;
+  --radius-card-lg: 1rem;
+  --btn-border-radius: 2.5rem;
+  --form-border-radius: 2rem;
+  --menu-radius: 0.5rem;
+  --shadow-float: none;
+  --shadow-glow: none;
+  --shadow-header: none;
+}
+
+:root {
+  --link-hover-color: var(--text-strong);
+  --menu-primary: var(--text-strong);
+  --menu-active-color: var(--text-strong);
+  --swiper-bullet-bg: color-mix(in srgb, var(--text-strong) 22%, transparent);
+  --swiper-bullet-active-bg: var(--text-strong);
+  --swiper-theme-color: var(--text-strong);
+}
+
+/* "Dark" sections are one step deeper. The Theme writes their text in --parchment (the
+   canvas colour, light in Editorial), so here it has to point at starlight. The utility
+   colours (--color-parchment …) resolve where they are defined (:root), so they are
+   redefined here too, or text-parchment would stay the night canvas colour. */
+[data-theme="dark"] {
+  --parchment: var(--on-dark);
+  --color-parchment: var(--on-dark);
+  --color-paper: var(--surface-alt);
+  --menu-dropdown-bg: var(--surface-alt);
+  --menu-mob-panel-bg: var(--surface);
+}
+
+/* Uploaded SVG icons (images.iconMask) take the accent colour */
+[data-icon-mask] {
+  position: relative;
+}
+[data-icon-mask] > img {
+  opacity: 0;
+}
+[data-icon-mask]::after {
+  content: "";
+  position: absolute;
+  inset: var(--icon-inset, 0);
+  background-color: var(--accent);
+  -webkit-mask: var(--icon-url) center / contain no-repeat;
+  mask: var(--icon-url) center / contain no-repeat;
+}
+.service-card-icon[data-icon-mask] {
+  --icon-inset: 12px;
+}
+
+/* If the accent is too dark on --surface-dark, turn accents white there:
+:is([data-theme="dark"], .product-quote) :is(.text-accent, .text-success, .testimonial-mark) { color: var(--on-dark); }
+:is([data-theme="dark"], .product-quote) [data-icon-mask]::after { background-color: var(--on-dark); }
+*/
+
+/* =========================================
+   Header (templates/_includes/header/simpleHeader.twig)
+   Full-width bar, no glass box: transparent over a hero or banner, night with a
+   hairline once the page scrolls. Same layer as the Theme's header.css, whose
+   floating-glass rules use !important.
+   ========================================= */
+@layer components {
+  .altitude-header .menu-link {
+    @apply text-[15px] font-normal tracking-[0.01em] text-on-dark/80 hover:text-on-dark;
+  }
+  .altitude-header .header-cta.tw-btn {
+    @apply h-10 rounded-full border-0 bg-primary px-5 text-sm font-normal text-on-primary shadow-none hover:bg-[var(--primary-hover)];
+  }
+  /* Scrolled, or a page without a banner: night bar with a hairline */
+  .altitude-header.headerMain {
+    background-color: color-mix(in srgb, var(--surface-dark) 88%, transparent) !important;
+    border-bottom: 1px solid color-mix(in srgb, white 8%, transparent);
+    box-shadow: none !important;
+  }
+  /* Over a banner: fully transparent, no glass panel */
+  #header.has-header-banner .altitude-header.headerMain.header-floating-glass:not(.scrolled, .menu-open) {
+    background: transparent !important;
+    border-bottom-color: transparent;
+  }
+  #header.has-header-banner .altitude-header.header-floating-glass:not(.scrolled, .menu-open) .header-panel {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding-inline: revert-layer !important;
+  }
+  #header.has-header-banner .altitude-header.header-floating-glass:not(.scrolled, .menu-open) .header-panel::before {
+    display: none !important;
+  }
+  /* Dropdowns and the mobile menu on night */
+  .altitude-header .dropdown-menu,
+  .altitude-header .sub-menu-ul {
+    @apply rounded-[var(--menu-radius)] border border-white/10 bg-surface-alt shadow-none;
+  }
+}
+
+/* =========================================
+   Hero (templates/_includes/hero-banner/sliderLayout3.twig)
+   The media fills the slide and drifts in slowly; several slides get progress bars.
+   ========================================= */
+@layer components {
+  .altitude-hero-media .hero-media,
+  .altitude-hero-media .hero-media-fill,
+  .altitude-hero-media .hero-media-embed {
+    @apply absolute inset-0 size-full object-cover;
+  }
+  .altitude-hero-media .hero-media-embed iframe {
+    @apply absolute top-1/2 left-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-1/2;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .altitude-hero-media .hero-media-fill {
+      animation: altitude-drift 24s var(--ease-out-soft) both;
+    }
+  }
+  /* Progress-bar pagination: the active bar fills over the autoplay delay */
+  .altitude-hero-pagination {
+    --swiper-bullet-bg: rgba(255, 255, 255, 0.25);
+    --swiper-bullet-active-bg: rgba(255, 255, 255, 0.25);
+  }
+  .altitude-hero-pagination .swiper-pagination-bullet-active::before {
+    content: "";
+    @apply absolute inset-0 origin-left bg-on-dark;
+    animation: altitude-progress var(--hero-delay, 7000ms) linear both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :is(.altitude-hero-pagination, .altitude-quotes-pagination) .swiper-pagination-bullet-active::before { animation: none; transform: none; }
+  }
+}
+@keyframes altitude-drift {
+  from { transform: scale(1.08); }
+  to { transform: scale(1); }
+}
+@keyframes altitude-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* =========================================
+   Logo: the inline SVG wordmark is ink in Editorial; on night it is starlight
+   (header _parts/logo and the footer _logo print the same SVG)
+   ========================================= */
+@layer components {
+  svg[role="img"] text[fill="#2a2b2f"] {
+    fill: var(--text-strong);
+  }
+  :is(.header-logo-svg, svg[role="img"]) text {
+    font-family: var(--heading-font-family);
+    font-weight: 400;
+    letter-spacing: 0.005em;
+  }
+}
+
+/* =========================================
+   Buttons: every CMS colour option as a pill; the blue is the primary fill only.
+   ========================================= */
+@layer components {
+  .tw-btn {
+    @apply rounded-full font-normal tracking-[0.01em] shadow-none;
+  }
+  .tw-btn.tw-btn-primary {
+    @apply border-transparent bg-primary text-on-primary hover:bg-[var(--primary-hover)];
+  }
+  .tw-btn:is(.tw-btn-secondary, .tw-btn-light, .tw-btn-white, .tw-btn-default) {
+    @apply border-transparent bg-[#cdddff]/15 text-on-dark hover:bg-[#cdddff]/25 hover:text-on-dark;
+  }
+  .tw-btn:is(.tw-btn-outline, .tw-btn-outline-light, .tw-btn-outline-dark, .tw-btn-outline-secondary, .tw-btn-ghost) {
+    @apply border border-white/25 bg-transparent text-on-dark hover:border-white/45 hover:bg-white/5 hover:text-on-dark;
+  }
+  .tw-btn.tw-btn-dark {
+    @apply border-transparent bg-surface-alt text-on-dark hover:bg-[var(--surface-dark-hover)];
+  }
+  /* Header CTA over a banner: the Theme's glass rules make it a light pill */
+  #header.has-header-banner .altitude-header.header-floating-glass:not(.scrolled, .menu-open) .header-main .header-cta.tw-btn {
+    background-color: var(--primary) !important;
+    color: var(--on-primary) !important;
+    border-color: transparent !important;
+    height: 40px;
+    padding-inline: 20px;
+  }
+}
+
+/* =========================================
+   Light interludes: like the reference, the middle of a page steps out of the night.
+   A section the CMS gives the Aged Paper background (its alternate surface) becomes a
+   pale canvas with dark text; everything else stays night.
+   ========================================= */
+.bg-\[var\(--cms-bg\)\][style*="--cms-bg:var(--surface-alt)"]:not([data-theme="dark"]) {
+  /* The inline --cms-bg points at --surface-alt, so that is the pale canvas here */
+  --surface-alt: #f7f7f9;
+  --surface: #ffffff;
+  --line: #e2e2e8;
+  --text-strong: #1e1e2a;
+  --text-body: #4b4b58;
+  --text-muted: #6a6a77;     /* 5.0:1 on #f7f7f9 */
+  --accent: #4b4b58;
+  --parchment: #ffffff;
+  --aged-paper: #f7f7f9;
+  --ink: #1e1e2a;
+  --charcoal: #4b4b58;
+  --graphite: #6a6a77;
+  --color-parchment: #ffffff;
+  --color-paper: #f7f7f9;
+  --color-ink: #1e1e2a;
+  --color-strong: #1e1e2a;
+  --color-body: #4b4b58;
+  --color-muted: #6a6a77;
+  --color-line: #e2e2e8;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f7f7f9;
+  --color-white: #ffffff;
+  --color-on-dark: #ededf3;
+  --body-color: #4b4b58;
+  --link-color: #1e1e2a;
+  --swiper-bullet-bg: rgba(30, 30, 42, 0.18);
+  --swiper-bullet-active-bg: #1e1e2a;
+  color: #4b4b58;
+}
+
+/* =========================================
+   Section heads: left-aligned heads sit under a full-width hairline, centred ones
+   stay open (the reference does both)
+   ========================================= */
+@layer components {
+  .section-head.is-left {
+    @apply border-t border-line pt-10;
+  }
+  .section-head :is(.section-title, .block-heading-title) {
+    @apply font-[450] tracking-[0.005em] text-balance;
+  }
+}
+
+/* =========================================
+   Cards, every listing (portfolio, journal, case studies, services, team, awards,
+   testimonials, universal card): the reference's media tile with a caption underneath.
+   12px media, no lift and no shadow; the photo eases in on hover.
+   ========================================= */
+@layer components {
+  :is(.project-card, .post-card, .work-card, .service-card, .team-card, .award-card, .ucard) {
+    @apply shadow-none! translate-y-0!;
+  }
+  :is(.project-card-media, .post-card-media, .work-card-media, .team-card-photo, .award-card-media) {
+    @apply overflow-hidden rounded-[var(--radius-card)] bg-surface-alt;
+  }
+  :is(.project-card-media, .post-card-media, .work-card-media, .team-card-photo, .award-card-media) img {
+    @apply transition-transform duration-700 ease-[cubic-bezier(0.2,0.8,0.2,1)];
+  }
+  :is(.project-card, .post-card, .work-card, .team-card, .award-card):hover :is(.project-card-media, .post-card-media, .work-card-media, .team-card-photo, .award-card-media) img {
+    @apply scale-[1.04];
+  }
+  :is(.project-card-title, .post-card-title, .work-card-title, .team-card-name, .award-card-title, .service-card-title) {
+    @apply font-medium tracking-[0.005em] text-strong;
+  }
+  :is(.project-card-meta, .post-card-meta, .post-card-text, .work-card-text, .team-card-role, .award-card-text, .service-card-text) {
+    @apply text-body;
+  }
+  :is(.post-card-tag, .work-card-eyebrow, .service-card-eyebrow, .award-card-eyebrow) {
+    @apply rounded-full bg-surface-alt px-2.5 py-0.5 text-[12px] font-normal tracking-[0.01em] text-muted normal-case;
+  }
+  /* The round arrow on a card corner (the reference's press cards) */
+  .project-card-arrow {
+    @apply rounded-full bg-surface-dark/70 text-on-dark backdrop-blur-sm;
+  }
+  /* Service and plain cards: a graphite panel, 12px, hairline */
+  :is(.service-card, .tw-card) {
+    @apply rounded-[var(--radius-card)] border border-line bg-surface-alt;
+  }
+  .service-card:hover {
+    @apply border-strong/25;
+  }
+  .service-card-icon {
+    @apply rounded-[var(--radius-sm)] bg-surface;
+  }
+  :is(.service-card-link, .post-card-link, .work-card-link) {
+    @apply text-sm font-normal text-strong;
+  }
+  /* Testimonial cards in a grid: graphite panel, regular quote */
+  .testimonial-card {
+    @apply rounded-[var(--radius-card)] border border-line bg-surface-alt shadow-none;
+  }
+  .testimonial-quote {
+    @apply font-normal text-strong not-italic;
+  }
+  .testimonial-mark {
+    @apply text-muted;
+  }
+}
+
+/* =========================================
+   Sliders: pagination as thin progress bars (the reference's testimonial carousel),
+   round graphite arrows. The active bar fills over the autoplay delay when there is one.
+   ========================================= */
+@layer components {
+  .swiper-pagination:not(.altitude-hero-pagination) {
+    @apply flex items-center justify-center gap-2;
+  }
+  .swiper-pagination:not(.altitude-hero-pagination) .swiper-pagination-bullet,
+  .altitude-hero-pagination .swiper-pagination-bullet {
+    width: 2.5rem !important;
+    height: 2px !important;
+    margin: 0 !important;
+    border-radius: 9999px !important;
+    background-color: var(--swiper-bullet-bg) !important;
+    overflow: visible;
+  }
+  .swiper-pagination:not(.altitude-hero-pagination) .swiper-pagination-bullet-active {
+    background-color: var(--swiper-bullet-active-bg) !important;
+  }
+  :is(.swiper-button-next, .swiper-button-prev) {
+    @apply size-11 rounded-full border border-line bg-surface-alt text-strong shadow-none after:text-sm;
+  }
+  :is(.swiper-button-next, .swiper-button-prev):hover {
+    @apply bg-[var(--surface-dark-hover)];
+  }
+}
+
+/* =========================================
+   Scroll reveal: sections and cards rise in as they enter, CSS only (scroll-driven
+   animations; browsers without them simply show everything). Off for reduced motion.
+   ========================================= */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    :is([data-reveal], .block-section .section-head, .block-section :is(.project-card, .post-card, .work-card, .service-card, .team-card, .award-card, .testimonial-card, .ucard)) {
+      animation: altitude-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+@keyframes altitude-reveal {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Testimonial carousel: the active bar fills over the autoplay delay */
+@layer components {
+  .altitude-quotes-pagination .swiper-pagination-bullet-active {
+    background: var(--swiper-bullet-bg) !important;
+  }
+  .altitude-quotes-pagination .swiper-pagination-bullet-active::before {
+    content: "";
+    @apply absolute inset-0 origin-left;
+    background: var(--swiper-bullet-active-bg);
+    animation: altitude-progress var(--hero-delay, 7000ms) linear both;
+  }
+  .altitude-quotes:hover .altitude-quotes-pagination .swiper-pagination-bullet-active::before {
+    animation-play-state: paused;
+  }
+}
+
+/* =========================================
+   Scroll interaction (CSS scroll-driven animations; static where unsupported or when
+   reduced motion is set):
+   - hero: the photo moves slower than the page and the copy fades as it leaves
+   - large media (image with text, single images): ease from a slight zoom into place
+   ========================================= */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .altitude-hero {
+      view-timeline: --altitude-hero block;
+    }
+    .altitude-hero-media {
+      animation: altitude-parallax linear both;
+      animation-timeline: --altitude-hero;
+      animation-range: exit 0% exit 100%;
+    }
+    .altitude-hero .hero-title,
+    .altitude-hero .hero-lead,
+    .altitude-hero .hero-actions {
+      animation: altitude-fade-out linear both;
+      animation-timeline: --altitude-hero;
+      animation-range: exit 0% exit 60%;
+    }
+    .block-section :is(.image-with-text, .imageWithText, .single-image) img,
+    .block-section [class*="imageWithText"] img {
+      animation: altitude-settle linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+  }
+}
+@keyframes altitude-parallax {
+  from { transform: translateY(0); }
+  to { transform: translateY(22%); }
+}
+@keyframes altitude-fade-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(-40px); }
+}
+@keyframes altitude-settle {
+  from { transform: scale(1.12); }
+  to { transform: scale(1); }
+}
+
+/* =========================================
+   Logo wall: monochrome marks like the reference (white on night, ink on light),
+   full strength on hover
+   ========================================= */
+@layer components {
+  .block-section[class*="clientLogos"] img {
+    @apply opacity-60 brightness-0 invert transition-opacity duration-300 hover:opacity-100;
+  }
+  .bg-\[var\(--cms-bg\)\][style*="--cms-bg:var(--surface-alt)"] [class*="clientLogos"] img,
+  .bg-\[var\(--cms-bg\)\][style*="--cms-bg:var(--surface-alt)"][class*="clientLogos"] img {
+    @apply invert-0 opacity-55;
+  }
+}
+
+/* =========================================
+   Closing call to action (_blocks/ctaBanner): the reference's centred statement. The
+   Theme's default alignment (centre on phones, left on desktop) is centred throughout;
+   an alignment set in the CMS still wins. A background photo is an atmosphere under a
+   night wash, not a haze.
+   ========================================= */
+@layer components {
+  .cta-section .cta-box {
+    @apply rounded-[var(--radius-card-lg)] border border-line;
+  }
+  .cta-section .cta-box:not(.has-bg) {
+    @apply border-0 bg-transparent;
+  }
+  @media (min-width: 1024px) {
+    .cta-section .text-center.lg\:text-left { text-align: center; }
+    .cta-section .justify-center.lg\:justify-start { justify-content: center; }
+    .cta-section .text-center.lg\:text-left :is(.cta-title, .cta-text) { margin-inline: auto; }
+  }
+  .cta-section .cta-title {
+    @apply max-w-[22ch] text-[clamp(2rem,4vw,3rem)] leading-[1.12] font-[450] tracking-[0.005em] text-balance text-strong [&_em]:font-[inherit] [&_em]:not-italic;
+  }
+  .cta-section .cta-text {
+    @apply max-w-[52ch] text-body;
+  }
+  .cta-section .cta-box > .absolute.inset-0 {
+    @apply opacity-45;
+  }
+  .cta-section .cta-box.has-bg::after {
+    content: "";
+    @apply pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(80%_80%_at_50%_50%,rgba(23,23,33,0.35),rgba(23,23,33,0.85))];
+  }
+  .cta-section .cta-box > .grid {
+    @apply z-[2];
+  }
+}
+
+/* =========================================
+   Footer: the deepest night, small column labels, silver links, legal row under a hairline
+   ========================================= */
+@layer components {
+  footer, #footer {
+    background-color: var(--surface-dark);
+  }
+  footer :is(h2, h3, h4, h5, h6) {
+    @apply text-sm font-medium tracking-[0.01em] text-strong;
+  }
+  footer :is(ul, ol) a {
+    @apply text-sm text-body no-underline transition-colors hover:text-strong;
+  }
+}
+
+/* Client logos on detail pages (portfolio header): starlight monochrome like the logo wall */
+@layer components {
+  :is(.portfolio-logo, .portfolio-head) img[src$=".svg"],
+  .portfolio-logo img {
+    @apply brightness-0 invert opacity-80;
+  }
+}
+
+/* =========================================
+   Hardcoded white boxes inside blocks (compare table, accordion "card header", modal
+   panels …) are Graphite on the night; inside a light interlude they stay white.
+   ========================================= */
+/* Unlayered on purpose: bg-white is a utility, and the utilities layer beats components */
+:where(.block-section, .tw-modal__content, .tw-modal) .bg-white:not(img) {
+  background-color: var(--surface-alt);
+}
+.bg-\[var\(--cms-bg\)\][style*="--cms-bg:var(--surface-alt)"]:not([data-theme="dark"]) .bg-white:not(img) {
+  background-color: #ffffff;
+}
+@layer components {
+  /* Recommended plan: night card with a hairline in the button blue; its text is written
+     in --parchment by the Theme, which is the night colour here */
+  .pricingCompare .tw-card.ring-2 {
+    --parchment: var(--on-dark);
+    --color-parchment: var(--on-dark);
+    --tw-ring-color: var(--primary);
+    --tw-ring-shadow: 0 0 0 1px var(--primary);
+    background-color: var(--surface-dark);
+  }
+}
+
+/* =========================================
+   Page banner (templates/_includes/page-banner/standard-banner.twig, always layout 2):
+   centred headline and lead on night, the image wide and rounded below, clear of the header
+   ========================================= */
+@layer components {
+  .page-hero--sliderLayout2 {
+    @apply bg-surface pt-[calc(var(--header-height,96px)+3.5rem)] pb-4;
+  }
+  .page-hero--sliderLayout2 .page-hero-slide {
+    background-color: transparent !important;
+  }
+  .page-hero--sliderLayout2 .page-hero-copy {
+    @apply mx-auto flex max-w-3xl flex-col items-center text-center;
+  }
+  .page-hero .page-hero-title {
+    @apply m-0 text-[clamp(2.4rem,4.6vw,3.6rem)] leading-[1.08] font-[450] tracking-[0.005em] text-balance text-strong;
+  }
+  .page-hero .page-hero-lead {
+    @apply mx-auto mt-5 max-w-[56ch] text-lg leading-relaxed text-body md:text-xl;
+  }
+  .page-hero .page-hero-actions {
+    @apply mt-8 flex flex-wrap justify-center gap-3;
+  }
+  .page-hero .page-hero-wide {
+    @apply mt-14 aspect-[16/7] overflow-hidden rounded-[var(--radius-card-lg)] border border-line;
+  }
+  .page-hero .page-hero-wide img {
+    animation: none;
+  }
+}
+
+/* =========================================
+   Type discipline (the reference): no tracked capitals and nothing heavier than 500 in
+   page content. Unlayered so it beats the uppercase / font-bold utilities.
+   ========================================= */
+:is(.block-section, .page-hero, .article-page, .product-page, .portfolio-page, .casestudy-page, footer) :is(.uppercase) {
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+:is(.block-section, .page-hero, .article-page, .product-page, .portfolio-page, .casestudy-page, footer) :is(.font-bold, .font-extrabold, .font-black, .font-semibold) {
+  font-weight: 500;
+}
+
+/* =========================================
+   Pricing, "cards with features" (the reference's pricing page): the plans are columns of
+   one panel split by hairlines; every plan's button is the tint pill except the recommended
+   one (else the first), which is the blue pill; names and prices at a regular weight.
+   Unlayered: these override flex-gap, rounded and font utilities.
+   ========================================= */
+.pricingCompare .flex.flex-wrap.justify-center.gap-6:has(> div > .tw-card) {
+  gap: 0;
+  max-width: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card-lg);
+  overflow: hidden;
+  background-color: var(--surface-alt);
+  padding: 0;
+  margin-top: 1.5rem;
+}
+.pricingCompare .flex.flex-wrap.justify-center.gap-6:has(> div > .tw-card) > div {
+  width: 100%;
+  border-bottom: 1px solid var(--line);
+}
+@media (min-width: 1024px) {
+  .pricingCompare .flex.flex-wrap.justify-center.gap-6:has(> div > .tw-card) {
+    flex-wrap: nowrap;
+  }
+  .pricingCompare .flex.flex-wrap.justify-center.gap-6:has(> div > .tw-card) > div {
+    width: auto;
+    flex: 1 1 0;
+    border-bottom: 0;
+    border-right: 1px solid var(--line);
+  }
+  .pricingCompare .flex.flex-wrap.justify-center.gap-6:has(> div > .tw-card) > div:last-child {
+    border-right: 0;
+  }
+}
+.pricingCompare .flex.flex-wrap.justify-center.gap-6:has(> div > .tw-card) .tw-card {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  --tw-ring-shadow: 0 0 #0000;
+}
+.pricingCompare .flex.flex-wrap.justify-center.gap-6:has(> div > .tw-card) .tw-card .tw-btn {
+  background-color: color-mix(in srgb, #cdddff 15%, transparent);
+  color: var(--text-strong);
+  border-color: transparent;
+}
+.pricingCompare .flex.flex-wrap.justify-center.gap-6:has(> div > .tw-card) .tw-card.ring-2 .tw-btn,
+.pricingCompare .flex.flex-wrap.justify-center.gap-6:not(:has(.ring-2)) > div:first-child .tw-card .tw-btn {
+  background-color: var(--primary);
+  color: var(--on-primary);
+}
+.pricingCompare .tw-card .bg-primary.rounded-full {
+  background-color: color-mix(in srgb, #cdddff 18%, transparent);
+  color: var(--text-strong);
+  font-weight: 500;
+}
+.pricingCompare .tw-card .text-2xl {
+  font-size: 1.5rem;
+  font-weight: 450;
+}
+.pricingCompare .tw-card .text-4xl {
+  font-size: clamp(1.9rem, 2.6vw, 2.25rem);
+  font-weight: 400;
+}
+
+/* =========================================
+   Image with text (_blocks/imageWithText): the reference's split rows. The picture sits
+   inset on a soft rounded tile, the copy beside it is a modest heading and muted text.
+   ========================================= */
+@layer components {
+  .split-section .split-grid {
+    @apply grid items-center gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-20;
+  }
+  .split-section .split-grid.is-reversed {
+    @apply lg:grid-cols-[1fr_1.15fr];
+  }
+  .split-section .split-media {
+    @apply overflow-hidden rounded-[var(--radius-card-lg)] border border-line bg-surface-alt p-5 md:p-8;
+  }
+  .split-section .split-media img {
+    @apply block w-full rounded-[var(--radius-card)];
+  }
+  .split-section .split-title {
+    @apply m-0 mb-4 text-[clamp(1.35rem,2vw,1.75rem)] leading-[1.25] font-[450] tracking-[0.005em] text-strong [&_em]:font-[inherit] [&_em]:not-italic;
+  }
+  .split-section .split-text {
+    @apply max-w-[48ch] text-base leading-relaxed text-body;
+  }
+  .split-section .split-text ul {
+    @apply mt-5 border-t border-line;
+  }
+  .split-section .split-text li {
+    @apply border-b border-line py-3 text-[15px] text-body;
+  }
+  /* The Theme's tick sits at the top of the line; on these padded rows centre it */
+  .split-section .split-text .check-list {
+    @apply gap-0;
+  }
+  .split-section .split-text .check-list li::before {
+    top: calc(0.75rem + 0.15em);
+  }
+  .split-section .split-text .check-list li::after {
+    top: calc(0.75rem + 0.15em + 4px);
+  }
+}
+
+/* Card links (service, post, work cards): the reference's round arrow button. The label stays
+   in the markup for screen readers; only the arrow is drawn. */
+@layer components {
+  :is(.service-card-link, .work-card-link) {
+    @apply mt-6 inline-flex size-9 items-center justify-center overflow-hidden rounded-full bg-surface text-[0px] text-strong transition-colors hover:bg-[var(--surface-dark-hover)];
+  }
+  :is(.service-card-link, .work-card-link) i {
+    @apply text-base;
+  }
+}
+/* Inside the joined panel the recommended plan is a column like the others: the Theme writes
+   its text in --parchment, so point that at the section's strong text (light on night,
+   ink on a light interlude) */
+.pricingCompare .flex.flex-wrap.justify-center.gap-6:has(> div > .tw-card) .tw-card.ring-2 {
+  --parchment: var(--text-strong);
+  --color-parchment: var(--text-strong);
+  color: var(--text-body);
+}
+
+/* =========================================
+   Logo wall: a plain row like the reference, no cells or rules (unlayered: the cell
+   borders are utilities)
+   ========================================= */
+.logos-section :is(.logo-row, .logo-grid) > *,
+.logos-section :is(.logo-row, .logo-grid) {
+  border-color: transparent !important;
+  background: transparent !important;
+}
+.logos-section .logo-title {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* =========================================
+   Universal cards, product cards: panels and media at 12/16px, medium titles, regular
+   prices, tint chips and pills; ratings are quiet starlight, not a second colour
+   ========================================= */
+@layer components {
+  .ucard {
+    @apply rounded-[var(--radius-card-lg)];
+  }
+  .ucard :is(img, .ucard-media) {
+    @apply rounded-[var(--radius-card)];
+  }
+  .ucard :is(h2, h3, h4) {
+    @apply font-medium tracking-[0.005em];
+  }
+  .ucard a.tw-btn,
+  .ucard .tw-btn {
+    @apply h-8 rounded-full border-transparent bg-[#cdddff]/15 px-4 text-[13px] text-strong;
+  }
+  .product-card-media {
+    @apply overflow-hidden rounded-[var(--radius-card)] bg-surface-alt;
+  }
+  .product-card-media img {
+    @apply transition-transform duration-700;
+  }
+  .product-card:hover .product-card-media img {
+    @apply scale-[1.04];
+  }
+  .product-card-title {
+    @apply font-medium text-strong;
+  }
+  .product-card-price {
+    @apply font-normal text-strong;
+  }
+  .product-card-tag {
+    @apply rounded-full bg-surface-dark/70 px-2.5 py-0.5 text-[12px] font-normal tracking-[0.01em] text-on-dark normal-case backdrop-blur-sm;
+  }
+  :is(.product-card-rating, .testimonial-rating, .product-rating, .product-stars) :is(i, svg, span) {
+    color: var(--text-muted) !important;
+    fill: currentColor;
+  }
+}

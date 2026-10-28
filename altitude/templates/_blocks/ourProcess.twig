@@ -1,0 +1,110 @@
+{#- Altitude: Our Process (overrides templates/_blocks/ourProcess.twig). Same fields and options:
+	process items (title, description, duration, icon, optional link), Process Style (layout,
+	items per row, step/card background, title/content colours, text alignment) and Block Style.
+	  horizontalCards        a grid of media tiles: the icon on a rounded tile, the title,
+	                         description and duration underneath (the reference's feature cards)
+	  timeline               the same tiles in a slider with progress-bar pagination
+	  verticalSteps/zigzag   numbered rows between hairlines (the reference's feature list) -#}
+{% import "_macros/images" as images %}
+{% from '_macros/block-style' import bsClasses, bsStyle, bsResponsive, bsContainer %}
+
+{% set headingAndContent = block.headingAndContent.one() %}
+{% set steps = block.processItems.all() ?? [] %}
+{% set blockStyle = block.blockStyle ?? [] %}
+{% set blockType = block.type.handle ?? 'ourProcess' %}
+
+{% set ps = block.processStyle.one() ?? null %}
+{% set layout = ps ? (ps.processLayout.value ?? 'timeline') : 'timeline' %}
+{% set perRowRaw = ps and ps['itemsPerRow'] is defined ? (ps['itemsPerRow'].value ?? (ps['itemsPerRow'] ~ '')) : '' %}
+{% set perRow = perRowRaw in ['2', '3', '4', '6'] ? perRowRaw : '4' %}
+{% set stepBg = ps ? (ps.stepBackground.one() ?? null) : null %}
+{% set cardBg = ps and ps.cardBackground is defined ? (ps.cardBackground.one() ?? null) : null %}
+{% set titleColor = ps ? (ps.titleColor.one() ?? null) : null %}
+{% set contentColor = ps ? (ps.contentColor.one() ?? null) : null %}
+{% set align = ps ? (ps.textAlign.value ?? 'start') : 'start' %}
+{% set alignClass = { 'center': 'text-center items-center', 'end': 'text-right items-end' }[align] ?? 'text-left items-start' %}
+
+{% set themeSwitche = null %}
+{% if blockStyle is defined and blockStyle|length %}
+	{% set bsData = blockStyle.one() %}
+	{% if bsData and bsData.background is defined %}{% set themeSwitche = bsData.background.one().themeDark ?? null %}{% endif %}
+{% endif %}
+
+{% set tileStyle = (stepBg ? 'background-color:' ~ stepBg.colorcode|roleColor ~ ';' : '') ~ (cardBg ? 'background-color:' ~ cardBg.colorcode|roleColor ~ ';' : '') %}
+{% set titleStyle = titleColor ? 'color:' ~ titleColor.colorcode|roleColor ~ ';' : '' %}
+{% set textStyle = contentColor ? 'color:' ~ contentColor.colorcode|roleColor ~ ';' : '' %}
+{% set cols = { '2': 'lg:grid-cols-2', '3': 'lg:grid-cols-3', '4': 'lg:grid-cols-4', '6': 'lg:grid-cols-6' }[perRow] %}
+
+{% macro tile(item, n, tileStyle, titleStyle, textStyle, alignClass) %}
+	{% import "_macros/images" as images %}
+	{% set link = (item.switchOff ?? false) and item.linkUrl ? (item.linkUrl.url ?? item.linkUrl) : null %}
+	<div class="group relative flex h-full flex-col gap-4 {{ alignClass }}">
+		<div class="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface-alt transition-colors duration-300 group-hover:border-strong/25" {% if tileStyle %}style="{{ tileStyle }}"{% endif %}>
+			<span class="absolute top-4 left-4 text-[13px] text-muted">{{ '%02d'|format(n) }}</span>
+			{% if item.image|length %}
+				<span class="size-14 transition-transform duration-500 group-hover:scale-110" {{ images.iconMask(item.image.0) }}>{{ images.singleImg(item.image.0, 112, {'ratio': 1}, 'w-full h-full object-contain') }}</span>
+			{% else %}
+				<span class="text-4xl font-[450] text-strong">{{ n }}</span>
+			{% endif %}
+		</div>
+		<div class="flex flex-col gap-1.5 {{ alignClass }}">
+			<h3 class="step-title m-0 text-base font-medium text-strong" {% if titleStyle %}style="{{ titleStyle }}"{% endif %}>
+				{% if link %}<a href="{{ link }}" class="after:absolute after:inset-0">{{ item.plainText }}</a>{% else %}{{ item.plainText }}{% endif %}
+			</h3>
+			{% if item.Description|length %}
+				<div class="step-description text-[15px] leading-relaxed text-body [&_p]:m-0" {% if textStyle %}style="{{ textStyle }}"{% endif %}>{{ item.Description|raw }}</div>
+			{% endif %}
+			{% if item.duration|length %}
+				<span class="mt-1 text-[13px] text-muted">{{ item.duration }}</span>
+			{% endif %}
+		</div>
+	</div>
+{% endmacro %}
+
+{% if steps|length %}
+	{{ bsResponsive(blockStyle, '.' ~ blockType ~ block.uid ~ '-style') }}
+	<section class="block-section {{ blockType }}{{ block.uid }}-style {{ bsClasses(blockStyle) }}" data-theme="{{ themeSwitche ? 'dark' : 'light' }}" style="{{ bsStyle(blockStyle) }}">
+		<div class="{{ bsContainer(blockStyle, 'container mx-auto px-4') }}">
+			{% include "_components/header-content-block" %}
+
+			{% if layout == 'horizontalCards' %}
+				<div class="process-container-inner grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 {{ cols }}">
+					{% for item in steps %}
+						<div data-reveal>{{ _self.tile(item, loop.index, tileStyle, titleStyle, textStyle, alignClass) }}</div>
+					{% endfor %}
+				</div>
+
+			{% elseif layout == 'timeline' %}
+				<div class="swiper altitude-slider" data-swiper-options='{"spaceBetween":24,"watchOverflow":true,"speed":600,"pagination":{"el":".swiper-pagination","clickable":true},"breakpoints":{"0":{"slidesPerView":1.15},"576":{"slidesPerView":2},"992":{"slidesPerView":{{ perRow > 3 ? 3 : perRow }}},"1200":{"slidesPerView":{{ perRow }}}}}'>
+					<div class="swiper-wrapper">
+						{% for item in steps %}
+							<div class="swiper-slide h-auto">{{ _self.tile(item, loop.index, tileStyle, titleStyle, textStyle, alignClass) }}</div>
+						{% endfor %}
+					</div>
+					<div class="swiper-pagination relative! bottom-0! mt-10"></div>
+				</div>
+
+			{% else %}
+				<ol class="process-container-inner m-0 list-none border-t border-line p-0 {{ layout == 'zigzagLayout' ? 'mx-auto max-w-4xl' : '' }}">
+					{% for item in steps %}
+						{% set link = (item.switchOff ?? false) and item.linkUrl ? (item.linkUrl.url ?? item.linkUrl) : null %}
+						<li class="group relative grid grid-cols-[3rem_1fr] gap-x-4 gap-y-1 border-b border-line py-7 md:grid-cols-[4rem_minmax(0,1fr)_auto] md:items-baseline" data-reveal>
+							<span class="text-[15px] text-muted">{{ '%02d'|format(loop.index) }}</span>
+							<div class="flex flex-col gap-1.5">
+								<h3 class="step-title m-0 text-[clamp(1.15rem,1.8vw,1.4rem)] font-[450] text-strong" {% if titleStyle %}style="{{ titleStyle }}"{% endif %}>
+									{% if link %}<a href="{{ link }}" class="after:absolute after:inset-0">{{ item.plainText }}</a>{% else %}{{ item.plainText }}{% endif %}
+								</h3>
+								{% if item.Description|length %}
+									<div class="step-description max-w-[62ch] text-[15px] leading-relaxed text-body [&_p]:m-0" {% if textStyle %}style="{{ textStyle }}"{% endif %}>{{ item.Description|raw }}</div>
+								{% endif %}
+							</div>
+							{% if item.duration|length %}
+								<span class="col-start-2 text-[13px] text-muted md:col-start-auto md:text-right">{{ item.duration }}</span>
+							{% endif %}
+						</li>
+					{% endfor %}
+				</ol>
+			{% endif %}
+		</div>
+	</section>
+{% endif %}

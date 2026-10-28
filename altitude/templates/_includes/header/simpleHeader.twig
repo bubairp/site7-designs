@@ -1,0 +1,78 @@
+{#- Altitude: the header bar (overrides templates/_includes/header/simpleHeader.twig; the other
+	three header layouts include this file). One full-width row: logo, centred navigation,
+	search and a tinted pill CTA. Over a hero it is transparent; once the page scrolls it
+	turns to night with a hairline (altitude.css "Header"). Keeps every hook the Theme's JS
+	and CMS options use: headerMain / header-main / header-panel / header-top / search-field,
+	the headerMenu markup, the mobile sidebar and the .header-height spacer. -#}
+{% import "_macros/images" as images %}
+{% import '_components/ctaButton' as buttons %}
+
+<div x-data="sidebarMenu">
+<div x-data="{ searchOpen: false }" class="headerMain altitude-header {{ headerClasses }} {{ headerPositioning }} sticky w-full z-[1030] bg-surface/90 backdrop-blur-xl transition-all duration-300" data-theme="dark">
+	{% if headerDisplayThinbar and generalEntry.headerNotification|length %}
+		<div class="header-top border-b border-white/10 bg-surface-dark py-2 text-on-dark/80">
+			<div class="container mx-auto px-4 text-center text-[13px] tracking-[0.02em]">{{ generalEntry.headerNotification }}</div>
+		</div>
+	{% endif %}
+	<div class="header-main flex flex-wrap bg-transparent py-3 lg:py-4">
+		<div class="header-panel {{ headerContainerWidth }}">
+			<div class="flex w-full flex-wrap items-center justify-between gap-x-6 lg:flex-nowrap">
+				<a class="menu-brand shrink-0 lg:flex lg:flex-1" href="{{ siteUrl }}" aria-label="{{ siteName }}">
+					<span class="logo shrink-0 text-on-dark">
+						{% include "_includes/header/_parts/logo" %}
+					</span>
+				</a>
+
+				<div class="order-2 ms-auto flex items-center gap-3 lg:order-last lg:flex-1 lg:justify-end">
+					{% if headerDisplayPhone and generalEntry.phoneNumber %}
+						<a class="hidden text-sm text-on-dark/80 transition-colors hover:text-on-dark sm:block" href="tel:{{ generalEntry.phoneNumber }}">{{ generalEntry.phoneNumber }}</a>
+					{% endif %}
+					{% if headerDisplaySocial %}
+						<div class="social-items hidden md:flex">{% include '_components/social' with { sizeClass: 'w-7 h-7', iconSize: 14 } %}</div>
+					{% endif %}
+					{% if headerDisplaySearch %}
+						<button @click="searchOpen = !searchOpen" :aria-expanded="searchOpen ? 'true' : 'false'" type="button" class="inline-flex size-10 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 text-lg text-on-dark/80 transition-colors hover:bg-white/10 hover:text-on-dark" aria-label="{{ 'Search'|t }}">
+							<i class="ti ti-search" aria-hidden="true"></i>
+						</button>
+					{% endif %}
+					{% if headerDisplayCTA is defined and headerButton is defined and headerDisplayCTA and headerButton %}
+						{{ buttons.renderButton(headerButton, {}, 'header-cta hidden sm:inline-flex') }}
+					{% endif %}
+					<button id="sidebarMenuToggle" @click="sidebarOpen = true" :aria-expanded="sidebarOpen ? 'true' : 'false'" class="inline-flex size-10 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 text-on-dark transition-colors hover:bg-white/10 lg:hidden" type="button" aria-label="{{ 'Open menu'|t }}" aria-controls="offcanvasRight">
+						<span class="hamburger-icon" aria-hidden="true">
+							<span class="bar bar-1"></span>
+							<span class="bar bar-2"></span>
+							<span class="bar bar-3"></span>
+						</span>
+					</button>
+				</div>
+
+				<nav class="hidden w-full lg:order-2 lg:flex lg:w-auto lg:items-center lg:justify-center" id="menuNav" role="navigation" aria-label="{{ 'Main navigation'|t }}">{{ craft.simplerpmenu.getRpMenuHTML('headerMenu', {
+					'menu-id': 'headerMenu',
+					'menu-class': 'simple-rp-menu',
+					'ul-class': 'menu-ul flex flex-col lg:flex-row p-0 m-0',
+					'li-class': '',
+					'sub-menu-ul-class': 'sub-menu-ul',
+					'link-class': 'menu-link',
+				}) }}</nav>
+			</div>
+
+			<div x-show="searchOpen" x-collapse x-cloak class="search-field w-full">
+				<form action="{{ siteUrl('search') }}" method="get" class="mx-auto block max-w-[600px] pt-4 pb-1">
+					<label class="flex h-12 items-center gap-3 rounded-full border border-white/15 bg-white/5 px-5 transition-colors focus-within:border-white/40">
+						<i class="ti ti-search text-lg text-on-dark/60" aria-hidden="true"></i>
+						<span class="sr-only">{{ 'Search'|t }}</span>
+						<input class="grow border-0 bg-transparent p-0 text-base text-on-dark placeholder-on-dark/50 focus:outline-hidden focus:ring-0" placeholder="{{ 'Search the site'|t }}" required name="term" id="searchField" x-ref="searchInput" x-effect="if (searchOpen) $nextTick(() => $refs.searchInput.focus())">
+						<button type="button" @click="searchOpen = false" class="inline-flex size-8 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-on-dark/60 hover:text-on-dark" aria-label="{{ 'Close search'|t }}">
+							<i class="ti ti-x text-lg" aria-hidden="true"></i>
+						</button>
+					</label>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+{# variant 'light' is the Theme's mobile-menu mode (not a colour); altitude.css darkens it #}
+{% include '_includes/header/_parts/sidebar' with { variant: 'light', showCta: true } %}
+</div>
+<div class="header-height" style="min-height: var(--header-height, 100px);"></div>

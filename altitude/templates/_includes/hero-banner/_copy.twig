@@ -1,0 +1,19 @@
+{#- Altitude: hero copy (overrides templates/_includes/hero-banner/_copy.twig). Same fields and
+	switches as the Theme: eyebrow (Subtitle, when Display Title is on), heading (h1 on the
+	first slide), lead (Description, when its switch is on), optional check list, buttons.
+	Regular 450 headline, nothing italic; the buttons share one translucent capsule.
+	Expects: slide, headingTag, eyebrowClass, withList (default true). -#}
+{% import '_components/ctaButton' as buttons %}
+{% if slide.displayTitle and slide.subtitle|length %}
+	<span class="{{ eyebrowClass }} mb-5 text-sm tracking-[0.02em] text-on-dark/70">{{ slide.subtitle }}</span>
+{% endif %}
+<{{ headingTag }} class="hero-title m-0 max-w-[22ch] text-[clamp(2.5rem,4.6vw,3.6rem)] leading-[1.08] font-[450] tracking-[0.005em] text-balance text-on-dark [&_em]:not-italic">{{ slide.heading|raw }}</{{ headingTag }}>
+{% if slide.switchOffDes and slide.description|length %}
+	<div class="hero-lead mt-5 max-w-[52ch] text-lg leading-relaxed text-on-dark/75 md:text-xl">{{ slide.description }}</div>
+{% endif %}
+{% if withList ?? true %}
+	{% include "_includes/hero-banner/_list" with { items: (slide.displayCheckList ?? false) ? (slide.checkListShowTable ?? []) : [] } %}
+{% endif %}
+{% if slide.button|length %}
+	<div class="hero-actions mt-9 inline-flex flex-wrap items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/10 p-1.5 backdrop-blur-md">{{ buttons.renderButton(slide.button.all()) }}</div>
+{% endif %}

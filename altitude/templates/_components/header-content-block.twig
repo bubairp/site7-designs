@@ -1,0 +1,28 @@
+{#- Altitude: section head (overrides templates/_components/header-content-block.twig). Same
+	fields as the Theme (eyebrow badge, heading with its tag, description, alignment, dark
+	switch). Left-aligned heads sit under a full-width hairline with the heading at a medium
+	size; centred heads are larger statements. The eyebrow is quiet sentence-case text, not
+	tracked capitals. Keeps the Theme's classes (section-head, is-left …) for block CSS. -#}
+{% if headingAndContent and (headingAndContent.heading|length or headingAndContent.Description|length or headingAndContent.badgeText|length) %}
+	{% set alignVal = headingAndContent.align.value ?? headingAndContent.align ?? 'center' %}
+	{% set alignClass = {'left': 'is-left', 'start': 'is-left', 'center': 'is-center', 'right': 'is-right', 'end': 'is-right'}[alignVal] ?? 'is-center' %}
+	{% set headingTag = (headingAndContent.headingTags.value ?? headingAndContent.headingTags ?? 'h2') ?: 'h2' %}
+	{% set centred = alignClass == 'is-center' %}
+	{% set layout = {
+		'is-left': 'items-start text-left',
+		'is-center': 'items-center text-center mx-auto max-w-3xl',
+		'is-right': 'items-end text-right ms-auto',
+	}[alignClass] %}
+
+	<div class="header-content-block section-head {{ alignClass }} {{ blockCssClasses ?? '' }} {{ (blockType is defined and blockType and blockType != 'headingContent') ? blockType ~ '-style' : '' }} mb-12 flex flex-col gap-4 md:mb-14 {{ layout }}" data-theme="{{ themeSwitche ?? null ? 'dark' : 'light' }}">
+		{% if headingAndContent.switchOff and headingAndContent.badgeText|length %}
+			<span class="section-eyebrow smallText-badge text-sm tracking-[0.01em] text-muted normal-case">{{ headingAndContent.badgeText }}</span>
+		{% endif %}
+		{% if headingAndContent.heading|length %}
+			<{{ headingTag }} class="block-heading-title section-title m-0 font-[450] tracking-[0.005em] text-balance text-strong [&_em]:not-italic {{ centred ? 'text-[clamp(2rem,3.6vw,2.9rem)] leading-[1.12]' : 'max-w-[26ch] text-[clamp(1.6rem,2.6vw,2.15rem)] leading-[1.2]' }}">{{ headingAndContent.heading|raw }}</{{ headingTag }}>
+		{% endif %}
+		{% if headingAndContent.Description|length %}
+			<div class="block-description section-lead tw-rich-text m-0 max-w-[60ch] text-base leading-relaxed text-body md:text-lg [&_p]:m-0">{{ headingAndContent.Description|raw }}</div>
+		{% endif %}
+	</div>
+{% endif %}

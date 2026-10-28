@@ -1,0 +1,25 @@
+{#- Altitude: testimonial card (overrides templates/_components/_testimonials/testimonialCard.twig),
+	used by the grid views. The reference's quote voice on a soft panel: first sentence in the
+	strong colour, the rest muted; under a hairline the person with a small round photo and,
+	when set, a quiet rating. Expects: testimonial. -#}
+{% import "_macros/images" as images %}
+{% import "_macros/ratings" as ratings %}
+{% set text = testimonial.comment|striptags|trim %}
+{% set m = text|split('. ', 2) %}
+<figure class="testimonial-card m-0 flex h-full flex-col justify-between gap-8 rounded-[var(--radius-card-lg)] border border-line bg-surface-alt p-7 md:p-8">
+	<blockquote class="testimonial-quote m-0 text-[17px] leading-[1.55] font-normal before:hidden after:hidden">
+		<span class="font-medium text-strong">{{ m|length > 1 ? m[0] ~ '.' : text }}</span>{% if m|length > 1 %}<span class="text-muted">&nbsp;{{ m[1] }}</span>{% endif %}
+	</blockquote>
+	<figcaption class="testimonial-person flex items-center gap-3 border-t border-line pt-5">
+		{% if testimonial.image|length %}
+			<span class="size-10 shrink-0 overflow-hidden rounded-full bg-surface">{{ images.singleImg(testimonial.image.0, 80, {'ratio': 1}, 'h-full w-full object-cover', { alt: '' }) }}</span>
+		{% endif %}
+		<span class="flex min-w-0 flex-col">
+			<span class="testimonial-name text-[15px] font-medium text-strong">{{ testimonial.authorName }}</span>
+			{% if testimonial.authorRole|length %}<span class="testimonial-role text-sm text-muted">{{ testimonial.authorRole }}</span>{% endif %}
+		</span>
+		{% if testimonial.ratings ?? false %}
+			<span class="testimonial-rating ms-auto text-muted opacity-80">{{ ratings.stars(testimonial.ratings, '12px') }}</span>
+		{% endif %}
+	</figcaption>
+</figure>

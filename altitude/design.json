@@ -1,0 +1,8 @@
+{
+  "handle": "altitude",
+  "name": "Altitude",
+  "version": "0.1.0",
+  "description": "A night canvas with light interludes, regular-weight Inter, one blue for buttons, pills and hairlines, with scroll and slider interaction.",
+  "contract": "1",
+  "reference": "Refero style \"Mercury \u2014 Mountain Top Command Center\" (mercury.com), adapted"
+}

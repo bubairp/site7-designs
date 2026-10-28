@@ -1,0 +1,46 @@
+{#- Altitude: search + category filter of the blog and shop listings
+	(overrides templates/_components/listing-filter.twig; same params, see that file).
+	The reference's controls: a pill search field with its button inside, then the categories
+	as pill chips on a hairline row (a select when there are more than 8). No card around it.
+	Same GET parameters (search, category); searching keeps the chosen category. -#}
+{% set useChips = categories|length <= 8 %}
+{% set chip = 'inline-flex h-9 shrink-0 items-center rounded-full border px-4 text-sm font-normal transition-colors' %}
+{% set chipIdle = 'border-line bg-transparent text-body hover:border-strong/40 hover:text-strong' %}
+{% set chipActive = 'border-transparent bg-[#cdddff]/20 text-strong' %}
+{% set searchQuery = searchTerm ? '&search=' ~ searchTerm|url_encode : '' %}
+
+<div class="mb-10 flex flex-col gap-5">
+	<form name="{{ formName }}" id="{{ formName }}" action="{{ currentUrl }}" method="GET" role="search">
+		<div class="flex flex-col gap-4 {{ useChips ? '' : 'md:flex-row' }}">
+			<div class="flex max-w-xl flex-1 items-center gap-2 rounded-full border border-line bg-surface-alt ps-5 pe-1.5 transition-colors focus-within:border-strong/40">
+				<i class="ti ti-search text-lg text-muted" aria-hidden="true"></i>
+				<input class="h-12 min-w-0 flex-1 border-0 bg-transparent p-0 text-base text-strong shadow-none outline-none placeholder:text-muted focus:ring-0" type="search" name="search" placeholder="{{ placeholder }}" aria-label="{{ placeholder }}" value="{{ searchTerm }}">
+				{% if searchTerm %}
+					<a href="{{ currentUrl }}{{ selectedCategory ? '?category=' ~ selectedCategory|url_encode }}" class="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-muted hover:bg-surface hover:text-strong" aria-label="{{ 'Clear search'|t }}"><i class="ti ti-x" aria-hidden="true"></i></a>
+				{% endif %}
+				<button type="submit" class="tw-btn tw-btn-primary tw-btn-sm shrink-0">{{ 'Search'|t }}</button>
+			</div>
+
+			{% if useChips %}
+				{% if selectedCategory %}<input type="hidden" name="category" value="{{ selectedCategory }}">{% endif %}
+				<nav class="flex flex-wrap items-center gap-2 border-b border-line pb-5" aria-label="{{ 'Categories'|t }}">
+					<a href="{{ currentUrl }}{{ searchTerm ? '?search=' ~ searchTerm|url_encode }}" class="{{ chip }} {{ selectedCategory ? chipIdle : chipActive }}" {{ selectedCategory ? '' : 'aria-current="page"' }}>{{ 'All'|t }}</a>
+					{% for category in categories %}
+						{% set active = selectedCategory == category.slug %}
+						<a href="{{ currentUrl }}?category={{ category.slug|url_encode }}{{ searchQuery }}" class="{{ chip }} {{ active ? chipActive : chipIdle }}" {{ active ? 'aria-current="page"' }}>{{ category.title }}</a>
+					{% endfor %}
+					{% if selectedCategory or searchTerm %}
+						<a href="{{ currentUrl }}" class="ms-auto inline-flex shrink-0 items-center gap-1.5 ps-2 text-sm text-muted hover:text-strong"><i class="ti ti-restore" aria-hidden="true"></i>{{ 'Clear filters'|t }}</a>
+					{% endif %}
+				</nav>
+			{% else %}
+				<select name="category" aria-label="{{ 'Category'|t }}" onchange="this.form.submit()" class="h-12 rounded-full border border-line bg-surface-alt px-5 text-base text-strong md:w-64">
+					<option value="">{{ 'All categories'|t }}</option>
+					{% for category in categories %}
+						<option value="{{ category.slug }}" {{ selectedCategory == category.slug ? 'selected' }}>{{ (category.level ?? 1) > 1 ? '— ' }}{{ category.title }}</option>
+					{% endfor %}
+				</select>
+			{% endif %}
+		</div>
+	</form>
+</div>

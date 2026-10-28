@@ -1,0 +1,68 @@
+{#- Altitude: Testimonials (overrides templates/_blocks/testimonials.twig). Same fields: heading,
+	selected testimonials (quote, name, role, photo, rating), display view, items per row,
+	Block Style.
+	  sliderView   the reference's quote carousel: one centred quote at a time (first sentence
+	               strong, the rest muted), crossfade, autoplay that pauses on hover,
+	               progress-bar pagination
+	  gridView     graphite quote cards (altitude.css "Cards"), items per row as set -#}
+{% import "_macros/images" as images %}
+{% import "_macros/ratings" as ratings %}
+{% from '_macros/block-style' import bsClasses, bsStyle, bsResponsive, bsContainer %}
+{% set headingAndContent = block.headingAndContent.one() %}
+{% set items = (block.selectTestimonials ?? null) ? block.selectTestimonials.all() : [] %}
+{% set blockStyle = block.blockStyle ?? [] %}
+{% set blockType = block.type.handle ?? 'testimonials' %}
+
+{% if not items %}{% include '_components/empty-block-notice' with { what: 'testimonials'|t, pack: 'Testimonials Pack'|t } only %}{% endif %}
+{% if items %}
+	{% set themeSwitche = null %}
+	{% if blockStyle is defined and blockStyle|length %}
+		{% set bsData = blockStyle.one() %}
+		{% if bsData and bsData.background is defined %}{% set themeSwitche = bsData.background.one().themeDark ?? null %}{% endif %}
+	{% endif %}
+	{% set view = block.displayView.value ?? 'sliderView' %}
+	{% set view = view in ['gridView', 'masonryView', 'listView'] ? 'gridView' : 'sliderView' %}
+	{% set perRow = block.testimonialPerRow.value|default('3') %}
+	{% set delay = 7000 %}
+
+	{{ bsResponsive(blockStyle, '.' ~ blockType ~ block.uid ~ '-style') }}
+	<section class="block-section testimonials-section {{ blockType }}{{ block.uid }}-style {{ bsClasses(blockStyle) }}" data-theme="{{ themeSwitche ? 'dark' : 'light' }}" style="{{ bsStyle(blockStyle) }}">
+		<div class="{{ bsContainer(blockStyle, 'container mx-auto px-4') }}">
+			{% include "_components/header-content-block" %}
+
+			{% if view == 'gridView' %}
+				<div class="grid grid-cols-1 gap-6 {{ {'2': 'md:grid-cols-2', '4': 'md:grid-cols-2 lg:grid-cols-4'}[perRow] ?? 'md:grid-cols-2 lg:grid-cols-3' }}">
+					{% for testimonial in items %}
+						<div>{% include "_components/_testimonials/testimonialCard.twig" with { testimonial: testimonial } %}</div>
+					{% endfor %}
+				</div>
+			{% else %}
+				{% set multi = items|length > 1 %}
+				{#- The reference's quote carousel: a centred quote, no photo; its first sentence in the
+					strong colour and the rest muted, the person underneath, progress bars below -#}
+				<div class="{{ multi ? 'swiper altitude-quotes' : '' }} mx-auto max-w-3xl" style="--hero-delay: {{ delay }}ms" {% if multi %}data-swiper-options='{"effect":"fade","fadeEffect":{"crossFade":true},"speed":900,"autoHeight":true,"autoplay":{"delay":{{ delay }},"disableOnInteraction":false,"pauseOnMouseEnter":true},"pagination":{"el":".altitude-quotes-pagination","clickable":true}}'{% endif %}>
+					<div class="{{ multi ? 'swiper-wrapper' : '' }}">
+						{% for t in items %}
+							{% set text = t.comment|striptags|trim %}
+							{% set m = text|split('. ', 2) %}
+							{% set lead = m|length > 1 ? m[0] ~ '.' : text %}
+							{% set rest = m|length > 1 ? m[1] : '' %}
+							<figure class="{{ multi ? 'swiper-slide' : '' }} m-0 flex flex-col items-center text-center">
+								<blockquote class="m-0 text-[clamp(1.3rem,2.2vw,1.65rem)] leading-[1.4] font-normal tracking-[0.005em] text-balance before:hidden after:hidden">
+									<span class="text-muted">&ldquo;</span><span class="font-medium text-strong">{{ lead }}</span>{% if rest %}<span class="text-muted">&nbsp;{{ rest }}</span>{% endif %}<span class="text-muted">&rdquo;</span>
+								</blockquote>
+								<figcaption class="mt-7 flex flex-col items-center gap-0.5">
+									<span class="text-base font-medium text-strong">{{ t.authorName }}</span>
+									{% if t.authorRole|length %}<span class="text-[15px] text-muted">{{ t.authorRole }}</span>{% endif %}
+								</figcaption>
+							</figure>
+						{% endfor %}
+					</div>
+					{% if multi %}
+						<div class="altitude-quotes-pagination swiper-pagination relative! bottom-0! mt-10"></div>
+					{% endif %}
+				</div>
+			{% endif %}
+		</div>
+	</section>
+{% endif %}

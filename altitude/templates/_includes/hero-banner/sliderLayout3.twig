@@ -1,0 +1,39 @@
+{#- Altitude: home hero (overrides templates/_includes/hero-banner/sliderLayout3.twig; layouts 1
+	and 2 include this file). Full-height photo or video under a night wash; headline, lead and
+	the buttons in one translucent capsule sit in the upper third; the stats are a slim bar
+	along the bottom. Several slides
+	crossfade, and the pagination is a row of progress bars that fill over the autoplay delay
+	(altitude.css "Hero"). The photo drifts in very slowly unless reduced motion is set.
+	Reads the same Hero Banner Slider fields as the Theme (_copy/_list/_media-pair). -#}
+{% set multi = heroBannerSliders|length > 1 %}
+{% set delay = 7000 %}
+<section class="altitude-hero relative isolate w-full overflow-hidden bg-surface-dark text-on-dark" data-theme="dark" style="--hero-delay: {{ delay }}ms">
+	<div class="{{ multi ? 'swiper' : '' }}" {% if multi %}data-swiper-options='{"effect":"fade","fadeEffect":{"crossFade":true},"speed":1200,"autoplay":{"delay":{{ delay }},"disableOnInteraction":false},"pagination":{"el":".altitude-hero-pagination","clickable":true}}'{% endif %}>
+		<div class="{{ multi ? 'swiper-wrapper' : '' }}">
+			{% for slide in heroBannerSliders %}
+				{% set bgColor = (slide.colorLibrary.one().colorcode ?? null)|roleColor %}
+				<div class="{{ multi ? 'swiper-slide' : '' }} relative flex min-h-[100svh] flex-col" {% if bgColor %}style="background-color: {{ bgColor }};"{% endif %}>
+					<div class="altitude-hero-media absolute inset-0 -z-10">
+						{% include "_includes/hero-banner/_media-pair" with { width: 1920, eager: loop.first } %}
+					</div>
+					{# Night wash: readable copy in the middle, a deep floor for the stats #}
+					<div class="absolute inset-0 -z-10 bg-[radial-gradient(70%_55%_at_50%_45%,rgba(23,23,33,0.35),rgba(23,23,33,0.7))]" aria-hidden="true"></div>
+					<div class="absolute inset-x-0 bottom-0 -z-10 h-2/5 bg-gradient-to-t from-surface-dark to-transparent" aria-hidden="true"></div>
+
+					<div class="container mx-auto flex flex-1 flex-col items-center justify-start px-4 pt-[calc(var(--header-height,96px)+clamp(3rem,9vh,6.5rem))] pb-16 text-center">
+						{% include "_includes/hero-banner/_copy" with { headingTag: loop.first ? 'h1' : 'h2', eyebrowClass: 'altitude-eyebrow', withList: false } %}
+					</div>
+					{% set items = (slide.displayCheckList ?? false) ? (slide.checkListShowTable ?? []) : [] %}
+					{% if items|length %}
+						<div class="container mx-auto w-full px-4 pb-8 md:pb-10">
+							{% include "_includes/hero-banner/_list" with { items: items } %}
+						</div>
+					{% endif %}
+				</div>
+			{% endfor %}
+		</div>
+		{% if multi %}
+			<div class="altitude-hero-pagination absolute! inset-x-0! bottom-4! z-10 flex justify-center gap-2" aria-label="{{ 'Slides'|t }}"></div>
+		{% endif %}
+	</div>
+</section>
