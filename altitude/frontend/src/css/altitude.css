@@ -1578,3 +1578,11 @@
 .product-reviews {
   border-top: 0;
 }
+
+/* =========================================
+   Reviews (templates/_blocks/reviews.twig, an extra block): stars in quiet starlight like
+   every rating here, not the Theme's gold; cards and summary on the Theme's tokens
+   ========================================= */
+.reviews-section .review-stars {
+  color: var(--text-strong);
+}
