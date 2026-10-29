@@ -499,11 +499,13 @@ div.sm\:rounded-full:has(input[type="email"]) input[type="email"].rounded-full {
   :is(.split-text ul li, .check-list li)::before {
     @apply rounded-md border-0 bg-accent/10;
   }
-  .split-image.is-rounded,
-  .split-media picture:has(.is-rounded) {
+  /* The frame holds the image, video or embedded player (and clips it), so it carries the
+     corners, hairline and shadow */
+  .split-frame.is-rounded,
+  .split-frame.is-rounded :is(.split-image, picture) {
     @apply rounded-[var(--radius-card-lg)];
   }
-  .split-media picture:has(.is-rounded) {
+  .split-frame.is-rounded {
     @apply border border-line shadow-lg;
   }
 

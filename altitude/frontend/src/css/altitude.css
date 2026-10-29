@@ -696,10 +696,11 @@
   .split-section .split-media {
     @apply overflow-hidden;
   }
-  .split-section .split-media :is(.split-image.is-rounded, picture:has(.is-rounded)) {
+  /* The frame holds the image, video or embedded player and clips it to these corners */
+  .split-section .split-media :is(.split-frame.is-rounded, .split-image.is-rounded, picture:has(.is-rounded)) {
     border-radius: var(--radius-card-lg);
   }
-  .split-section .split-media :is(.split-image.is-square, picture:has(.is-square)) {
+  .split-section .split-media :is(.split-frame.is-square, .split-image.is-square, picture:has(.is-square)) {
     border-radius: 0;
   }
   .split-section .split-title {
