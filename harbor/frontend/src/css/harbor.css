@@ -6,9 +6,9 @@
    re-skin them; designs/harbor/templates overrides what tokens can't.
    Inter is already loaded by the site's own CSS (base/fonts.css).
    ========================================= */
-@import '../../../../frontend/src/css/app.css';
+@import '../../../../../frontend/src/css/app.css';
 
-@source '../../templates/**/*.twig';
+@source '../../../templates/**/*.twig';
 
 :root {
   /* Surfaces: white canvas, whisper-grey alternates, graphite dark sections */

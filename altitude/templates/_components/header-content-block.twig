@@ -1,7 +1,7 @@
 {#- Altitude: section head (overrides templates/_components/header-content-block.twig). Same
 	fields as the Theme (eyebrow badge, heading with its tag, description, alignment, dark
-	switch). Left-aligned heads sit under a full-width hairline with the heading at a medium
-	size; centred heads are larger statements. The eyebrow is quiet sentence-case text, not
+	switch). Left-aligned heads have the heading at a medium size; centred heads are larger
+	statements. The eyebrow is quiet sentence-case text, not
 	tracked capitals. Keeps the Theme's classes (section-head, is-left …) for block CSS. -#}
 {% if headingAndContent and (headingAndContent.heading|length or headingAndContent.Description|length or headingAndContent.badgeText|length) %}
 	{% set alignVal = headingAndContent.align.value ?? headingAndContent.align ?? 'center' %}

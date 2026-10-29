@@ -7,8 +7,10 @@ A Site7 design: frontend only. It reads the same CMS fields as the default desig
 - **Reference:** Refero style "Mercury — Mountain Top Command Center" (mercury.com) and the
   real mercury.com home, pricing and VC-funds pages: their layout, type, colour roles and
   interactions. Not a copy of that brand: no logo, name, product shots or copy.
-- **Files:** `src/css/altitude.css` (role tokens and the rules utilities can't express),
-  `templates/` (overrides, same paths as the theme), built into `web/designs/altitude/`.
+- **Files:** `frontend/src/css/altitude.css` (role tokens and the rules utilities can't
+  express), `frontend/src/js/altitude.js` (Altitude's own interaction: the product quote's
+  pointer drift), `templates/` (overrides, same paths as the theme), built into
+  `web/designs/altitude/`.
 - **Preview:** `?design=altitude` (Dev Mode) or `bash scripts/design.sh preview altitude`.
 - **JavaScript:** none of its own. Interactions use what every page already loads: Alpine
   (`x-data` in the templates), Swiper (`data-swiper-options`) and CSS (scroll-driven
@@ -41,25 +43,34 @@ A Site7 design: frontend only. It reads the same CMS fields as the default desig
 
 | File | Altitude's version |
 |---|---|
-| `_includes/header/simpleHeader.twig` (+ the other three layouts include it) | Full-width bar, transparent over a banner, night with a hairline once scrolled; blue CTA pill |
+| `_includes/header/simpleHeader.twig` (+ the other three layouts include it) | Full-width bar, transparent over a banner, night with a hairline after 24px of scroll (not at the banner's end; inline script); same width, height and 1px border in every state, dropdowns included; blue CTA pill |
 | `_includes/hero-banner/sliderLayout3.twig` (+ layouts 1/2), `_copy.twig`, `_list.twig` | Full-height photo under a night wash, headline in the upper third, buttons in one translucent capsule, stats as a slim bar; slow drift, crossfade, progress-bar pagination |
 | `_includes/page-banner/standard-banner.twig` | Every banner with an image is the reference's inner-page opening: centred headline, lead, buttons, the image wide and rounded below |
-| `_components/header-content-block.twig` | Section heads: left heads under a hairline at a medium size, centred heads larger; quiet sentence-case eyebrow |
+| `_components/header-content-block.twig` | Section heads: no rule above; left heads at a medium size, centred heads larger; quiet sentence-case eyebrow |
 | `_components/listing-filter.twig` | Pill search field, pill category chips on a hairline |
 | `_components/_testimonials/testimonialCard.twig` | Quote card: first sentence strong, rest muted, person under a hairline |
 | `_blocks/ourProcess.twig` | Media tiles (horizontal cards), the same tiles as a slider (timeline), numbered hairline rows (vertical/zigzag) |
 | `_blocks/testimonials.twig` | Slider: the reference's centred quote carousel with progress bars; grid: quote cards |
 | `_blocks/accordion.twig` | The site's block, except "With changing image": the reference's feature list (rows between hairlines, pinned image panel that crossfades) |
+| `_blocks/clientLogos.twig` | The reference's logo wall, marks in one tone (starlight, ink on a light interlude): slider view is a CSS marquee (logos printed twice, edges fade, pauses on hover, static row with reduced motion), list view a centred row, grid view soft tiles; same fields |
+| `_layouts/detail/product.twig` | The Theme's product layout with one change: the highlight quote sits on the product's first photo used as a texture (toned, softened, night wash, film grain and a dot grid) that drifts against the pointer (frontend/src/js/altitude.js sets --mx/--my; mouse only, still with reduced motion; plain night without a photo); keep the rest in step with the Theme's file |
+| `_blocks/video.twig` | The Theme's block without its 64rem wrapper and extra top margin: the video takes the container width under the section head |
 | `_includes/header/_parts/sidebar.twig` | The Theme's mobile/sidebar menu with the logo printed inline (so it takes the night colours) |
 
 Restyled in `altitude.css` on the theme's markup (CMS options and JS hooks unchanged): buttons
-(every colour option), cards of every listing, image with text (photo inset on a tile),
+(every colour option), cards of every listing (badges and skill pills hug their text in a tint
+of the text colour, so they show on any card; the round arrow is centred, tinted the same way
+and sits at the card's foot; award list rows show the badge as plain text), reviews and
+comments (the Theme's light-page greys mapped to night text and hairlines, the reply a tinted
+bubble, faint empty rating stars), image with text (the photo fills its column, square when "rounded" is off; ticks centred on ruled rows),
 pricing (one panel split by hairlines, the recommended plan's button blue), compare table,
-logo wall (plain starlight row), closing CTA (centred statement), footer, sliders (thin bars),
-logo recolour, white boxes inside blocks (Graphite on night), main menu dropdowns (Graphite
+closing CTA (centred statement), footer, sliders (thin bars),
+logo recolour (the Site7 Engine mark as a blue disc with a white "7" and starlight text, the
+same in every header state), white boxes inside blocks (Graphite on night), main menu dropdowns (Graphite
 panels, rows that light up, a compact two-column mega panel), filter pills as the reference's
 underlined tabs, slider arrows (one round Graphite button everywhere), universal card tags and
-overlay buttons, page banner (buttons in a capsule, image in a soft framed panel).
+overlay buttons, page banner (buttons in a capsule, the image wide and rounded with no frame, 3:2 on phones, 40/56px under it so it never meets a light section), the floating
+AI chat bubble (the blue) and back to top (Graphite disc, blue progress ring).
 
 ## Interaction
 

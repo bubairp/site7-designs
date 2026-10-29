@@ -76,7 +76,23 @@
 {% include '_includes/header/_parts/sidebar' with { variant: 'light', showCta: true } %}
 </div>
 <div class="header-height" style="min-height: var(--header-height, 100px);"></div>
-{# Native wheel scrolling like the reference: the Theme's smooth scroll (Lenis, desktop only)
-   glides on for 1.2s after each wheel turn. Altitude only turns its wheel smoothing off;
-   Lenis keeps running, so header states and anchor scrolling still work. #}
-<script>window.addEventListener('load', function () { if (window.lenis && window.lenis.options) { window.lenis.options.smoothWheel = false; } });</script>
+{# Over a banner the Theme keeps the bar transparent until it reaches the banner's bottom
+   (js/app.js initGlassHeader). Altitude turns it night after a short scroll instead, like the
+   solid bar, and slides the announcement bar away at the same point (the Theme does that at
+   the first pixel), so it is one motion. The Theme sets both classes on every scroll frame,
+   so an observer puts this design's values back before the frame paints. #}
+<script>
+(function () {
+	var header = document.querySelector('.headerMain.altitude-header.header-floating-glass');
+	if (!header || !document.querySelector('#header.has-header-banner')) return;
+	var sync = function () {
+		var want = window.scrollY > 24;
+		['scrolled', 'thinbar-away'].forEach(function (cls) {
+			if (header.classList.contains(cls) !== want) header.classList.toggle(cls, want);
+		});
+	};
+	new MutationObserver(sync).observe(header, { attributes: true, attributeFilter: ['class'] });
+	window.addEventListener('scroll', sync, { passive: true });
+	sync();
+})();
+</script>

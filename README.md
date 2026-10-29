@@ -12,7 +12,10 @@ a Library package from Commerce24, into the same path.
 <handle>/
 ├── design.json        handle, name, description
 ├── DESIGN.md          the design's rules
-├── src/css/<handle>.css   Tailwind tokens on top of the site's CSS
+├── frontend/src/      laid out like the theme package (themes/site7-theme/frontend/src)
+│   ├── css/<handle>.css   Tailwind tokens on top of the site's CSS
+│   ├── js/<handle>.js     optional: the design's own script, runs after the theme's JS
+│   └── images/            optional: images its CSS or JS uses
 └── templates/         only the templates it replaces, at the same paths as the theme's
 ```
 

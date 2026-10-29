@@ -3,7 +3,7 @@
 A Site7 design: frontend only. It reads the same CMS fields as the default design (Editorial, `DESIGN.md` at the project root) and changes only how they look. Files missing here come from `templates/`.
 
 - **Reference:** Refero style "Arcade" (arcade.software), adapted for an agency site. Not a copy of that brand: no logos, product shots or script lettering.
-- **Files:** `src/css/harbor.css` (Tailwind role tokens), `templates/` (overrides, same paths as `templates/`), built into `web/designs/harbor/`.
+- **Files:** `frontend/src/css/harbor.css` (Tailwind role tokens), `templates/` (overrides, same paths as `templates/`), built into `web/designs/harbor/`.
 - **Preview:** `?design=harbor` (Dev Mode). Build: `DESIGN=harbor npx vite build --config vite.design.mjs` in `frontend/`.
 
 ## Templates it overrides
@@ -19,7 +19,7 @@ Same paths as `templates/` (DESIGN.md at the project root, "Detail layouts"); st
 | `_includes/hero-banner/sliderLayout1/2/3.twig`, `_copy.twig`, `_list.twig` | Home hero: layout 3 a graphite stage with the media framed below and a stats grid; layout 1 split with a glowing media frame; layout 2 copy beside an edge-to-edge media half below the header |
 | `_includes/footer/basicFooter.twig` | Graphite footer (unless the CMS sets a footer colour or image), small uppercase column labels, the company name as a faint wordmark |
 
-Restyled in `src/css/harbor.css` with Tailwind `@apply`, Theme markup kept (CMS options, data handling and JS stay the Theme's):
+Restyled in `frontend/src/css/harbor.css` with Tailwind `@apply`, Theme markup kept (CMS options, data handling and JS stay the Theme's):
 
 | Area | Harbor |
 |---|---|

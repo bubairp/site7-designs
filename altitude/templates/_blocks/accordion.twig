@@ -152,7 +152,6 @@
 			{% set accordionDisplayMode = block.accordionDisplayMode ?? 'simpleAccordion' %}
 			{% if accordionDisplayMode == 'simpleAccordion' %}
 				<div class="flex flex-col">
-					<div class="w-full max-w-4xl mx-auto">
 						<div class="tw-accordion w-full {% if isAlt2Style or accordionStyle == 'cardStyleAccordion' %}!overflow-visible !rounded-none{% endif %}" id="industries" x-data="{ activeAccordion: 0 }">
 							{% for index, item in expandableContent %}
 								{% include "_blocks/_nested/accordion/" ~ item.type.handle with { 
@@ -174,7 +173,6 @@
 								} %}
 							{% endfor %}
 						</div>
-					</div>
 				</div>
 			{% elseif accordionDisplayMode == 'accordionWithChangingImage' %}
 				{#- Altitude: the reference's feature list. Rows between hairlines; the active row

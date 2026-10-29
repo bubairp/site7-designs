@@ -1,0 +1,88 @@
+{#- Altitude: client logos (overrides templates/_blocks/clientLogos.twig). Same fields as the
+	Theme: section head, logos (image, title, link), display mode, columns per row, show title.
+	The reference's logo wall: one-tone marks at a readable size, no cells or rules.
+	  Slider view  a continuous marquee (CSS only: the logos print twice and the track moves
+	               by half its width, edges fade out; static row with reduced motion)
+	  List view    one centred row that wraps
+	  Grid view    soft Graphite tiles, the columns per row from the CMS
+	Styles: altitude.css "Client logos". -#}
+{% import "_macros/images" as images %}
+{% from '_macros/block-style' import bsClasses, bsStyle, bsResponsive, bsContainer %}
+
+{% set headingAndContent = block.headingAndContent.one() %}
+{% set imageTitleLink = block.imageTitleLink.all() ?? [] %}
+{% set blockStyle = block.blockStyle ?? [] %}
+{% set blockType = block.type.handle ?? '' %}
+{% set blockTypeUid = block.uid ?? '' %}
+
+{% set scopedSel = '.' ~ blockType ~ blockTypeUid ~ '-style' %}
+{% set containerWidth = bsContainer(blockStyle, 'container mx-auto px-4') %}
+{% set themeSwitche = null %}
+{% set blockStyleData = blockStyle|length ? blockStyle.one() : null %}
+{% if blockStyleData and blockStyleData.background is defined %}
+	{% set themeSwitche = blockStyleData.background.one().themeDark ?? null %}
+{% endif %}
+
+{% macro logo(item, showTitle, hidden) %}
+	{% import "_macros/images" as images %}
+	{% import "_macros/utils" as utils %}
+	{% set link = item.linkUrl ?? null %}
+	{% set image = item.image.one() ?? null %}
+	<{{ link ? 'a' : 'div' }} {% if link %}href="{{ link.url ?? link }}" {{ utils.newTabAttrs(link.url ?? link, 'noopener') }}{% if hidden %} tabindex="-1"{% endif %}{% endif %} class="logo-item group">
+		<span class="logo-mark">
+			{% if image %}
+				{{ images.singleImg(image, image.extension == 'svg' ? 160 : 240, {}, 'logo-img', { alt: hidden ? '' : (item.title ?: 'Client logo') }) }}
+			{% elseif item.title %}
+				<span class="logo-wordmark">{{ item.title }}</span>
+			{% endif %}
+		</span>
+		{% if showTitle and item.title and image %}
+			<span class="logo-title">{{ item.title }}</span>
+		{% endif %}
+	</{{ link ? 'a' : 'div' }}>
+{% endmacro %}
+
+{% import _self as logos %}
+{% if imageTitleLink|length %}
+	{{ bsResponsive(blockStyle, scopedSel) }}
+
+	{% set showTitle = block.logoTitleDisplay ?? false %}
+	{% set displayMode = block.displayMode.value ?? 'sliderView' %}
+	{% set displayMode = {'Slider View': 'sliderView', 'List View': 'listView', 'Grid View': 'gridView'}[displayMode] ?? displayMode %}
+	{% set columnPerRow = block.columnPerRow.value ?? 'md-2' %}
+	{% set gridCols = {'md-6': 'md:grid-cols-2', 'md-4': 'md:grid-cols-3', 'md-3': 'md:grid-cols-4', 'md-2': 'md:grid-cols-6'}[columnPerRow] ?? 'md:grid-cols-6' %}
+
+	<section class="block-section logos-section logos-{{ displayMode }} {{ blockType }}{{ blockTypeUid }}-style {{ bsClasses(blockStyle) }}" data-theme="{{ themeSwitche ? 'dark' : 'light' }}" style="{{ bsStyle(blockStyle) }}">
+		<div class="{{ containerWidth }}">
+			{% if headingAndContent %}
+				{% include "_components/header-content-block" %}
+			{% endif %}
+
+			{% if displayMode == 'listView' %}
+				<div class="logo-row">
+					{% for item in imageTitleLink %}{{ logos.logo(item, showTitle, false) }}{% endfor %}
+				</div>
+			{% elseif displayMode == 'gridView' %}
+				<div class="logo-grid grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 {{ gridCols }}">
+					{% for item in imageTitleLink %}{{ logos.logo(item, showTitle, false) }}{% endfor %}
+				</div>
+			{% else %}
+				{# A short list repeats inside each half so the row is always wider than the screen #}
+				{% set repeat = imageTitleLink|length < 8 ? 2 : 1 %}
+				<div class="logo-marquee" style="--marquee-duration: {{ max(30, imageTitleLink|length * repeat * 4) }}s;">
+					<div class="logo-marquee-track">
+						{% for half in 1..2 %}
+							<ul class="logo-marquee-list" role="list" {% if half == 2 %}aria-hidden="true"{% endif %}>
+								{% for pass in 1..repeat %}
+									{% for item in imageTitleLink %}
+										<li {% if pass > 1 and half == 1 %}aria-hidden="true"{% endif %}>{{ logos.logo(item, showTitle, half == 2 or pass > 1) }}</li>
+									{% endfor %}
+								{% endfor %}
+							</ul>
+						{% endfor %}
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	</section>
+{% endif %}

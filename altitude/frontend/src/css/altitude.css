@@ -7,9 +7,9 @@
    Dark throughout: every section sits on the night canvas, one blue for
    primary buttons only, light-weight Inter headlines, pills, no shadows.
    ========================================= */
-@import '../../../../frontend/src/css/app.css';
+@import '../../../../../frontend/src/css/app.css';
 
-@source '../../templates/**/*.twig';
+@source '../../../templates/**/*.twig';
 
 :root {
   /* Surfaces, three steps of night (DESIGN.md "Surfaces"): no shadows, depth is a step up */
@@ -135,18 +135,16 @@
   /* Scrolled, or a page without a banner: night bar with a hairline */
   .altitude-header.headerMain {
     background-color: color-mix(in srgb, var(--surface-dark) 88%, transparent) !important;
-    border-bottom: 1px solid color-mix(in srgb, white 8%, transparent);
     box-shadow: none !important;
   }
-  /* Over a banner: fully transparent, no glass panel */
+  /* Over a banner: fully transparent, no glass panel (hairline, width and height: the
+     "Header: one height in every state" rules further down) */
   #header.has-header-banner .altitude-header.headerMain.header-floating-glass:not(.scrolled, .menu-open) {
     background: transparent !important;
-    border-bottom-color: transparent;
   }
   #header.has-header-banner .altitude-header.header-floating-glass:not(.scrolled, .menu-open) .header-panel {
     background: transparent !important;
     box-shadow: none !important;
-    padding-inline: revert-layer !important;
   }
   #header.has-header-banner .altitude-header.header-floating-glass:not(.scrolled, .menu-open) .header-panel::before {
     display: none !important;
@@ -212,6 +210,21 @@
     font-weight: 400;
     letter-spacing: 0.005em;
   }
+  /* The mark: Altitude's blue disc with a white "7" (the Site7 Engine logo's terracotta and
+     cream), the same over a banner photo and on the night bar. The long selectors outrank the
+     Theme's over-photo recolour (components/header.css), which made the disc light. */
+  :is(.header-logo-svg, svg[role="img"]) circle[fill="#b05a36"],
+  #header.has-banner-photo .altitude-header.headerMain.header-floating-glass:not(.scrolled, .menu-open) .header-logo-svg circle[fill="#b05a36"] {
+    fill: var(--primary);
+  }
+  :is(.header-logo-svg, svg[role="img"]) path[stroke="#fef9ef"],
+  #header.has-banner-photo .altitude-header.headerMain.header-floating-glass:not(.scrolled, .menu-open) .header-logo-svg path[stroke="#fef9ef"] {
+    stroke: #fff;
+  }
+  .altitude-header .header-logo-svg text[fill="#2a2b2f"],
+  #header.has-banner-photo .altitude-header.headerMain.header-floating-glass:not(.scrolled, .menu-open) .header-logo-svg text[fill="#2a2b2f"] {
+    fill: var(--on-dark);
+  }
 }
 
 /* =========================================
@@ -250,6 +263,7 @@
    ========================================= */
 .bg-\[var\(--cms-bg\)\][style*="--cms-bg:var(--surface-alt)"]:not([data-theme="dark"]) {
   /* The inline --cms-bg points at --surface-alt, so that is the pale canvas here */
+  --logo-filter: brightness(0);
   --surface-alt: #f7f7f9;
   --surface: #ffffff;
   --line: #e2e2e8;
@@ -281,13 +295,9 @@
 }
 
 /* =========================================
-   Section heads: left-aligned heads sit under a full-width hairline, centred ones
-   stay open (the reference does both)
+   Section heads: open, no rule above (left heads had a full-width hairline; removed)
    ========================================= */
 @layer components {
-  .section-head.is-left {
-    @apply border-t border-line pt-10;
-  }
   .section-head :is(.section-title, .block-heading-title) {
     @apply font-[450] tracking-[0.005em] text-balance;
   }
@@ -317,8 +327,20 @@
   :is(.project-card-meta, .post-card-meta, .post-card-text, .work-card-text, .team-card-role, .award-card-text, .service-card-text) {
     @apply text-body;
   }
+  /* Card badges: a pill that hugs its text. Without a width a card's flex column stretched
+     it across the card, and long ones wrapped inside the pill. The fill is a tint of the
+     text colour, so it shows on night, on a Graphite card and on a white one (a Graphite
+     fill vanished on Graphite cards and left the text indented). */
   :is(.post-card-tag, .work-card-eyebrow, .service-card-eyebrow, .award-card-eyebrow) {
-    @apply rounded-full bg-surface-alt px-2.5 py-0.5 text-[12px] font-normal tracking-[0.01em] text-muted normal-case;
+    @apply inline-flex w-fit max-w-full items-center self-start rounded-full border-0 bg-[color-mix(in_srgb,var(--text-strong)_8%,transparent)] px-2.5 py-0.5 text-[12px] leading-[1.6] font-normal tracking-[0.01em] whitespace-nowrap text-body normal-case;
+  }
+  .text-center > :is(.post-card-tag, .work-card-eyebrow, .service-card-eyebrow, .award-card-eyebrow),
+  .text-center :is(.post-card-body, .work-card-body, .award-card-body) > :is(.post-card-tag, .work-card-eyebrow, .award-card-eyebrow) {
+    @apply self-center;
+  }
+  /* Award list rows: the badge is the row's first column, so plain quiet text there */
+  .award-card--row .award-card-eyebrow {
+    @apply w-auto self-auto rounded-none bg-transparent p-0 text-[13px] whitespace-normal;
   }
   /* The round arrow on a card corner (the reference's press cards) */
   .project-card-arrow {
@@ -670,11 +692,15 @@
   .split-section .split-grid.is-reversed {
     @apply lg:grid-cols-[1fr_1.15fr];
   }
+  /* The picture fills its column, no framed tile; "Image border rounded" off keeps it square */
   .split-section .split-media {
-    @apply overflow-hidden rounded-[var(--radius-card-lg)] border border-line bg-surface-alt p-5 md:p-8;
+    @apply overflow-hidden;
   }
-  .split-section .split-media img {
-    @apply block w-full rounded-[var(--radius-card)];
+  .split-section .split-media :is(.split-image.is-rounded, picture:has(.is-rounded)) {
+    border-radius: var(--radius-card-lg);
+  }
+  .split-section .split-media :is(.split-image.is-square, picture:has(.is-square)) {
+    border-radius: 0;
   }
   .split-section .split-title {
     @apply m-0 mb-4 text-[clamp(1.35rem,2vw,1.75rem)] leading-[1.25] font-[450] tracking-[0.005em] text-strong [&_em]:font-[inherit] [&_em]:not-italic;
@@ -682,32 +708,43 @@
   .split-section .split-text {
     @apply max-w-[48ch] text-base leading-relaxed text-body;
   }
+  /* Ruled rows. The Theme's tick (sections.css .split-text ul li) sits at a fixed offset from
+     the row's top, which the row padding pushed above the text: centre it on the first line. */
   .split-section .split-text ul {
-    @apply mt-5 border-t border-line;
+    @apply mt-5 gap-0 border-t border-line;
   }
-  .split-section .split-text li {
-    @apply border-b border-line py-3 text-[15px] text-body;
+  .split-section .split-text ul li {
+    @apply m-0 border-b border-line py-3.5 ps-8 text-[15px] text-body;
   }
-  /* The Theme's tick sits at the top of the line; on these padded rows centre it */
-  .split-section .split-text .check-list {
-    @apply gap-0;
+  .split-section .split-text ul li::before {
+    top: calc(0.875rem + (1lh - 18px) / 2);
   }
-  .split-section .split-text .check-list li::before {
-    top: calc(0.75rem + 0.15em);
-  }
-  .split-section .split-text .check-list li::after {
-    top: calc(0.75rem + 0.15em + 4px);
+  .split-section .split-text ul li::after {
+    top: calc(0.875rem + (1lh - 18px) / 2 + 4px);
   }
 }
 
 /* Card links (service, post, work cards): the reference's round arrow button. The label stays
    in the markup for screen readers; only the arrow is drawn. */
 @layer components {
+  /* The disc is a tint of the text colour (a night fill disappeared on white cards), at the
+     foot of the card so a row of cards lines its arrows up; 24px stay clear above it */
   :is(.service-card-link, .work-card-link) {
-    @apply mt-6 inline-flex size-9 items-center justify-center overflow-hidden rounded-full bg-surface text-[0px] text-strong transition-colors hover:bg-[var(--surface-dark-hover)];
+    @apply mt-auto inline-flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--text-strong)_10%,transparent)] text-[0px] text-strong transition-colors hover:bg-[color-mix(in_srgb,var(--text-strong)_18%,transparent)];
   }
-  :is(.service-card-link, .work-card-link) i {
+  :is(.service-card, .work-card-body) > :has(+ :is(.service-card-link, .work-card-link)) {
+    margin-bottom: 1.5rem;
+  }
+  /* Centred in the disc: the Theme's 8px gap still applies to the hidden label (an empty
+     flex item), which pushed the arrow off centre, and its hover nudge moved it further */
+  :is(.service-card-link, .work-card-link) {
+    gap: 0;
+    padding: 0;
+  }
+  :is(.service-card-link, .work-card-link) i,
+  .group:hover :is(.service-card-link, .work-card-link) i {
     @apply text-base;
+    transform: none;
   }
 }
 /* Inside the joined panel the recommended plan is a column like the others: the Theme writes
@@ -720,17 +757,152 @@
 }
 
 /* =========================================
-   Logo wall: a plain row like the reference, no cells or rules (unlayered: the cell
-   borders are utilities)
+   Client logos (templates/_blocks/clientLogos.twig): the reference's logo wall. Every mark
+   in one tone (starlight on night, ink on a light interlude) at a readable size, no cells
+   or rules. Slider view is a CSS marquee, list view a centred row, grid view soft tiles.
+   Unlayered: the Theme's cell borders and fades are component rules with utilities.
    ========================================= */
-.logos-section :is(.logo-row, .logo-grid) > *,
-.logos-section :is(.logo-row, .logo-grid) {
-  border-color: transparent !important;
-  background: transparent !important;
+:root {
+  --logo-filter: brightness(0) invert(1);
+}
+.logos-section .logo-item {
+  min-height: 0;
+  padding: 0;
+  gap: 12px;
+  border: 0 !important;
+}
+.logos-section .logo-mark {
+  height: auto;
+  filter: var(--logo-filter);
+  opacity: 0.72;
+  transition: opacity 0.3s ease;
+}
+.logos-section .logo-item:hover .logo-mark {
+  filter: var(--logo-filter);
+  opacity: 1;
+}
+.logos-section .logo-mark :is(picture, img) {
+  width: 100%;
+  max-width: none;
+  height: 2.25rem;
+  object-fit: contain;
+}
+.logos-section .logo-wordmark {
+  font-size: 1.25rem;
+  font-weight: 450;
 }
 .logos-section .logo-title {
-  color: var(--text-muted);
+  font-size: 13px;
   font-weight: 400;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--text-muted);
+}
+@media (min-width: 768px) {
+  .logos-section .logo-mark :is(picture, img) {
+    height: 2.75rem;
+  }
+}
+
+/* Slider view: a marquee. The track holds the list twice and moves by half its width, so
+   the loop has no seam; each list carries a trailing gap for the same reason. */
+.logo-marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+}
+.logo-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: altitude-marquee var(--marquee-duration, 45s) linear infinite;
+}
+.logo-marquee:hover .logo-marquee-track {
+  animation-play-state: paused;
+}
+.logo-marquee-list {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  margin: 0;
+  padding: 0 2.5rem 0 0;
+  list-style: none;
+}
+.logo-marquee-list > li {
+  flex: 0 0 auto;
+  width: 8rem;
+  margin: 0;
+  padding: 0;
+}
+.logo-marquee-list > li::before,
+.logo-marquee-list > li::after {
+  content: none;
+}
+@media (min-width: 768px) {
+  .logo-marquee-list {
+    gap: 3.5rem;
+    padding-right: 3.5rem;
+  }
+  .logo-marquee-list > li {
+    width: 10rem;
+  }
+}
+@keyframes altitude-marquee {
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo-marquee {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .logo-marquee-track {
+    width: auto;
+    animation: none;
+  }
+  .logo-marquee-list {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 2rem;
+    padding-right: 0;
+  }
+  .logo-marquee-list[aria-hidden="true"],
+  .logo-marquee-list > li[aria-hidden="true"] {
+    display: none;
+  }
+}
+
+/* List view: one centred row that wraps */
+.logos-section .logo-row {
+  align-items: center;
+  gap: 2rem 3.5rem;
+  border: 0;
+}
+.logos-section .logo-row > .logo-item {
+  flex: 0 0 auto;
+  width: 8rem;
+}
+@media (min-width: 768px) {
+  .logos-section .logo-row > .logo-item {
+    width: 10rem;
+  }
+}
+
+/* Grid view: soft tiles tinted from the text colour (Graphite on night, pale grey on a light
+   interlude), a little stronger on hover */
+.logos-section .logo-grid {
+  border: 0;
+}
+.logos-section .logo-grid > .logo-item {
+  min-height: 8.5rem;
+  padding: 1.5rem 1.25rem;
+  border-radius: var(--radius-card);
+  background-color: color-mix(in srgb, var(--text-strong) 5%, transparent);
+  transition: background-color 0.3s ease;
+}
+.logos-section .logo-grid > .logo-item:hover {
+  background-color: color-mix(in srgb, var(--text-strong) 9%, transparent);
+}
+.logos-section .logo-grid .logo-mark :is(picture, img) {
+  max-width: 9rem;
 }
 
 /* =========================================
@@ -851,12 +1023,6 @@
   .cta-section .text-center.lg\:text-left > .mb-2 { justify-content: center; }
 }
 
-/* Left section heads: the hairline runs the full container width (the Theme caps the head
-   at 46rem); the text inside keeps its measure */
-.section-head.is-left {
-  max-width: none;
-}
-
 /* Page banner block: a night wash and starlight text whatever its dark switch */
 .block-section[class*="pageBanner"] .mix-blend-screen,
 .block-section[class*="pageBanner"] .mix-blend-multiply {
@@ -927,23 +1093,48 @@
 /* Header: one height in every state, so switching from transparent (over a banner) to night
    (scrolled) only changes colour. The Theme's glass state adds panel padding; Altitude has no
    glass box, so it is zeroed, and the change is eased over 400ms. */
-.altitude-header.headerMain .header-main {
+.altitude-header.headerMain .header-main,
+#header.has-header-banner .altitude-header.headerMain.header-floating-glass:not(.scrolled, .menu-open) .header-main {
   padding-block: 14px !important;
 }
+/* One width too: the Theme's glass state insets the panel from the screen edges and swaps
+   the container gutter (px-4) for its own padding, so the row was wider over the banner. */
 #header.has-header-banner .altitude-header.header-floating-glass:not(.scrolled, .menu-open) .header-panel {
-  padding-block: 0 !important;
+  width: 100% !important;
+  margin-inline: auto !important;
+  padding: 0 1rem !important;
+}
+@media (min-width: 1024px) {
+  /* The logo's own size (h-9), not the glass state's larger one */
+  #header.has-header-banner .altitude-header.header-floating-glass:not(.scrolled, .menu-open) :is(.header-logo-svg, .logo img) {
+    height: 2.25rem !important;
+  }
+}
+/* The hairline is one 1px border in every state; only its colour changes. The Theme's
+   .menu-dropdown-open sets border-bottom: none, which reset the colour to the text colour,
+   so closing a dropdown faded a light line back out (and the bar moved by 1px). */
+.altitude-header.headerMain,
+.altitude-header.headerMain.menu-dropdown-open {
+  border-bottom: 1px solid var(--altitude-header-line, color-mix(in srgb, white 8%, transparent)) !important;
+}
+#header.has-header-banner .altitude-header.headerMain.header-floating-glass:not(.scrolled, .menu-open) {
+  --altitude-header-line: transparent;
 }
 .altitude-header.headerMain {
   transition:
-    transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
-    background-color 0.4s ease,
-    border-color 0.4s ease,
-    -webkit-backdrop-filter 0.4s ease,
-    backdrop-filter 0.4s ease !important;
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    -webkit-backdrop-filter 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    backdrop-filter 0.5s cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 .altitude-header .menu-link,
 .altitude-header .header-cta {
   transition: color 0.25s ease, background-color 0.25s ease;
+}
+/* Whatever still changes colour between the states fades with the bar */
+.altitude-header :is(.header-logo-svg *, .logo, #sidebarMenuToggle, [aria-label="Search"]) {
+  transition: color 0.4s ease, fill 0.4s ease, stroke 0.4s ease, background-color 0.25s ease !important;
 }
 @media (prefers-reduced-motion: reduce) {
   .altitude-header.headerMain { transition: none !important; }
@@ -1156,11 +1347,12 @@
     z-index: 11;
   }
 
-  /* Case-study skill tags */
+  /* Case-study skill tags: the same tint as the card badges (a blue tint all but vanished
+     on white cards) */
   .work-card-tags li {
     border: 0 !important;
     border-radius: 9999px;
-    background-color: color-mix(in srgb, #cdddff 12%, transparent);
+    background-color: color-mix(in srgb, var(--text-strong) 8%, transparent);
     color: var(--text-body);
     font-size: 12px;
     padding: 3px 10px;
@@ -1168,7 +1360,8 @@
 }
 
 /* Page banner, as the reference's inner pages: buttons in one translucent capsule, the image
-   inside a soft framed panel */
+   wide and rounded with no frame, and less space under it than the Theme's (56/80px margin
+   plus the banner's padding) */
 @layer components {
   .page-hero .page-hero-actions {
     display: inline-flex;
@@ -1182,12 +1375,29 @@
     align-items: center;
   }
   .page-hero .page-hero-wide {
-    padding: clamp(14px, 3vw, 40px);
-    background: radial-gradient(120% 120% at 50% 0%, color-mix(in srgb, #cdddff 10%, var(--surface-alt)), var(--surface-alt));
-    border-radius: 20px;
+    padding: 0;
+    margin-bottom: 0;
+    border: 0;
+    background: var(--surface-alt);
+    border-radius: var(--radius-card-lg);
+  }
+  /* Some room under the image of its own, so it never sits on the edge of a light section */
+  .page-hero.page-hero--sliderLayout2 {
+    padding-bottom: 2.5rem;
+  }
+  @media (min-width: 1024px) {
+    .page-hero.page-hero--sliderLayout2 {
+      padding-bottom: 3.5rem;
+    }
+  }
+  /* 16:7 is a thin strip on a phone */
+  @media (max-width: 767.98px) {
+    .page-hero .page-hero-wide,
+    .page-hero .page-hero-wide img {
+      aspect-ratio: 3 / 2 !important;
+    }
   }
   .page-hero .page-hero-wide img {
-    border-radius: 12px;
     aspect-ratio: 16 / 7;
     object-fit: cover;
     width: 100%;
@@ -1227,4 +1437,143 @@
   #header.has-header-banner:has(.header-floating-glass) > .header-banner .page-hero--sliderLayout2 .page-hero-grid {
     padding-top: 40px !important;
   }
+}
+
+/* =========================================
+   Floating buttons (_layouts/entry.twig): the AI chat bubble and back to top. The Theme
+   paints the chat bubble with --ink (light on night here) and the back-to-top button white
+   (bg utilities, so !important). Chat is the blue; back to top a Graphite disc with a
+   starlight arrow, its scroll-progress ring in the blue.
+   ========================================= */
+@layer components {
+  #ai-chat-widget {
+    --primary-blue: var(--primary) !important;
+  }
+  #ai-chat-toggle {
+    color: #fff !important;
+    box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.7) !important;
+  }
+  .tw-btn-scroll-top {
+    background-color: var(--surface-alt) !important;
+    color: var(--on-dark) !important;
+    box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.7) !important;
+  }
+  .tw-btn-scroll-top::before {
+    background-color: var(--surface-alt) !important;
+  }
+  .tw-btn-scroll-top svg circle {
+    stroke: var(--primary);
+  }
+  .tw-btn-scroll-top:hover {
+    color: #fff !important;
+  }
+  .tw-btn-scroll-top:hover::before {
+    background-color: var(--surface-dark-hover) !important;
+  }
+}
+
+/* =========================================
+   Reviews and comments (_components/comments.twig: product reviews, blog comments). The
+   Theme's template writes light-page greys (text-dark, gray-50/100/200 …), which on night
+   left the review text unreadable. Unlayered so it beats those utilities.
+   ========================================= */
+#comments :is(.text-dark, .text-gray-700) {
+  color: var(--text-body);
+}
+#comments .text-gray-500 {
+  color: var(--text-muted);
+}
+#comments :is(.border-gray-100, .border-gray-200) {
+  border-color: var(--line);
+}
+/* The admin reply: a tinted bubble with all four corners, no tail (the tail's square showed) */
+#comments .bg-gray-50 {
+  background-color: color-mix(in srgb, var(--text-strong) 5%, transparent);
+  border-radius: var(--radius-card);
+}
+#comments .bg-gray-50::before {
+  content: none;
+}
+/* Rating input: empty stars faint, chosen and hovered ones starlight */
+#comments #ratingWrapper input ~ label {
+  color: color-mix(in srgb, var(--text-strong) 25%, transparent);
+}
+#comments #ratingWrapper input:checked ~ label,
+#comments #ratingWrapper input ~ label:hover,
+#comments #ratingWrapper input ~ label:hover ~ label {
+  color: var(--text-strong) !important;
+}
+
+/* =========================================
+   Product quote (templates/_layouts/detail/product.twig): the highlight quote on the
+   product's first photo used as a texture (toned, softened, under a night wash, film grain
+   and a fine dot grid). The pointer's position comes in as --mx/--my (-0.5 to 0.5, from
+   frontend/src/js/altitude.js): the photo drifts against it and the grain a little with
+   it, eased.
+   Plain night when the product has no photo; still with reduced motion.
+   ========================================= */
+.product-quote.has-image {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.product-quote-media,
+.product-quote-texture {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.product-quote-media :is(picture, img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.55) contrast(1.1) blur(1.5px);
+  transform: translate3d(calc(var(--mx, 0) * -36px), calc(var(--my, 0) * -24px), 0) scale(1.14);
+  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.product-quote-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 90% at calc(50% + var(--mx, 0) * 20%) calc(50% + var(--my, 0) * 20%), rgba(23, 23, 33, 0.66), rgba(23, 23, 33, 0.92)),
+    rgba(23, 23, 33, 0.2);
+}
+/* Grain (SVG noise) over a fine dot grid, a few pixels of drift with the pointer */
+.product-quote-texture {
+  inset: -12px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 1px 1px, rgba(237, 237, 243, 0.16) 1px, transparent 1.4px);
+  background-size: 160px 160px, 14px 14px;
+  opacity: 0.32;
+  mix-blend-mode: overlay;
+  transform: translate3d(calc(var(--mx, 0) * 10px), calc(var(--my, 0) * 8px), 0);
+  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .product-quote-media :is(picture, img),
+  .product-quote-texture {
+    transform: none;
+    transition: none;
+  }
+  .product-quote-media :is(picture, img) {
+    transform: scale(1.04);
+  }
+}
+/* The product name under the quote: quiet sentence case, not tracked capitals */
+.product-quote figcaption {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: color-mix(in srgb, var(--on-dark) 72%, transparent);
+}
+/* Reviews follow the quote without a rule between them */
+.product-reviews {
+  border-top: 0;
 }
