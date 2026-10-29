@@ -1586,3 +1586,8 @@
 .reviews-section .review-stars {
   color: var(--text-strong);
 }
+/* Image/Video with Text at full width keeps Altitude's larger inner corners (the Theme's
+   .split-full rounds only the corners away from the screen edge) */
+.split-section {
+  --split-radius: var(--radius-card-lg);
+}
