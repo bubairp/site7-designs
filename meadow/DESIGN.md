@@ -46,7 +46,10 @@ White on `#22c55e` is about 2.3:1, below 4.5:1. Kept to match the reference; dar
 
 | Area | Meadow |
 |---|---|
-| Header | 15px menu links in slate, 38px header button (14px text) |
+| Header | 15px menu links in slate; the current page and hover on a faint green pill with green text, no underline; 38px header button (14px text) |
+| Process steps | Green rounded square (12px, 4px white border, soft shadow) with a dark icon; the number on a white disc with a green ring. A CMS step colour still wins |
+| Testimonials | Slate-100 card (white on a coloured section), 32px corners, 36px padding, no quote mark; the person first (64px avatar, Josefin 18px bold name, amber stars), the quote below in muted Inter 16px |
+| CTA banner | With no box colour from the CMS on a light section: the green box, 32px corners, dark text, slate-night main button and white second button. A CMS box colour or a dark section keeps its own look |
 | Home hero (layout 3) | 563px on desktop, under the header; the photo under a green wash (teal → green, left to right; top to bottom on phones); copy centred on phones, left from 1024px; uppercase eyebrow pill with a yellow dot; slate-night main button and white second button, side by side on phones |
 | Page banners | Cover (layout 3) at most 460px; split image 16:10; title 36 → 56px, lead 16 / 18px |
 | Section heads | Green-tint eyebrow pill (12px, uppercase), 8px title → lead, 16 / 32px to the content |

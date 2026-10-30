@@ -452,6 +452,93 @@ div.sm\:rounded-full:has(input[type="email"]) .wf-submit-btn {
     font-weight: 700;
   }
 
+  /* Menu (the reference's): the current page and hover get a faint green pill and green
+     text, no underline. Doubled class beats the Theme's underline rule (header-menu.css). */
+  .headerMain {
+    --menu-hover-bg: color-mix(in srgb, var(--primary) 6%, transparent);
+    --menu-hover-color: var(--accent);
+  }
+  .headerMain .simple-rp-menu.simple-rp-menu .menu-ul > li :is(a, span).menu-link {
+    @apply no-underline!;
+  }
+
+  /* Process steps (ourProcess): the reference's green rounded square with a dark icon, a
+     4px white border and a soft shadow; the number on a white disc with a green ring.
+     The Theme's rules (blocks.css) build later, hence the doubled classes. A step colour
+     set in the CMS (inline !important) still wins. */
+  /* Only the !important colours here (an earlier layer wins !important); the rest is
+     unlayered at the end of this file, as the Theme's rule sits in the utilities layer. */
+  .ourProcess .w-20.h-20.h-20.bg-primary {
+    background-color: var(--primary) !important;
+  }
+  .ourProcess .w-20.h-20.h-20 > .rounded-full {
+    color: var(--primary) !important;
+  }
+
+  /* Testimonials (the reference's card): slate-100, 32px corners, 36px padding, no quote
+     mark; the person first (64px avatar, Josefin name, amber stars), the quote below in
+     muted Inter. White cards on a coloured section. */
+  .testimonial-card {
+    padding: 36px;
+    border-radius: 2rem;
+    background-color: var(--neutral-100);
+  }
+  .bg-\[var\(--cms-bg\)\] .testimonial-card {
+    background-color: #ffffff;
+  }
+  .testimonial-mark {
+    display: none;
+  }
+  .testimonial-person {
+    order: -1;
+    margin-bottom: 20px;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .testimonial-person picture,
+  .testimonial-avatar {
+    width: 64px;
+    height: 64px;
+  }
+  .testimonial-name {
+    font-family: var(--heading-font-family);
+    font-size: 1.125rem;
+    font-weight: 700;
+  }
+  .testimonial-quote,
+  .testimonial-quote :is(p, li) {
+    margin-bottom: 0;
+    color: var(--neutral-600);
+  }
+
+  /* CTA banner: the reference's green box (32px corners, dark text, slate-night main
+     button, white second one) when the CMS sets no box colour on a light section */
+  .cta-box.is-rounded {
+    border-radius: 2rem;
+  }
+  .cta-section:not([data-theme="dark"]) .cta-box:not(.has-bg) {
+    background-color: var(--primary);
+  }
+  .cta-section:not([data-theme="dark"]) .cta-box:not(.has-bg) :is(.cta-title, h2, h3) {
+    color: var(--text-strong);
+  }
+  .cta-section:not([data-theme="dark"]) .cta-box:not(.has-bg) .cta-text,
+  .cta-section:not([data-theme="dark"]) .cta-box:not(.has-bg) .cta-text :is(p, li) {
+    color: rgb(18 21 25 / 0.8);
+  }
+  .cta-section:not([data-theme="dark"]) .cta-box:not(.has-bg) .tw-btn-primary {
+    background-color: #1e2939;
+    color: #ffffff;
+  }
+  .cta-section:not([data-theme="dark"]) .cta-box:not(.has-bg) .tw-btn-primary:hover {
+    background-color: #0f172a;
+  }
+  .cta-section:not([data-theme="dark"]) .cta-box:not(.has-bg) :is(.tw-btn-secondary, .tw-btn-outline-dark, .tw-btn-outline-secondary, .tw-btn-outline-primary, .tw-btn-light, .tw-btn-white) {
+    border-color: transparent;
+    background-color: #ffffff;
+    color: var(--text-strong);
+  }
+
   /* Services list view: rows 20px / 28px instead of 28px / 36px */
   .service-list-row {
     padding-block: 20px;
@@ -521,4 +608,32 @@ div.sm\:rounded-full:has(input[type="email"]) .wf-submit-btn {
   .tw-btn-lg {
     @apply px-8 py-4 text-base;
   }
+}
+
+/* =========================================
+   Unlayered: these Theme rules sit in the utilities layer (or are Meadow's own unlayered
+   icon-mask default), so a components-layer rule can't reach them.
+   ========================================= */
+
+/* Process step box: 12px corners, a 4px white border, a soft shadow; a dark icon; the
+   number on a white disc with a green ring */
+.ourProcess .w-20.h-20.bg-primary {
+  border: 4px solid #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+.ourProcess .w-20.h-20 [data-icon-mask]::after {
+  background-color: var(--text-strong);
+}
+.ourProcess .w-20.h-20 > .rounded-full {
+  border-color: var(--primary);
+  background-color: #ffffff;
+  font-family: var(--body-font-family);
+  font-weight: 700;
+}
+
+/* Testimonial stars: the reference's amber, not the accent */
+.testimonial-rating,
+:is(.testimonial-rating, .product-card-rating) .text-warning {
+  color: #ffb834;
 }
