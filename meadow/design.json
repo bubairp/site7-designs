@@ -1,0 +1,8 @@
+{
+  "handle": "meadow",
+  "name": "Meadow",
+  "version": "0.1.0",
+  "description": "A white canvas with one bright green, Josefin Sans headings over Inter, rounded flat cards, a green hero and a black footer.",
+  "contract": "1",
+  "reference": "The Site7 product site (craftsite-one): its colours, type, container and spacing"
+}
