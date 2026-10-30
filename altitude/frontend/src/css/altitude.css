@@ -782,11 +782,12 @@
   filter: var(--logo-filter);
   opacity: 1;
 }
-.logos-section .logo-mark :is(picture, img) {
-  width: 100%;
-  max-width: none;
-  height: 2.25rem;
-  object-fit: contain;
+/* Sized by their own proportions (the Theme's --logo-* scale): 20–36px tall, 44px from 768 */
+.logos-section {
+  --logo-area: 3600;
+  --logo-min-h: 20px;
+  --logo-max-h: 2.25rem;
+  --logo-max-w: 10rem;
 }
 .logos-section .logo-wordmark {
   font-size: 1.25rem;
@@ -800,8 +801,9 @@
   color: var(--text-muted);
 }
 @media (min-width: 768px) {
-  .logos-section .logo-mark :is(picture, img) {
-    height: 2.75rem;
+  .logos-section {
+    --logo-area: 4400;
+    --logo-max-h: 2.75rem;
   }
 }
 
@@ -902,8 +904,8 @@
 .logos-section .logo-grid > .logo-item:hover {
   background-color: color-mix(in srgb, var(--text-strong) 9%, transparent);
 }
-.logos-section .logo-grid .logo-mark :is(picture, img) {
-  max-width: 9rem;
+.logos-section .logo-grid {
+  --logo-max-w: 9rem;
 }
 
 /* =========================================
