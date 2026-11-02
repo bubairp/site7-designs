@@ -109,6 +109,14 @@
 .service-card-icon[data-icon-mask] {
   --icon-inset: 12px;
 }
+/* Universal Card "Icon Top": the reference shows the icon on its own (an SVG's own tile,
+   if it has one), not in the Theme's bordered circle, which the full-size mask overlapped */
+.ucard--iconTop .aspect-square {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+}
 
 /* =========================================
    Container: 1230px including 16px gutters at every width (the reference's
