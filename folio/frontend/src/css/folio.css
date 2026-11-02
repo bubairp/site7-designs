@@ -1,0 +1,2810 @@
+/* =========================================
+   Folio design (designs/folio/DESIGN.md)
+   Built with: bash scripts/design.sh build folio
+   Everything Editorial ships, with Folio's role tokens on top. Templates
+   only use role utilities (bg-surface, text-strong …), so the tokens below
+   re-skin them; designs/folio/templates overrides what tokens can't.
+   A printed monograph: Stone canvas, Archivo in two widths (condensed slabs,
+   normal text), Ink hairlines, flat sheets, raw rectangular photos and one
+   Signal Yellow that only marks the primary action and the announcement bar.
+   ========================================= */
+@import '../../../../../frontend/src/css/app.css';
+@import '../../../../../frontend/node_modules/@fontsource-variable/archivo/wdth.css';
+
+@source '../../../templates/**/*.twig';
+
+:root {
+  /* Surfaces: Stone canvas, Paper sheets, Carbon for dark bands, media and footer */
+  --surface: #d4d1c4;
+  --surface-alt: #ffffff;
+  --surface-dark: #191919;
+  --surface-dark-hover: #252420;
+  --line: #0d0d0d;             /* rules are Ink: DESIGN.md §1 "Hairlines, not boxes" */
+  --line-soft: #a9a697;        /* decorative dividers only (below 3:1) */
+  --stone-deep: #c6c3b4;       /* empty image plates */
+
+  /* Text (contrast on Stone: 12.7 / 10.8 / 5.7:1) */
+  --text-strong: #0d0d0d;
+  --text-body: #1f1f1c;
+  --text-muted: #4d4b44;
+  --on-dark: #f4f3ee;          /* 15.8:1 on Carbon */
+  --on-dark-muted: #a3a196;    /* 6.8:1 on Carbon */
+  --design-white: #ffffff;
+  --design-black: #0d0d0d;
+
+  /* Signal Yellow: the primary action and the announcement bar, nothing else.
+     Never text: 1.1:1 on Stone. Ink on it is 14.4:1. */
+  --primary: #ffdd00;
+  --primary-hover: #f0cf00;
+  --on-primary: #0d0d0d;
+  --accent: #0d0d0d;           /* eyebrows, active links, icons are typographic: Ink */
+
+  /* Neutral ramp: warm greys around Stone */
+  --neutral-50: #f4f3ee;
+  --neutral-100: #ebe9e1;
+  --neutral-200: #dedcd1;
+  --neutral-300: #c6c3b4;
+  --neutral-400: #a9a697;
+  --neutral-500: #7d7a6d;
+  --neutral-600: #4d4b44;
+  --neutral-700: #36352f;
+  --neutral-800: #252420;
+  --neutral-900: #191919;
+  --neutral-950: #0d0d0d;
+
+  /* Type: Archivo only. Headings condensed (font-stretch, see the base layer) */
+  --body-font-family: "Archivo Variable", "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --heading-font-family: "Archivo Variable", "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --btn-font-family: "Archivo Variable", "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body-tracking: 0;
+  --heading-weight: 500;
+  --heading-tracking: -0.02em;
+  --heading-em-style: normal;  /* no italic word swaps */
+  --heading-em-weight: inherit;
+  --heading-em-color: inherit;
+  --quote-weight: 500;
+  --quote-style: normal;
+  --pullquote-weight: 500;
+  --lead-weight: 400;
+
+  /* Shape: 2px controls, 4px sheets, 0px photos; no shadows anywhere */
+  --radius-sm: 2px;
+  --radius-base: 2px;
+  --radius-card: 4px;
+  --radius-card-lg: 4px;
+  --btn-border-radius: 2px;
+  --form-border-radius: 2px;
+  --menu-radius: 2px;
+  --shadow-float: none;
+  --shadow-glow: none;
+  --shadow-header: none;
+  /* Tailwind's rounded-* scale, which block markup uses directly: nothing above 4px */
+  --radius-md: 2px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+  --radius-2xl: 4px;
+  --radius-3xl: 4px;
+  --radius-4xl: 4px;
+
+  --folio-ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --folio-stretch: 68%;
+}
+
+:root {
+  --link-hover-color: var(--text-strong);
+  --menu-primary: var(--text-strong);
+  --menu-active-color: var(--text-strong);
+  --menu-text: var(--text-strong);
+  --menu-mob-text: var(--text-strong);
+  --menu-font-size: 14px;
+  --swiper-bullet-active-bg: var(--text-strong);
+  --swiper-theme-color: var(--text-strong);
+}
+
+[data-theme="dark"] {
+  --menu-dropdown-bg: var(--surface-dark);
+  --menu-mob-panel-bg: var(--surface-dark);
+  --accent: var(--on-dark);
+  --line: rgb(244 243 238 / 0.32);
+}
+
+/* Uploaded SVG icons (images.iconMask) take the accent colour (Ink; Sheet on dark) */
+[data-icon-mask] {
+  position: relative;
+}
+[data-icon-mask] > img {
+  opacity: 0;
+}
+[data-icon-mask]::after {
+  content: "";
+  position: absolute;
+  inset: var(--icon-inset, 0);
+  background-color: var(--accent);
+  -webkit-mask: var(--icon-url) center / contain no-repeat;
+  mask: var(--icon-url) center / contain no-repeat;
+}
+.service-card-icon[data-icon-mask] {
+  --icon-inset: 12px;
+}
+.ucard--iconTop .aspect-square {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+}
+
+/* =========================================
+   Container: 1360px including gutters (16 / 24 / 40px). Unlayered, so it beats the
+   Theme's container utility.
+   ========================================= */
+.container {
+  padding-inline: 1rem;
+}
+@media (width >= 768px) {
+  .container { padding-inline: 1.5rem; }
+}
+@media (width >= 1024px) {
+  .container { padding-inline: 2.5rem; }
+}
+@media (width >= 1360px) {
+  .container { max-width: 1360px; }
+}
+
+/* =========================================
+   Type: Archivo. Headings condensed and weight 500, tight leading, negative tracking.
+   ========================================= */
+@layer base {
+  body {
+    background-color: var(--surface);
+    font-stretch: 100%;
+  }
+
+  h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, h6,
+  .block-heading-title, .section-title {
+    font-stretch: var(--folio-stretch);
+    font-weight: 500;
+    text-wrap: balance;
+  }
+
+  h1, .h1 {
+    @apply text-[2.75rem] md:text-[4.5rem] lg:text-[6.5rem];
+    line-height: 0.9;
+    letter-spacing: -0.025em;
+  }
+
+  h2, .h2 {
+    @apply text-[2.25rem] md:text-[3rem] lg:text-[4rem];
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+
+  h3, .h3 {
+    @apply text-[1.375rem] md:text-2xl lg:text-[1.625rem];
+    font-stretch: 100%;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  h4, .h4 {
+    @apply text-xl;
+    font-stretch: 100%;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Focus: a 2px Ink outline, Sheet on dark */
+  :focus-visible {
+    outline: 2px solid var(--text-strong);
+    outline-offset: 2px;
+  }
+  [data-theme="dark"] :focus-visible {
+    outline-color: var(--on-dark);
+  }
+
+  ::selection {
+    background-color: var(--primary);
+    color: var(--on-primary);
+  }
+}
+
+@layer components {
+  /* ---------------------------------------------------------------- buttons
+     Primary: Signal fill, Ink stroke (yellow on Stone is 1.1:1), 2px, 48px tall, an arrow
+     that steps 4px on hover. Secondary: Ink stroke, fills Ink on hover. */
+  .tw-btn {
+    @apply px-6 py-[0.8rem] text-[0.9375rem];
+    min-height: 48px;
+    border-width: 1px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.2;
+  }
+  .tw-btn:focus-visible {
+    box-shadow: none;
+    outline: 2px solid var(--text-strong);
+    outline-offset: 2px;
+  }
+  .tw-btn:active {
+    transform: none;
+  }
+  .tw-btn-sm {
+    @apply px-4 py-2 text-sm;
+    min-height: 40px;
+  }
+  .tw-btn-lg {
+    @apply px-8 py-4 text-base;
+    min-height: 56px;
+  }
+
+  /* Hover, Folio's own: an Ink fill rises from the bottom edge like ink filling a plate
+     (background-size on a flat gradient, no extra markup), and the arrow slides out to the
+     right and comes back in from the left. --fill is the rising colour, --fill-text the
+     label on it. */
+  .tw-btn {
+    --fill: var(--text-strong);
+    --fill-text: var(--surface);
+    background-image: linear-gradient(var(--fill), var(--fill));
+    background-repeat: no-repeat;
+    background-position: 50% 100%;
+    background-size: 100% 0%;
+    transition: background-size 0.38s var(--folio-ease), color 0.22s var(--folio-ease), border-color 0.22s var(--folio-ease);
+  }
+  .tw-btn:hover,
+  .tw-btn:focus-visible {
+    background-size: 100% 100%;
+    color: var(--fill-text);
+  }
+  .tw-btn-ghost {
+    background-image: none;
+  }
+  .tw-btn-primary:not(.tw-btn-icon)::after {
+    content: "→";
+    display: inline-block;
+    font-weight: 400;
+  }
+  .tw-btn-primary:not(.tw-btn-icon):hover::after {
+    animation: folio-arrow 0.45s var(--folio-ease);
+  }
+
+  .tw-btn-primary {
+    --fill-text: var(--primary);   /* Signal on Ink: 14.4:1 */
+    border-color: var(--text-strong);
+  }
+  .tw-btn-primary:hover {
+    background-color: var(--primary);
+  }
+  [data-theme="dark"] .tw-btn-primary {
+    --fill: var(--on-dark);
+    --fill-text: var(--surface-dark);
+    border-color: var(--primary);
+  }
+
+  .tw-btn-secondary,
+  .tw-btn-outline-dark,
+  .tw-btn-outline-secondary,
+  .tw-btn-outline-primary {
+    border-color: var(--text-strong);
+    background-color: transparent;
+    color: var(--text-strong);
+  }
+  .tw-btn-secondary:hover,
+  .tw-btn-outline-dark:hover,
+  .tw-btn-outline-secondary:hover,
+  .tw-btn-outline-primary:hover {
+    background-color: transparent;
+  }
+  [data-theme="dark"] :is(.tw-btn-secondary, .tw-btn-outline-dark, .tw-btn-outline-secondary, .tw-btn-outline-primary, .tw-btn-outline-light) {
+    --fill: var(--on-dark);
+    --fill-text: var(--surface-dark);
+    border-color: var(--on-dark);
+    color: var(--on-dark);
+  }
+  .tw-btn-light,
+  .tw-btn-white {
+    border-color: var(--surface-alt);
+    background-color: var(--surface-alt);
+    color: var(--text-strong);
+  }
+  .tw-btn-light:hover,
+  .tw-btn-white:hover {
+    border-color: var(--text-strong);
+    background-color: var(--surface-alt);
+  }
+  .tw-btn-dark {
+    --fill: var(--primary);
+    --fill-text: var(--on-primary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tw-btn { transition: none; }
+    .tw-btn-primary:not(.tw-btn-icon):hover::after { animation: none; }
+  }
+
+  /* ---------------------------------------------------------------- header
+     A solid Stone bar on an Ink rule (never glass, see templates/_includes/header);
+     the announcement strip is the one yellow band. */
+  .headerMain {
+    background-color: var(--surface);
+    backdrop-filter: none;
+    border-bottom: 1px solid var(--text-strong);
+    box-shadow: none;
+  }
+  .headerMain[data-theme="dark"] {
+    background-color: var(--surface-dark);
+    border-bottom-color: var(--line);
+  }
+  .headerMain .header-top {
+    background-color: var(--primary);
+    color: var(--on-primary);
+  }
+  .headerMain .header-top .container {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+  .headerMain .header-cta {
+    min-height: 40px;
+    padding-inline: 18px;
+    font-size: 14px;
+  }
+  /* Menu: text links, the current page and hover underlined 6px below; no pill */
+  .headerMain {
+    --menu-hover-bg: transparent;
+    --menu-hover-color: var(--text-strong);
+  }
+  .headerMain .simple-rp-menu.simple-rp-menu .menu-ul > li > :is(a, span).menu-link {
+    font-weight: 500;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 1px;
+  }
+
+  /* ---------------------------------------------------------------- home hero (layout 3)
+     templates/_includes/hero-banner/sliderLayout3.twig: a display slab on Stone with the
+     image inline, then a full-bleed plate. */
+  .hero-folio-slide {
+    background-color: var(--surface);
+  }
+  .hero-folio-inner {
+    padding-block: 40px 48px;
+  }
+  @media (min-width: 768px) {
+    .hero-folio-inner { padding-block: 64px; }
+  }
+  @media (min-width: 1024px) {
+    .hero-folio-inner { padding-block: 88px 72px; }
+  }
+  .hero-folio .hero-eyebrow {
+    display: block;
+    margin-bottom: 20px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-strong);
+  }
+  .folio-slab.hero-title {
+    margin: 0;
+    max-width: none;
+    font-size: clamp(3.5rem, 10.5vw, 9.5rem);
+    font-weight: 500;
+    font-stretch: var(--folio-stretch);
+    line-height: 0.88;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    text-wrap: balance;
+    color: var(--text-strong);
+  }
+  .folio-line {
+    display: inline-block;
+    vertical-align: top;
+  }
+  .folio-motion .folio-slab .folio-line {
+    clip-path: inset(-0.1em -0.1em 0 -0.1em);
+  }
+  .folio-slab.is-revealed .folio-line {
+    clip-path: none;
+  }
+  /* The inline image: one line tall, 3:2, between the two halves */
+  .folio-inline-media {
+    display: inline-block;
+    width: 1.5em;
+    height: 0.78em;
+    margin-inline: 0.12em;
+    vertical-align: 0.04em;
+    overflow: hidden;
+    background-color: var(--stone-deep);
+  }
+  .folio-inline-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero-folio-foot {
+    display: grid;
+    gap: 28px;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--text-strong);
+  }
+  @media (min-width: 1024px) {
+    .hero-folio-foot {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      align-items: end;
+      gap: 40px;
+      margin-top: 56px;
+    }
+  }
+  .hero-folio .hero-lead {
+    margin: 0;
+    max-width: 40rem;
+    font-size: 1.125rem;
+    line-height: 1.45;
+    color: var(--text-body);
+  }
+  @media (min-width: 768px) {
+    .hero-folio .hero-lead { font-size: 1.25rem; }
+  }
+  .hero-folio .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 0;
+  }
+  @media (min-width: 1024px) {
+    .hero-folio .hero-actions { justify-content: flex-end; }
+  }
+  .hero-folio-plate {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background-color: var(--surface-dark);
+  }
+  @media (min-width: 768px) {
+    .hero-folio-plate { aspect-ratio: 21 / 9; }
+  }
+  .hero-folio-plate .hero-media {
+    position: absolute;
+    inset: 0;
+  }
+  /* Gallery arrows: the Theme squares nothing here and sets 9999px !important in this layer */
+  :is(.gallery-section, .product-gallery) .swiper :is(.swiper-button-next, .swiper-button-prev) {
+    border-radius: var(--radius-base) !important;
+  }
+
+  .hero-folio .hero-pagination {
+    position: static;
+    padding-block: 16px;
+  }
+
+  /* Hero layouts 1 and 2 (Theme templates): square photos, Stone, slab title */
+  .hero-split-slide:not(.is-dark) {
+    background-color: var(--surface);
+  }
+  .hero-split-media,
+  .hero-split-media :is(img, video, picture) {
+    border-radius: 0;
+  }
+  .hero-split-copy .hero-title,
+  .hero-editorial .hero-title {
+    font-stretch: var(--folio-stretch);
+    font-weight: 500;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+  .hero-editorial-overlay {
+    background: rgb(25 25 25 / 0.45);
+  }
+
+  /* ---------------------------------------------------------------- page banners */
+  .page-hero {
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--text-strong);
+  }
+  .page-hero-title {
+    font-size: clamp(2.75rem, 7.5vw, 6.5rem);
+    font-stretch: var(--folio-stretch);
+    line-height: 0.9;
+    letter-spacing: -0.025em;
+    text-transform: uppercase;
+  }
+  .page-hero-lead {
+    font-size: 1.125rem;
+    line-height: 1.45;
+    color: var(--text-body);
+  }
+  @media (min-width: 1024px) {
+    .page-hero-lead { font-size: 1.25rem; }
+  }
+  .page-hero-media,
+  .page-hero-media :is(img, video, picture),
+  .page-hero-wide,
+  .page-hero-wide :is(img, video, picture) {
+    border-radius: 0;
+  }
+  /* Cover: a flat Carbon wash, the copy bottom-left (VALIENTE's media window) */
+  .page-hero-cover-overlay,
+  .page-hero-slide.is-cover:has(.is-center) .page-hero-cover-overlay {
+    background: rgb(25 25 25 / 0.45);
+  }
+
+  /* ---------------------------------------------------------------- sections
+     64 / 88 / 120px. CMS block spacing still wins (utilities). */
+  .block-section,
+  .block-section.bg-\[var\(--cms-bg\)\],
+  .matrix-container > .entry-type:first-child > .block-section {
+    padding-block: 64px;
+  }
+  @media (min-width: 768px) {
+    .block-section,
+    .block-section.bg-\[var\(--cms-bg\)\],
+    .matrix-container > .entry-type:first-child > .block-section { padding-block: 88px; }
+  }
+  @media (min-width: 1024px) {
+    .block-section,
+    .block-section.bg-\[var\(--cms-bg\)\],
+    .matrix-container > .entry-type:first-child > .block-section { padding-block: 120px; }
+  }
+
+  /* Section head: a full-width Ink rule with the eyebrow on it, the condensed title on the
+     left. Centred heads (CMS "align") keep the rule but centre the copy. */
+  .section-head {
+    position: relative;
+    max-width: none;
+    margin-bottom: 32px;
+    padding-top: 0;
+  }
+  @media (min-width: 1024px) {
+    .section-head { margin-bottom: 48px; }
+  }
+  /* The index line: every section head is set like a monograph chapter opener, whatever
+     its CMS alignment: the eyebrow and a running chapter number "(03)" on the rule, an
+     uppercase condensed slab title on the left 8 columns, the lead on the right 4,
+     bottom-aligned. Phones stack it, left-aligned. */
+  .section-head,
+  .section-head.is-center,
+  .section-head.is-right {
+    align-items: flex-start;
+    margin-inline: 0;
+    text-align: left;
+    counter-increment: folio-chapter;
+  }
+  .section-head::after {
+    content: "(" counter(folio-chapter, decimal-leading-zero) ")";
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+    color: var(--text-strong);
+  }
+  [data-theme="dark"] .section-head::after {
+    color: var(--on-dark);
+  }
+  .section-head .section-title {
+    max-width: none;
+    margin-inline: 0;
+    font-size: clamp(2.5rem, 6.4vw, 6.25rem);
+    line-height: 0.9;
+    letter-spacing: -0.028em;
+    text-transform: uppercase;
+  }
+  .section-head .section-lead {
+    max-width: 34rem;
+    margin-top: 20px;
+    font-size: 1.125rem;
+    line-height: 1.45;
+    color: var(--text-body);
+  }
+  [data-theme="dark"] .section-head .section-lead {
+    color: var(--on-dark-muted);
+  }
+  @media (min-width: 1024px) {
+    .section-head,
+    .section-head.is-center,
+    .section-head.is-right {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 24px;
+      align-items: end;
+    }
+    .section-head > .section-eyebrow {
+      grid-column: 1 / 9;
+      grid-row: 1;
+      justify-self: start;
+      margin-bottom: 28px;
+    }
+    .section-head > .section-title {
+      grid-column: 1 / 9;
+      grid-row: 2;
+    }
+    .section-head > .section-lead {
+      grid-column: 9 / 13;
+      grid-row: 2;
+      margin: 0;
+      padding-bottom: 0.4em;
+    }
+  }
+  /* Heading + content block: the same slab, its text on a 7-column measure */
+  .heading-content-title {
+    font-size: clamp(2.5rem, 6.4vw, 6.25rem);
+    line-height: 0.9;
+    letter-spacing: -0.028em;
+    text-transform: uppercase;
+    text-align: left;
+  }
+  .heading-content-text {
+    max-width: 44rem;
+    margin-inline: 0;
+    text-align: left;
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+
+  .section-eyebrow {
+    margin-bottom: 20px;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--text-strong);
+  }
+  @media (min-width: 768px) {
+    .section-eyebrow { font-size: 0.8125rem; }
+  }
+  [data-theme="dark"] .section-eyebrow {
+    color: var(--on-dark);
+  }
+
+  /* ---------------------------------------------------------------- hairline index rows */
+  .service-list {
+    border-top: 1px solid var(--line);
+  }
+  .service-list-row {
+    padding-block: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  @media (min-width: 1024px) {
+    .service-list-row { padding-block: 32px; }
+  }
+  .service-list-index {
+    font-family: var(--body-font-family);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--text-strong);
+  }
+  .service-list-title {
+    font-stretch: var(--folio-stretch);
+    font-weight: 500;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    transition: transform 0.2s var(--folio-ease);
+  }
+  .service-list-text {
+    color: var(--text-muted);
+  }
+  a.service-list-row:hover .service-list-title,
+  a.service-list-row:hover .service-list-arrow {
+    color: var(--text-strong);
+  }
+  a.service-list-row:hover .service-list-title {
+    transform: translateX(4px);
+  }
+  a.service-list-row:hover .service-list-arrow {
+    transform: translateX(6px);
+  }
+
+  /* ---------------------------------------------------------------- cards
+     Photos at 0px, a meta row above the title, no shadows or lifts. */
+  :is(.post-card, .project-card) {
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+  }
+  :is(.post-card, .project-card):hover {
+    box-shadow: none;
+    transform: none;
+  }
+  :is(.post-card-media, .project-card-media),
+  :is(.post-card-media, .project-card-media) :is(img, picture, video) {
+    border-radius: 0;
+  }
+  :is(.post-card-body, .project-card-body) {
+    padding-inline: 0;
+  }
+  :is(.post-card-meta, .project-card-meta, .post-card-tag) {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-strong);
+  }
+  .post-card-tag {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+  :is(.service-card-title, .post-card-title, .project-card-title) {
+    font-stretch: 100%;
+    font-size: 1.375rem;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  @media (min-width: 1024px) {
+    :is(.service-card-title, .post-card-title, .project-card-title) { font-size: 1.625rem; }
+  }
+  :is(.post-card, .project-card):hover :is(.post-card-title, .project-card-title) {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
+  /* Universal cards: flat Paper sheets (Stone sheets on a Paper section) */
+  .ucard {
+    box-shadow: none;
+  }
+  .ucard-look--softShadow,
+  .ucard-look--highlighted {
+    box-shadow: none;
+  }
+  .ucard-look--outlined {
+    border-color: var(--text-strong);
+  }
+
+  /* ---------------------------------------------------------------- testimonials */
+  .testimonial-card {
+    padding: 28px;
+    border: 0;
+    border-radius: var(--radius-card);
+    box-shadow: none;
+  }
+  @media (min-width: 1024px) {
+    .testimonial-card { padding: 32px; }
+  }
+  .testimonial-mark {
+    display: none;
+  }
+  .testimonial-quote,
+  .testimonial-quote :is(p, li) {
+    font-family: var(--heading-font-family);
+    font-size: 1.5rem;
+    font-stretch: var(--folio-stretch);
+    font-style: normal;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--text-strong);
+  }
+  @media (min-width: 1024px) {
+    .testimonial-quote,
+    .testimonial-quote :is(p, li) { font-size: 1.75rem; }
+  }
+  [data-theme="dark"] :is(.testimonial-quote, .testimonial-quote p) {
+    color: var(--on-dark);
+  }
+  .testimonial-person {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+  .testimonial-person picture,
+  .testimonial-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 2px;
+  }
+  .testimonial-person picture img,
+  .testimonial-avatar img {
+    border-radius: 2px;
+  }
+  .testimonial-name {
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+  .testimonial-role {
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* ---------------------------------------------------------------- CTA banner
+     A light section's CTA box becomes a Carbon band with a slab title; a CMS box colour or
+     a dark section keeps its own look. */
+  .cta-box {
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .cta-section:not([data-theme="dark"]) .cta-box:not(.has-bg) {
+    background-color: var(--surface-dark);
+    color: var(--on-dark);
+  }
+  .cta-section:not([data-theme="dark"]) .cta-box:not(.has-bg) :is(.cta-title, h2, h3) {
+    color: var(--on-dark);
+  }
+  .cta-section:not([data-theme="dark"]) .cta-box:not(.has-bg) .cta-text,
+  .cta-section:not([data-theme="dark"]) .cta-box:not(.has-bg) .cta-text :is(p, li) {
+    color: var(--on-dark-muted);
+  }
+  .cta-section:not([data-theme="dark"]) .cta-box:not(.has-bg) .tw-btn-primary {
+    border-color: var(--primary);
+  }
+  .cta-section:not([data-theme="dark"]) .cta-box:not(.has-bg) :is(.tw-btn-secondary, .tw-btn-outline-dark, .tw-btn-outline-secondary, .tw-btn-outline-primary) {
+    border-color: var(--on-dark);
+    color: var(--on-dark);
+  }
+  .cta-title {
+    text-transform: uppercase;
+    line-height: 0.92;
+  }
+
+  /* ---------------------------------------------------------------- client logos
+     One row between two Ink rules, monochrome Ink at 70%, full on hover. */
+  .logo-mark {
+    filter: grayscale(1) brightness(0);
+    opacity: 0.7;
+    transition: opacity 0.2s var(--folio-ease);
+  }
+  .logo-item:hover .logo-mark {
+    opacity: 1;
+  }
+  [data-theme="dark"] .logo-mark {
+    filter: grayscale(1) brightness(0) invert(1);
+  }
+  .logo-row {
+    border-block: 1px solid var(--line);
+  }
+  .logo-row > .logo-item + .logo-item {
+    border-left: 1px solid var(--line);
+  }
+
+  /* ---------------------------------------------------------------- FAQ: hairline rows */
+  .tw-accordion-item {
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+  .tw-accordion-item:first-child {
+    border-top: 1px solid var(--line);
+  }
+  .tw-accordion-item > button,
+  .tw-accordion-item > button > span {
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+  @media (min-width: 768px) {
+    .tw-accordion-item > button,
+    .tw-accordion-item > button > span { font-size: 1.5rem; }
+  }
+
+  /* ---------------------------------------------------------------- forms */
+  :is(.tw-input, .tw-select, .tw-textarea, input[type="text"], input[type="email"], input[type="tel"], input[type="search"], input[type="number"], select, textarea):not([type="checkbox"]):not([type="radio"]) {
+    border-color: var(--text-strong);
+  }
+
+  /* Footer wordmark (templates/_includes/footer/basicFooter.twig): the company name across
+     the full width in the condensed display cut, solid, not faint. folio.js fits the size
+     to the container; this is the size before (and without) the script. */
+  .footer-main:has(.folio-wordmark) {
+    overflow: hidden;   /* the wordmark rises out of the bottom edge (folio.js) */
+  }
+  .folio-wordmark {
+    margin: 32px 0 0;
+    font-family: var(--heading-font-family);
+    font-size: clamp(3rem, 15.5vw, 15rem);
+    font-stretch: var(--folio-stretch);
+    font-weight: 500;
+    line-height: 0.8;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    color: currentColor;
+  }
+}
+
+/* =========================================
+   Unlayered: Theme rules that sit in the utilities layer.
+   ========================================= */
+
+@keyframes folio-arrow {
+  0% { transform: translateX(0); opacity: 1; }
+  45% { transform: translateX(110%); opacity: 0; }
+  46% { transform: translateX(-110%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+/* Leftover soft shapes from the Theme's own CSS: tags, filters, menu hovers, dropdowns,
+   the header search field, accordion cards and slider arrows (DESIGN.md §5) */
+.work-card-tags li,
+.filter-pill,
+.headerMain .menu-link,
+.dropdown-menu,
+.dropdown-menu .menu-link,
+.headerMain .search-field .tw-input,
+.tw-accordion-item,
+.tw-accordion-button,
+.swiper-button-next.rounded-full,
+.swiper-button-prev.rounded-full {
+  border-radius: var(--radius-base);
+}
+.social-dot,
+.project-card-arrow,
+.product-card-tag,
+.work-card-eyebrow,
+.slider-nav-btn,
+.swiper-button-next,
+.swiper-button-prev,
+textarea.tw-form-control {
+  border-radius: var(--radius-base);
+}
+.tw-accordion .tw-accordion-item,
+.tw-accordion .tw-accordion-item > button {
+  border-radius: var(--radius-card);
+}
+#offcanvasRight .menu-link,
+#offcanvasRight .dropdown-menu {
+  border-radius: var(--radius-base);
+}
+
+/* Drafting grid (folio.js): a hairline grid behind the hero slab and the Carbon CTA band;
+   cells fill under the pointer and fade, with a crosshair and a coordinate readout */
+.hero-folio-slide,
+.cta-box {
+  position: relative;
+  isolation: isolate;
+}
+.folio-grid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.folio-grid-readout {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  pointer-events: none;
+  font-family: var(--body-font-family);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s var(--folio-ease);
+}
+.folio-grid-readout.is-on {
+  opacity: 1;
+}
+[data-theme="dark"] .folio-grid-readout,
+.cta-box .folio-grid-readout {
+  color: var(--on-dark-muted);
+}
+/* Photo frames (card media wrappers) are square like the photos inside them */
+.img-zoom-wrapper,
+.work-card-media,
+.post-card-media,
+.project-card-media,
+.product-card-media {
+  border-radius: 0;
+}
+.filter-pill.active {
+  background-color: var(--text-strong);
+  color: var(--surface);
+}
+/* Photos are square-cornered; avatars and logos keep their own shapes */
+:where(main) img:not(.testimonial-avatar, [class*="avatar"], .logo-mark, .rounded-full) {
+  border-radius: 0;
+}
+
+/* No blur anywhere (DESIGN.md §1 reject list): the header bar is solid, and the overlays
+   behind an open dropdown or the phone menu are a flat Carbon tint */
+.headerMain,
+.hero-eyebrow {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.dropdown-overlay,
+.sidebar-overlay-premium {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background-color: rgb(25 25 25 / 0.28);
+}
+
+/* Header menu (desktop): small uppercase labels with a superscript index (Services⁰¹),
+   an Ink underline that draws in on hover and stays on the current page; no pill.
+   Components layer + !important: the Theme's menu rules are !important in this layer. */
+@layer components {
+  @media (min-width: 1024px) {
+    #menuNav .simple-rp-menu > .menu-ul {
+      counter-reset: folio-nav;
+      gap: 6px;
+    }
+    #menuNav .simple-rp-menu > .menu-ul > li {
+      counter-increment: folio-nav;
+    }
+    .headerMain #menuNav .simple-rp-menu.simple-rp-menu > .menu-ul > li > :is(a, span).menu-link,
+    .headerMain #menuNav .simple-rp-menu.simple-rp-menu > .menu-ul > li > .menu-group > :is(a, span).menu-link {
+      padding: 8px 10px !important;
+      border-radius: 0 !important;
+      background: none !important;
+      color: var(--text-strong) !important;
+      font-size: 12.5px !important;
+      font-weight: 500 !important;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none !important;
+    }
+    .headerMain #menuNav .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown > .menu-group > :is(a, span).menu-link {
+      padding-right: 26px !important;
+    }
+    #menuNav .simple-rp-menu > .menu-ul > li > :is(a, span, .menu-group) .menu-title,
+    #menuNav .simple-rp-menu > .menu-ul > li > :is(a, span).menu-link > .menu-title {
+      position: relative;
+      background-image: linear-gradient(currentColor, currentColor);
+      background-repeat: no-repeat;
+      background-position: 0 100%;
+      background-size: 0% 1px;
+      padding-bottom: 3px;
+      transition: background-size 0.3s var(--folio-ease);
+    }
+    #menuNav .simple-rp-menu > .menu-ul > li:is(:hover, .is-open, .active, .current-menu-ancestor, .current-menu-item, :has(.active)) > .menu-link .menu-title,
+    #menuNav .simple-rp-menu > .menu-ul > li:is(:hover, .is-open, .active, .current-menu-ancestor, .current-menu-item, :has(.active)) > .menu-group > .menu-link .menu-title {
+      background-size: 100% 1px;
+    }
+    #menuNav .simple-rp-menu > .menu-ul > li > .menu-link .menu-title::after,
+    #menuNav .simple-rp-menu > .menu-ul > li > .menu-group > .menu-link .menu-title::after {
+      content: counter(folio-nav, decimal-leading-zero);
+      position: relative;
+      top: -0.55em;
+      margin-left: 3px;
+      font-size: 0.68em;
+      letter-spacing: 0.02em;
+      color: var(--text-muted);
+    }
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown > .menu-group > a.dropdown-toggle .ddarow {
+      color: var(--text-strong) !important;
+      opacity: 0.7;
+    }
+  }
+}
+
+/* Desktop dropdown: a full-width Carbon panel (Folio layouts, at the end of this file, and
+   the components-layer rules below, which beat the Theme's !important positioning) */
+@layer components {
+  @media (min-width: 1024px) {
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown > .dropdown-menu {
+      position: absolute !important;
+      top: 100% !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: auto !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      margin: 0 !important;
+      padding: 28px max(2.5rem, calc((100vw - 1360px) / 2 + 2.5rem)) 32px !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background-color: var(--surface-dark) !important;
+      box-shadow: none !important;
+      transform: none !important;
+      clip-path: inset(0 0 100% 0);
+      transition: opacity 0.2s var(--folio-ease), clip-path 0.4s var(--folio-ease), visibility 0.2s !important;
+    }
+    /* opens downward like a blind; the links follow one after another */
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown:is(:hover, .is-open) > .dropdown-menu {
+      clip-path: inset(0 0 0 0);
+    }
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown > .dropdown-menu > ul > li {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.3s var(--folio-ease), transform 0.4s var(--folio-ease);
+    }
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown:is(:hover, .is-open) > .dropdown-menu > ul > li {
+      opacity: 1;
+      transform: none;
+    }
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown:is(:hover, .is-open) > .dropdown-menu > ul > li:nth-child(2) { transition-delay: 0.04s; }
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown:is(:hover, .is-open) > .dropdown-menu > ul > li:nth-child(3) { transition-delay: 0.08s; }
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown:is(:hover, .is-open) > .dropdown-menu > ul > li:nth-child(4) { transition-delay: 0.12s; }
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown:is(:hover, .is-open) > .dropdown-menu > ul > li:nth-child(5) { transition-delay: 0.16s; }
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown:is(:hover, .is-open) > .dropdown-menu > ul > li:nth-child(n + 6) { transition-delay: 0.2s; }
+    @media (prefers-reduced-motion: reduce) {
+      .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown > .dropdown-menu,
+      .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown > .dropdown-menu > ul > li {
+        clip-path: none;
+        transform: none;
+        transition: none !important;
+      }
+    }
+    /* hover bridge from the menu item down to the panel */
+    /* only as tall as the gap under the menu links: a taller bridge spans the header and
+       would keep this panel open while the pointer moves to the next item */
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown > .dropdown-menu::before {
+      height: 18px !important;
+    }
+    /* the panel: the parent's name as a slab on the left (folio.js adds .folio-dd-label),
+       the numbered sub-pages in two columns on the right */
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown > .dropdown-menu {
+      display: grid !important;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+      column-gap: 40px;
+      align-items: start;
+    }
+    /* left column: the section's name and how many pages it holds (folio.js) */
+    .headerMain .folio-dd-label {
+      margin: 0;
+      padding-top: 4px;
+      font-family: var(--heading-font-family);
+      font-size: clamp(2rem, 3vw, 3rem);
+      font-stretch: var(--folio-stretch);
+      font-weight: 500;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      color: var(--on-dark);
+    }
+    .headerMain .folio-dd-label small {
+      display: block;
+      margin-top: 12px;
+      font-family: var(--body-font-family);
+      font-size: 0.6875rem;
+      font-stretch: 100%;
+      letter-spacing: 0.06em;
+      color: var(--on-dark-muted);
+    }
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown > .dropdown-menu > ul {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 32px;
+      width: auto !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: 0 !important;
+      background: none !important;
+      box-shadow: none !important;
+      counter-reset: folio-menu;
+    }
+    .headerMain .simple-rp-menu.simple-rp-menu .dropdown-menu > ul > li {
+      counter-increment: folio-menu;
+      border-top: 1px solid rgb(244 243 238 / 0.16);
+    }
+    .headerMain .simple-rp-menu.simple-rp-menu .dropdown-menu > ul > li :is(a, span).menu-link {
+      display: flex !important;
+      align-items: baseline;
+      gap: 12px;
+      padding: 14px 0 16px !important;
+      border-radius: 0 !important;
+      background: none !important;
+      color: var(--on-dark) !important;
+      font-family: var(--heading-font-family) !important;
+      font-size: 1.375rem !important;
+      font-stretch: var(--folio-stretch) !important;
+      font-weight: 500 !important;
+      line-height: 1.05 !important;
+      letter-spacing: -0.01em !important;
+      text-transform: uppercase !important;
+      text-decoration: none !important;
+      opacity: 1 !important;
+      transition: color 0.2s !important;
+    }
+    /* hover / focus / current: the Theme's mega-menu fills the link white and indents it
+       (!important); Folio keeps the dark panel and marks the link with its underline */
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown > .dropdown-menu > ul > li > :is(a, span).menu-link:is(:hover, :focus, :focus-visible, .active),
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown > .dropdown-menu > ul > li:is(:hover, .active, .current-menu-item) > :is(a, span).menu-link {
+      padding-left: 0 !important;
+      background: none !important;
+      color: var(--on-dark) !important;
+      box-shadow: none !important;
+    }
+    .headerMain .simple-rp-menu.simple-rp-menu > .menu-ul > li.dropdown > .dropdown-menu > ul > li > .menu-link.active .menu-title {
+      background-size: 100% 1px;
+    }
+    .headerMain .simple-rp-menu.simple-rp-menu .dropdown-menu > ul > li :is(a, span).menu-link .menu-title {
+      background-image: linear-gradient(currentColor, currentColor);
+      background-repeat: no-repeat;
+      background-position: 0 100%;
+      background-size: 0% 1px;
+      padding-bottom: 2px;
+      transition: background-size 0.3s var(--folio-ease);
+    }
+    .headerMain .simple-rp-menu.simple-rp-menu .dropdown-menu > ul > li :is(a, span).menu-link::before {
+      content: counter(folio-menu, decimal-leading-zero);
+      min-width: 1.6em;
+      font-family: var(--body-font-family);
+      font-size: 0.6875rem;
+      font-stretch: 100%;
+      letter-spacing: 0.04em;
+      color: var(--on-dark-muted);
+    }
+    .headerMain .simple-rp-menu.simple-rp-menu .dropdown-menu > ul > li :is(a, span).menu-link::after {
+      content: "→";
+      margin-left: 2px;
+      font-size: 1rem;
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: opacity 0.2s, transform 0.3s var(--folio-ease);
+    }
+    .headerMain .simple-rp-menu.simple-rp-menu .dropdown-menu > ul > li :is(a, span).menu-link:hover .menu-title,
+    .headerMain .simple-rp-menu.simple-rp-menu .dropdown-menu > ul > li :is(a, span).menu-link:focus-visible .menu-title {
+      background-size: 100% 1px;
+    }
+    .headerMain .simple-rp-menu.simple-rp-menu .dropdown-menu > ul > li :is(a, span).menu-link:hover::after,
+    .headerMain .simple-rp-menu.simple-rp-menu .dropdown-menu > ul > li :is(a, span).menu-link:focus-visible::after {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* Phone menu (#offcanvasRight): the desktop panel's language, a Carbon sheet with the
+   pages as numbered condensed caps between faint rules */
+@layer components {
+  #offcanvasRight {
+    background-color: var(--surface-dark) !important;
+    color: var(--on-dark);
+  }
+  #offcanvasRight :is(.sidebar-foot, [class*="sidebar-foot"], .bg-white) {
+    border-color: rgb(244 243 238 / 0.18) !important;
+    background-color: transparent !important;
+  }
+  #offcanvasRight :is(button, a, i, span, svg) {
+    color: var(--on-dark);
+  }
+  #offcanvasRight .tw-btn-primary,
+  #offcanvasRight .tw-btn-primary * {
+    color: var(--on-primary) !important;
+  }
+  #offcanvasRight .sidebar-menu > ul,
+  #offcanvasRight .sidebar-menu .menu-ul {
+    counter-reset: folio-drawer;
+  }
+  #offcanvasRight .sidebar-menu .menu-ul > li {
+    counter-increment: folio-drawer;
+    border-bottom: 1px solid rgb(244 243 238 / 0.18) !important;
+  }
+  #offcanvasRight .menu-brand img {
+    filter: brightness(0) invert(1);
+  }
+  #offcanvasRight .sidebar-menu .menu-ul {
+    margin: 0 !important;
+    padding-inline: 20px !important;
+  }
+  #offcanvasRight .sidebar-menu .menu-ul > li > .menu-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  #offcanvasRight .sidebar-menu .menu-ul > li > :is(a, span).menu-link,
+  #offcanvasRight .sidebar-menu .menu-ul > li > .menu-group > :is(a, span).menu-link {
+    margin: 0 !important;
+    display: flex !important;
+    align-items: baseline;
+    gap: 14px;
+    padding: 16px 0 !important;
+    border-radius: 0 !important;
+    background: none !important;
+    color: var(--on-dark) !important;
+    font-family: var(--heading-font-family);
+    font-size: 1.875rem !important;
+    font-stretch: var(--folio-stretch);
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    letter-spacing: -0.015em;
+    text-transform: uppercase;
+  }
+  #offcanvasRight .sidebar-menu .menu-ul > li > :is(a, span).menu-link::before,
+  #offcanvasRight .sidebar-menu .menu-ul > li > .menu-group > :is(a, span).menu-link::before {
+    content: counter(folio-drawer, decimal-leading-zero);
+    font-family: var(--body-font-family);
+    font-size: 0.75rem;
+    font-stretch: 100%;
+    letter-spacing: 0.04em;
+    color: var(--on-dark-muted);
+  }
+  #offcanvasRight .sidebar-menu .sub-menu-ul .menu-link {
+    padding: 10px 0 10px 28px !important;
+    background: none !important;
+    color: var(--on-dark-muted) !important;
+    font-size: 0.9375rem !important;
+    text-transform: none;
+  }
+}
+
+/* Header search: a full-width Paper field on an Ink edge, square */
+.headerMain .search-field .tw-input {
+  border-color: var(--text-strong);
+  background-color: var(--surface-alt);
+}
+
+/* Phones: the inline hero image would sit alone on its own line; the plate below shows it */
+@media (max-width: 767.98px) {
+  .folio-inline-media { display: none; }
+}
+
+/* Announcement strip: the one yellow band (its bg-accent utility would draw Ink) */
+.headerMain .header-top {
+  background-color: var(--primary);
+  color: var(--on-primary);
+}
+
+/* No shadows and no pills anywhere in the page (DESIGN.md §5): block markup sets
+   shadow-* and rounded-full utilities directly. Unlayered, so it beats the utilities.
+   Form radios, spinners, slider bullets and avatars' own images are left alone. */
+:where(main, .footer-main, .headerMain) :is(.shadow-xs, .shadow-sm, .shadow, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl, [class*="hover:shadow"]),
+:where(main, .footer-main, .headerMain) :is([class*="hover:shadow"]):hover {
+  box-shadow: none;
+}
+:where(main, .footer-main, .headerMain, #offcanvasRight) .rounded-full:not(input, img, .tw-spinner-border, .swiper-pagination-bullet, .animate-spin) {
+  border-radius: 2px;
+}
+.service-card-icon {
+  border-radius: 2px;
+}
+
+/* Newsletter form (_components/newsletter-form.twig): its wrapper and field are fixed
+   sm:rounded-full / rounded-full classes */
+div.sm\:rounded-full:has(input[type="email"]),
+div.sm\:rounded-full:has(input[type="email"]) input[type="email"].rounded-full {
+  border-radius: var(--form-border-radius);
+}
+div.sm\:rounded-full:has(input[type="email"]) .wf-submit-btn {
+  min-height: 48px;
+}
+
+/* Footer column labels: small uppercase meta (the Theme's footer rule builds later) */
+.footer-main button[class] > span,
+.footer-main :is(h2, h3, h4, h5, h6).font-heading {
+  font-family: var(--body-font-family);
+  font-size: 0.75rem;
+  font-stretch: 100%;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Process steps: large condensed numerals, no discs. A CMS step colour still wins. */
+.ourProcess .w-20.h-20.bg-primary {
+  border-radius: 2px;
+  box-shadow: none;
+}
+.ourProcess .w-20.h-20 [data-icon-mask]::after {
+  background-color: var(--on-primary);
+}
+
+/* Photos everywhere: 0px. Avatars and logos keep their own shapes. */
+:is(.post-card-media, .project-card-media, .hero-split-media, .page-hero-media) :is(img, picture, video) {
+  border-radius: 0;
+}
+
+/* Testimonial and rating stars: Ink, not a colour */
+.testimonial-rating,
+:is(.testimonial-rating, .product-card-rating) .text-warning {
+  color: var(--text-strong);
+}
+[data-theme="dark"] .testimonial-rating {
+  color: var(--on-dark);
+}
+
+/* =========================================================================
+   FOLIO LAYOUTS (DESIGN.md §7b): the structural layer. Unlayered, so it beats the
+   Theme's component rules and the block markup's utilities. Each block keeps its CMS
+   fields and options; what changes is how its parts are arranged.
+   ========================================================================= */
+
+/* Running chapter numbers for the section heads, "(01)", "(02)" … per page */
+main {
+  counter-reset: folio-chapter;
+}
+
+/* Reading progress: a 2px Ink line along the top edge of the viewport (folio.js scrubs it) */
+.folio-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 1100;
+  height: 2px;
+  background-color: var(--text-strong);
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- services, grid view
+   Cards become a numbered index: one row per service between Ink rules, the title as a
+   slab, the text beside it, an arrow at the end. Hover floods the row with Ink. */
+.services-gridView .container .grid:has(> .service-card),
+.services-gridView .container .grid:has(> * > .service-card) {
+  display: block;
+  counter-reset: folio-row;
+  border-top: 1px solid var(--line);
+}
+.services-gridView .service-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 28px;
+  align-items: baseline;
+  gap: 10px 20px;
+  padding: 26px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background-color: transparent;
+  background-image: linear-gradient(var(--text-strong), var(--text-strong));
+  background-repeat: no-repeat;
+  background-position: 50% 100%;
+  background-size: 100% 0%;
+  box-shadow: none;
+  text-align: left;
+  counter-increment: folio-row;
+  transition: background-size 0.45s var(--folio-ease), color 0.25s var(--folio-ease), padding 0.45s var(--folio-ease);
+}
+.services-gridView .service-card::before {
+  content: counter(folio-row, decimal-leading-zero);
+  grid-column: 1;
+  grid-row: 1;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+.services-gridView .service-card-icon {
+  display: none;
+}
+.services-gridView .service-card-title {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw, 3.5rem);
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+.services-gridView .service-card-text,
+.services-gridView .service-card-text :is(p, li) {
+  grid-column: 2;
+  grid-row: 2;
+  max-width: 34rem;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-body);
+}
+.services-gridView .service-card-link {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  font-size: 0;
+}
+.services-gridView .service-card-link i {
+  font-size: 1.5rem;
+}
+@media (min-width: 1024px) {
+  .services-gridView .service-card {
+    grid-template-columns: 72px minmax(0, 6fr) minmax(0, 5fr) 40px;
+    padding: 34px 0;
+  }
+  .services-gridView .service-card-text {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: center;
+  }
+  .services-gridView .service-card-link {
+    grid-column: 4;
+  }
+}
+@media (hover: hover) {
+  .services-gridView .service-card:hover {
+    padding-inline: 20px;
+    background-size: 100% 100%;
+    color: var(--surface);
+  }
+  .services-gridView .service-card:hover :is(.service-card-title, .service-card-link i) {
+    color: var(--primary);
+  }
+  .services-gridView .service-card:hover .service-card-text {
+    color: var(--neutral-200);
+  }
+}
+.services-gridView[data-theme="dark"] .service-card {
+  background-image: linear-gradient(var(--on-dark), var(--on-dark));
+}
+
+/* ---------------------------------------------------------------- process steps
+   Cards become chapters: a big condensed numeral on a rule, the title and text below,
+   left-aligned; icon tiles and number discs go. A CMS step colour still colours the
+   numeral (it sets --step-indicator-color). */
+.ourProcess .process-container-inner > * {
+  text-align: left;
+}
+.ourProcess .process-container-inner .flex.flex-col.h-full {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none !important;
+  text-align: left;
+}
+/* The icon tile can carry a CMS colour inline with !important, so it is hidden and the
+   numeral is drawn from a counter instead */
+.ourProcess {
+  counter-reset: folio-step;
+}
+.ourProcess .w-20.h-20 {
+  display: none !important;
+}
+/* every layout (cards, timeline, vertical steps, zigzag): the element that held the tile
+   carries the numeral */
+.ourProcess :has(> .w-20.h-20) {
+  counter-increment: folio-step;
+}
+.ourProcess :has(> .w-20.h-20)::before {
+  content: counter(folio-step, decimal-leading-zero);
+  display: block;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--heading-font-family);
+  font-size: clamp(4.5rem, 8vw, 7.5rem);
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  color: var(--text-strong);
+}
+[data-theme="dark"] .ourProcess :has(> .w-20.h-20)::before {
+  color: var(--on-dark);
+}
+/* timeline (slider): no connecting line through the old tiles; numerals left-aligned */
+.ourProcess .swiper-slide {
+  text-align: left;
+}
+/* the slide's own connecting line (before: utilities) would turn the numeral into a bar */
+.ourProcess .swiper-slide:has(> .w-20.h-20)::before {
+  position: static;
+  inset: auto;
+  height: auto;
+  background: none;
+  opacity: 1;
+}
+.ourProcess .step-title {
+  font-size: 1.5rem;
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.ourProcess .step-description {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+.ourProcess .process-container-inner [class*="rounded-full"]:not(.absolute) {
+  margin-top: 16px;
+  padding: 4px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------- testimonials
+   The first quote is a full-width pull quote set as a slab; the rest sit as a ruled grid
+   of quotes. A giant condensed quotation mark opens each one. */
+.testimonials-section .grid > :first-child:not(:only-child) {
+  grid-column: 1 / -1;
+}
+@media (min-width: 768px) {
+  .testimonials-section .grid:has(> :first-child:not(:only-child)) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.testimonials-section .grid > :first-child .testimonial-card {
+  padding: 0 0 40px;
+  background: none;
+}
+.testimonials-section .grid > :first-child :is(.testimonial-quote, .testimonial-quote p) {
+  max-width: 22ch;
+  font-size: clamp(2.25rem, 5vw, 4.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+.testimonial-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 !important;
+}
+.testimonial-card::before {
+  content: "\201C";
+  display: block;
+  height: 0.45em;
+  margin-bottom: 16px;
+  font-family: var(--heading-font-family);
+  font-size: 6rem;
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  line-height: 0.85;
+  color: var(--text-strong);
+}
+[data-theme="dark"] .testimonial-card::before {
+  color: var(--on-dark);
+}
+.testimonial-person {
+  margin-top: auto;
+}
+
+/* ---------------------------------------------------------------- team
+   Portraits in greyscale that take their colour on hover; names in condensed caps */
+.team-section img:not([class*="avatar"]) {
+  filter: grayscale(1) contrast(1.05);
+  transition: filter 0.5s var(--folio-ease);
+}
+.team-section :is(a, .group, .swiper-slide, .grid > *):hover img {
+  filter: none;
+}
+.team-section :is(h3, h4) {
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+/* ---------------------------------------------------------------- client logos
+   A single row becomes an endless band (folio.js clones the marks into a track) */
+.logo-row.is-marquee {
+  display: block;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.folio-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: folio-marquee var(--marquee-time, 36s) linear infinite;
+}
+.folio-marquee-track > .logo-item {
+  flex: 0 0 auto;
+  min-width: 220px;
+  border-left: 1px solid var(--line);
+}
+.logo-row.is-marquee:hover .folio-marquee-track {
+  animation-play-state: paused;
+}
+@keyframes folio-marquee {
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .folio-marquee-track { animation: none; }
+}
+
+/* ---------------------------------------------------------------- accordion
+   Each question is a ruled row on three columns: its number, the question as a condensed
+   slab, and a drawn "+" that turns to "×" when open (the Theme's chevron is hidden). The
+   answer hangs under the question, not under the number. Hover nudges the question and
+   turns the "+"; an open item gets a heavier rule above it. */
+.tw-accordion {
+  counter-reset: folio-q;
+}
+.tw-accordion-item {
+  counter-increment: folio-q;
+  transition: border-color 0.2s;
+}
+.tw-accordion .tw-accordion-item > button {
+  display: grid !important;
+  grid-template-columns: 36px minmax(0, 1fr) 24px;
+  align-items: center;
+  column-gap: 12px;
+  width: 100%;
+  padding: 22px 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--text-strong) !important;
+  text-align: left;
+  cursor: pointer;
+}
+.tw-accordion .tw-accordion-item > button::before {
+  content: counter(folio-q, decimal-leading-zero);
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  padding-top: 0.45em;
+  font-family: var(--body-font-family);
+  font-size: 0.75rem;
+  font-stretch: 100%;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+.tw-accordion .tw-accordion-item > button > span {
+  grid-column: 2;
+  grid-row: 1;
+  font-family: var(--heading-font-family);
+  font-size: clamp(1.25rem, 2.2vw, 2rem) !important;
+  font-stretch: var(--folio-stretch);
+  font-weight: 500 !important;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  transition: transform 0.3s var(--folio-ease);
+}
+.tw-accordion .tw-accordion-item > button > svg {
+  display: none !important;
+}
+.tw-accordion .tw-accordion-item > button::after {
+  content: "";
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  width: 18px;
+  height: 18px;
+  background:
+    linear-gradient(currentColor, currentColor) center / 100% 1.5px no-repeat,
+    linear-gradient(currentColor, currentColor) center / 1.5px 100% no-repeat;
+  transition: transform 0.35s var(--folio-ease);
+}
+.tw-accordion .tw-accordion-item > button:is(.is-open, [aria-expanded="true"])::after {
+  transform: rotate(135deg);
+}
+@media (hover: hover) {
+  .tw-accordion .tw-accordion-item > button:hover > span {
+    transform: translateX(8px);
+  }
+  .tw-accordion .tw-accordion-item > button:not(.is-open, [aria-expanded="true"]):hover::after {
+    transform: rotate(90deg);
+  }
+}
+.tw-accordion .tw-accordion-item:has(> button:is(.is-open, [aria-expanded="true"])) {
+  border-top-width: 2px !important;
+}
+.tw-accordion .tw-accordion-item .tw-accordion-body {
+  padding: 0 32px 26px 48px !important;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--text-body);
+}
+.tw-accordion .tw-accordion-item .tw-accordion-body > * {
+  max-width: 60ch;
+}
+@media (min-width: 768px) {
+  .tw-accordion .tw-accordion-item > button {
+    grid-template-columns: 64px minmax(0, 1fr) 32px;
+    column-gap: 16px;
+    padding-block: 28px !important;
+  }
+  .tw-accordion .tw-accordion-item .tw-accordion-body {
+    padding-left: 80px !important;
+  }
+}
+[data-theme="dark"] .tw-accordion .tw-accordion-item > button {
+  color: var(--on-dark) !important;
+}
+[data-theme="dark"] .tw-accordion .tw-accordion-item .tw-accordion-body {
+  color: var(--on-dark-muted);
+}
+
+/* ---------------------------------------------------------------- editorial card grids
+   Blogs open with a feature story across two columns; case studies alternate wide and
+   narrow columns (7 / 5, then 5 / 7). Titles in condensed caps. */
+@media (min-width: 1024px) {
+  .entry-type.casestudies .block-section .grid[class*="grid-cols-2"] {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  .entry-type.casestudies .block-section .grid[class*="grid-cols-2"] > :nth-child(4n + 1),
+  .entry-type.casestudies .block-section .grid[class*="grid-cols-2"] > :nth-child(4n + 4) {
+    grid-column: span 7;
+  }
+  .entry-type.casestudies .block-section .grid[class*="grid-cols-2"] > :nth-child(4n + 2),
+  .entry-type.casestudies .block-section .grid[class*="grid-cols-2"] > :nth-child(4n + 3) {
+    grid-column: span 5;
+  }
+}
+:is(.post-card-title, .project-card-title, .work-card h3) {
+  text-transform: uppercase;
+  font-stretch: var(--folio-stretch);
+  letter-spacing: -0.01em;
+}
+.work-card {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* ---------------------------------------------------------------- journal strip
+   Blogs, grid view: the posts run as one horizontal strip of tall plates. On desktop
+   folio.js pins the section and slides the strip as you scroll (.is-strip-pinned); on
+   phones, or with reduced motion, it is a scroll-snap row you swipe. */
+.entry-type.blogs .block-section .grid:has(> * > .post-card),
+.entry-type.blogs .block-section .grid:has(> .post-card) {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  counter-reset: folio-post;
+  padding-bottom: 4px;
+}
+.entry-type.blogs .block-section .grid:has(> * > .post-card)::-webkit-scrollbar {
+  display: none;
+}
+.entry-type.blogs .block-section .grid:has(> * > .post-card) > *,
+.entry-type.blogs .block-section .grid:has(> .post-card) > .post-card {
+  flex: 0 0 82%;
+  scroll-snap-align: start;
+  counter-increment: folio-post;
+}
+@media (min-width: 768px) {
+  .entry-type.blogs .block-section .grid:has(> * > .post-card) > *,
+  .entry-type.blogs .block-section .grid:has(> .post-card) > .post-card { flex-basis: 44%; }
+}
+@media (min-width: 1024px) {
+  .entry-type.blogs .block-section .grid:has(> * > .post-card),
+  .entry-type.blogs .block-section .grid:has(> .post-card) { gap: 32px; }
+  .entry-type.blogs .block-section .grid:has(> * > .post-card) > *,
+  .entry-type.blogs .block-section .grid:has(> .post-card) > .post-card { flex-basis: min(30vw, 440px); }
+}
+/* three posts or fewer fill the row on desktop instead of overflowing it */
+@media (min-width: 1024px) {
+  .entry-type.blogs .block-section .grid:has(> * > .post-card):not(:has(> :nth-child(4))) > *,
+  .entry-type.blogs .block-section .grid:has(> .post-card):not(:has(> :nth-child(4))) > .post-card {
+    flex: 1 1 0;
+  }
+}
+.entry-type.blogs .block-section .grid.is-strip-pinned {
+  overflow: visible;
+  scroll-snap-type: none;
+}
+.entry-type.blogs .grid .post-card:not(.post-card--row) {
+  position: relative;
+}
+.entry-type.blogs .grid .post-card:not(.post-card--row)::before {
+  content: counter(folio-post, decimal-leading-zero);
+  display: block;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--heading-font-family);
+  font-size: 3rem;
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+}
+.entry-type.blogs .grid .post-card:not(.post-card--row) .post-card-media {
+  aspect-ratio: 4 / 5;
+}
+.entry-type.blogs .grid .post-card:not(.post-card--row) .post-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1);
+  transition: filter 0.5s var(--folio-ease);
+}
+.entry-type.blogs .grid .post-card:not(.post-card--row):hover .post-card-media img {
+  filter: none;
+}
+.entry-type.blogs .grid .post-card:not(.post-card--row) .post-card-title {
+  font-size: clamp(1.5rem, 2.2vw, 2rem);
+  line-height: 0.95;
+}
+
+/* ---------------------------------------------------------------- post list
+   (blogs listing page and list views, .post-list > .post-card--row): a numbered
+   contents index. Each story is a row between Ink rules: a big condensed number, a
+   4:3 photo plate, then meta, the title as a slab, the excerpt and the link. */
+.posts-section .container[class*="max-w-"] {
+  max-width: 1360px;
+}
+.post-list {
+  counter-reset: folio-story;
+  border-top: 1px solid var(--line);
+}
+.post-list > * {
+  counter-increment: folio-story;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+.post-list {
+  gap: 0 !important;
+}
+.post-card.post-card--row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  padding: 28px 0 32px;
+  border: 0 !important;
+  border-bottom: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+.post-card.post-card--row::before {
+  content: counter(folio-story, decimal-leading-zero);
+  font-family: var(--heading-font-family);
+  font-size: 2.5rem;
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+}
+.post-card--row .post-card-media {
+  width: 100% !important;
+  max-width: none !important;
+  aspect-ratio: 4 / 3;
+  margin: 0;
+}
+.post-card--row .post-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.post-card--row .post-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 !important;
+}
+.post-card--row .post-card-title {
+  margin: 0;
+  font-size: clamp(1.75rem, 3.2vw, 3rem);
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+.post-card--row .post-card-title a {
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
+  transition: background-size 0.35s var(--folio-ease);
+}
+.post-card--row:hover .post-card-title a {
+  background-size: 100% 2px;
+}
+.post-card--row .post-card-text {
+  max-width: 40rem;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--text-body);
+}
+.post-card--row .post-card-foot {
+  margin-top: auto;
+  padding-top: 8px;
+}
+@media (min-width: 768px) {
+  .post-card.post-card--row {
+    grid-template-columns: 64px minmax(0, 5fr) minmax(0, 7fr);
+    align-items: start;
+    gap: 32px;
+    padding-block: 36px;
+  }
+  .post-card.post-card--row::before {
+    font-size: 3rem;
+  }
+  .post-card--row .post-card-body {
+    min-height: 100%;
+    padding-top: 4px !important;
+  }
+}
+@media (min-width: 1024px) {
+  .post-card.post-card--row {
+    grid-template-columns: 96px minmax(0, 4fr) minmax(0, 7fr);
+    gap: 40px;
+  }
+  .post-card.post-card--row::before {
+    font-size: 4rem;
+  }
+}
+
+/* ---------------------------------------------------------------- capability grid
+   A Universal Card block given the CSS class "folio-capabilities" (Block style > CSS
+   classes; custom items, Icon Top). Items 1–4 are the feature tiles, set as a 2×2 block in
+   the middle of a full-bleed ruled grid; every other item is a small capability tile
+   (icon + label) in the cells around them. The grid fades out at both edges. folio.js
+   draws the tiles in from scattered positions as the section scrolls in. */
+.folio-capabilities .container > .grid {
+  --cap-line: rgb(13 13 13 / 0.14);
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(132px, auto);
+  grid-auto-flow: dense;
+  gap: 0 !important;
+  border-top: 1px solid var(--cap-line);
+  border-left: 1px solid var(--cap-line);
+}
+.folio-capabilities .container > .grid > * {
+  min-width: 0;
+  border-right: 1px solid var(--cap-line);
+  border-bottom: 1px solid var(--cap-line);
+}
+/* phones: a 6-column track, so the feature tiles sit two per row and the capability
+   tiles three per row */
+@media (max-width: 767.98px) {
+  .folio-capabilities .container > .grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-auto-rows: minmax(96px, auto);
+  }
+  .folio-capabilities .container > .grid > * {
+    grid-column: span 2;
+  }
+  .folio-capabilities .container > .grid > :nth-child(-n + 4) {
+    grid-column: span 3;
+  }
+  .folio-capabilities .container > .grid > :nth-child(-n + 4) .ucard > div > .block {
+    min-height: 96px;
+  }
+  .folio-capabilities .container > .grid > :nth-child(-n + 4) .universalCard-title {
+    font-size: 1.25rem !important;
+  }
+  .folio-capabilities .container > .grid > :nth-child(-n + 4) .universalCard-content {
+    display: none;
+  }
+  .folio-capabilities .container > .grid > :nth-child(n + 5) .ucard > div {
+    gap: 8px;
+    padding: 10px 6px !important;
+  }
+  .folio-capabilities .container > .grid > :nth-child(n + 5) .universalCard-title {
+    font-size: 0.6875rem !important;
+  }
+}
+@media (min-width: 768px) {
+  .folio-capabilities .container > .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .folio-capabilities .container > .grid > :nth-child(-n + 4) {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+}
+@media (min-width: 1024px) {
+  /* full bleed: the grid runs past the container to both screen edges and fades there */
+  .folio-capabilities .container > .grid {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-auto-rows: 150px;
+    border-left: 0;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 9%, #000 91%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 9%, #000 91%, transparent 100%);
+  }
+  .folio-capabilities .container > .grid > :nth-child(1) { grid-column: 3 / span 2; grid-row: 2 / span 2; }
+  .folio-capabilities .container > .grid > :nth-child(2) { grid-column: 5 / span 2; grid-row: 2 / span 2; }
+  .folio-capabilities .container > .grid > :nth-child(3) { grid-column: 3 / span 2; grid-row: 4 / span 2; }
+  .folio-capabilities .container > .grid > :nth-child(4) { grid-column: 5 / span 2; grid-row: 4 / span 2; }
+}
+
+/* small capability tiles: icon over a small label, centred; hover floods the cell with Ink */
+.folio-capabilities .ucard {
+  height: 100%;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+.folio-capabilities .container > .grid > :nth-child(n + 5) .ucard {
+  justify-content: center;
+  background-image: linear-gradient(var(--text-strong), var(--text-strong)) !important;
+  background-repeat: no-repeat !important;
+  background-position: 50% 100% !important;
+  background-size: 100% 0% !important;
+  transition: background-size 0.4s var(--folio-ease);
+}
+.folio-capabilities .container > .grid > :nth-child(n + 5) .ucard > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  height: 100%;
+  padding: 16px 10px !important;
+  text-align: center;
+}
+.folio-capabilities .container > .grid > :nth-child(n + 5) .ucard > div > .block {
+  width: 30px !important;
+  margin: 0 !important;
+}
+.folio-capabilities .container > .grid > :nth-child(n + 5) .universalCard-title {
+  margin: 0 !important;
+  font-family: var(--body-font-family);
+  font-size: 0.8125rem !important;
+  font-stretch: 100%;
+  font-weight: 500 !important;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--text-strong);
+  transition: color 0.25s var(--folio-ease);
+}
+.folio-capabilities [data-icon-mask]::after {
+  transition: background-color 0.25s var(--folio-ease);
+}
+@media (hover: hover) {
+  .folio-capabilities .container > .grid > :nth-child(n + 5) .ucard:hover {
+    background-size: 100% 100% !important;
+  }
+  .folio-capabilities .container > .grid > :nth-child(n + 5) .ucard:hover .universalCard-title {
+    color: var(--surface);
+  }
+  .folio-capabilities .container > .grid > :nth-child(n + 5) .ucard:hover [data-icon-mask]::after {
+    background-color: var(--surface);
+  }
+}
+
+/* feature tiles: a Paper sheet with the photo on top (greyscale, colour on hover), the
+   title as a slab, one line of text and "Explore →" */
+.folio-capabilities .container > .grid > :nth-child(-n + 4) .ucard {
+  background-color: var(--surface-alt) !important;
+}
+.folio-capabilities .container > .grid > :nth-child(-n + 4) .ucard > div {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto auto;
+  height: 100%;
+  padding: 14px !important;
+}
+.folio-capabilities .container > .grid > :nth-child(-n + 4) .ucard > div > .block {
+  width: 100% !important;
+  min-height: 150px;
+  margin: 0 0 14px !important;
+  overflow: hidden;
+}
+.folio-capabilities .container > .grid > :nth-child(-n + 4) .ucard > div > .block > .aspect-square {
+  aspect-ratio: auto;
+  height: 100%;
+}
+.folio-capabilities .container > .grid > :nth-child(-n + 4) .ucard img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1);
+  transition: filter 0.5s var(--folio-ease), transform 0.8s var(--folio-ease);
+}
+.folio-capabilities .container > .grid > :nth-child(-n + 4) .ucard:hover img {
+  filter: none;
+  transform: scale(1.03);
+}
+.folio-capabilities .container > .grid > :nth-child(-n + 4) .universalCard-title {
+  margin: 0 0 6px !important;
+  font-size: clamp(1.5rem, 2vw, 2rem) !important;
+  font-stretch: var(--folio-stretch);
+  font-weight: 500 !important;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+.folio-capabilities .container > .grid > :nth-child(-n + 4) .universalCard-content {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+.folio-capabilities .container > .grid > :nth-child(-n + 4) .tw-btn {
+  min-height: 0;
+  margin-top: 10px;
+  padding: 0;
+  border: 0;
+  background: none !important;
+  color: var(--text-strong);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+/* the button's ::after is the card-wide click area, so the arrow goes on ::before */
+.folio-capabilities .container > .grid > :nth-child(-n + 4) .tw-btn::before {
+  content: "→";
+  order: 2;
+  margin-left: 6px;
+  transition: transform 0.3s var(--folio-ease);
+}
+.folio-capabilities .container > .grid > :nth-child(-n + 4) .ucard:hover .tw-btn::before {
+  transform: translateX(5px);
+}
+/* the full-bleed grid is 100vw, which includes the scrollbar: clip the overflow */
+.folio-capabilities .block-section {
+  overflow-x: clip;
+}
+
+/* ---------------------------------------------------------------- CTA band
+   The title as a slab, with a giant ticker of the same words moving across behind it on
+   scroll (folio.js adds .folio-ticker) */
+.cta-box {
+  overflow: hidden;
+}
+.cta-box .cta-title {
+  font-size: clamp(2.5rem, 6vw, 6rem);
+  line-height: 0.9;
+  letter-spacing: -0.028em;
+}
+.folio-ticker {
+  position: absolute;
+  left: 0;
+  bottom: -0.1em;
+  z-index: 0;
+  display: flex;
+  gap: 0.35em;
+  white-space: nowrap;
+  font-family: var(--heading-font-family);
+  font-size: clamp(6rem, 18vw, 18rem);
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: currentColor;
+  opacity: 0.07;
+  pointer-events: none;
+}
+.cta-box > *:not(.folio-ticker, .folio-grid, .folio-grid-readout) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------------------------------------------------------------- image with text
+   The copy's title as a slab, the photo as a square-cornered plate */
+.split-section .split-grid :is(h2, h3) {
+  font-size: clamp(2.25rem, 4.6vw, 4.5rem);
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+.split-frame,
+.split-frame :is(img, picture, video) {
+  border-radius: 0 !important;
+}
+.split-frame {
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------- hero stats
+   (_includes/hero-banner/_list.twig, "figure | label" rows). The Theme draws them in
+   Parchment for its dark hero, which is Stone here, so they vanished on Folio's light
+   hero: Ink figures in the condensed cut over small-caps labels, four columns split by
+   rules. folio.js counts the figures up. */
+.hero-folio .hero-stats,
+.page-hero .hero-stats {
+  --stat-color: var(--text-strong);
+  --stat-muted: var(--text-muted);
+  --stat-rule: var(--line);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 40px;
+  border-top: 1px solid var(--line);
+}
+@media (min-width: 768px) {
+  .hero-folio .hero-stats,
+  .page-hero .hero-stats {
+    grid-template-columns: repeat(var(--stat-count, 4), minmax(0, 1fr));
+  }
+}
+.hero-folio .hero-stat,
+.page-hero .hero-stat {
+  gap: 10px;
+  padding: 20px 20px 4px 0;
+  border-left: 0;
+}
+.hero-folio .hero-stat + .hero-stat,
+.page-hero .hero-stat + .hero-stat {
+  padding-left: 20px;
+  border-left: 1px solid var(--line);
+}
+@media (max-width: 767.98px) {
+  .hero-folio .hero-stat:nth-child(odd),
+  .page-hero .hero-stat:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .hero-folio .hero-stat:nth-child(n + 3),
+  .page-hero .hero-stat:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+}
+.hero-folio .hero-stat-figure,
+.page-hero .hero-stat-figure {
+  font-size: clamp(2.75rem, 6vw, 5.5rem);
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 0.85;
+  letter-spacing: -0.035em;
+}
+.hero-folio .hero-stat-label,
+.page-hero .hero-stat-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.hero-stats:has(> :nth-child(2):last-child) { --stat-count: 2; }
+.hero-stats:has(> :nth-child(3):last-child) { --stat-count: 3; }
+.hero-stats:has(> :nth-child(5):last-child) { --stat-count: 5; }
+.hero-stats:has(> :nth-child(6):last-child) { --stat-count: 6; }
+[data-theme="dark"] .hero-stats {
+  --stat-color: var(--on-dark);
+  --stat-muted: var(--on-dark-muted);
+}
+
+/* ---------------------------------------------------------------- article header
+   (templates/_components/article-hero.twig): blog posts and case studies */
+.folio-article {
+  padding-top: 32px;
+  background-color: var(--surface);
+}
+@media (min-width: 1024px) {
+  .folio-article { padding-top: 48px; }
+}
+.folio-article-eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  margin: 28px 0 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+.folio-article-eyebrow .article-pill {
+  padding: 4px 8px;
+  border: 1px solid var(--text-strong);
+  border-radius: var(--radius-base);
+  background: none;
+  color: var(--text-strong);
+  text-decoration: none;
+}
+.folio-article-title {
+  max-width: 22ch;
+  margin: 0;
+  font-size: clamp(2.75rem, 6.4vw, 6.5rem);
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  line-height: 0.88;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.folio-article-foot {
+  display: grid;
+  gap: 20px;
+  margin-top: 32px;
+  padding: 24px 0 40px;
+  border-top: 1px solid var(--line);
+}
+@media (min-width: 1024px) {
+  .folio-article-foot {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: end;
+    gap: 40px;
+    margin-top: 48px;
+    padding-bottom: 56px;
+  }
+}
+.folio-article-lead {
+  max-width: 40rem;
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.45;
+  color: var(--text-body);
+}
+.folio-article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  margin: 0;
+  font-size: 0.875rem;
+}
+@media (min-width: 1024px) {
+  .folio-article-meta { justify-content: flex-end; }
+}
+.folio-article-meta .article-avatar {
+  border-radius: var(--radius-base);
+}
+.folio-article-cover {
+  margin: 0;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background-color: var(--surface-dark);
+}
+@media (min-width: 768px) {
+  .folio-article-cover { aspect-ratio: 21 / 9; }
+}
+.folio-article-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* the article body follows the cover with room to breathe */
+.folio-article + * {
+  margin-top: 0;
+}
+
+/* ---------------------------------------------------------------- article body
+   (blog posts; .article-page .article-body holds page-builder blocks). Hanging heads: each
+   "Heading + content" block puts its heading in the left four columns, sticky while its
+   section is read, and the text on the right seven; images span the full width. A big
+   condensed drop cap opens the article; quotes are slabs between rules. */
+.article-page .article-body .block-section {
+  padding-block: 28px !important;
+}
+/* the blog's narrow container setting would offset the body from the header's grid
+   (the Theme caps it with !important in the components layer, so this sits there too) */
+@layer components {
+  .article-page .article-body .matrix-container > .entry-type > .block-section > :is(.container, [class*="max-w-"]),
+  .article-page .article-body > .container {
+    max-width: 1360px !important;
+  }
+}
+/* the drop cap stays inside its paragraph instead of indenting the next one */
+.article-page .article-body .matrix-container > .entry-type:first-of-type .heading-content-text > p:first-child {
+  display: flow-root;
+}
+.article-page .article-body .block-section > [class*="max-w-"],
+.article-page .article-body .block-section > .container {
+  padding-inline: 1rem;
+}
+@media (min-width: 768px) {
+  .article-page .article-body .block-section > :is([class*="max-w-"], .container) { padding-inline: 1.5rem; }
+}
+@media (min-width: 1024px) {
+  .article-page .article-body .block-section > :is([class*="max-w-"], .container) { padding-inline: 2.5rem; }
+}
+.article-page .article-body .matrix-container > .entry-type:first-child > .block-section {
+  padding-top: 56px !important;
+}
+.article-page .article-body .heading-content-title {
+  font-size: clamp(1.75rem, 2.6vw, 2.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+.article-page .article-body .heading-content-text {
+  max-width: 40rem;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--text-body);
+}
+.article-page .article-body .heading-content-text :is(p, ul, ol) {
+  max-width: none;
+  margin-bottom: 1.1em;
+}
+@media (min-width: 1024px) {
+  .article-page .article-body .heading-content > .container {
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 40px;
+    align-items: start;
+  }
+  .article-page .article-body .heading-content-title {
+    grid-column: 1 / 5;
+    position: sticky;
+    top: calc(var(--header-height, 96px) + 24px);
+    margin: 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .article-page .article-body .heading-content-text {
+    grid-column: 5 / 12;
+    max-width: none;
+  }
+}
+/* drop cap on the article's first paragraph */
+.article-page .article-body .matrix-container > .entry-type:first-of-type .heading-content-text > p:first-child::first-letter {
+  float: left;
+  margin: 0.06em 0.12em 0 0;
+  font-family: var(--heading-font-family);
+  font-size: 5.4em;
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  line-height: 0.78;
+  letter-spacing: -0.04em;
+  color: var(--text-strong);
+}
+/* lists: Ink squares and condensed numerals */
+.article-page .article-body .heading-content-text ul {
+  list-style: none;
+  padding-left: 0;
+}
+.article-page .article-body .heading-content-text ul > li {
+  position: relative;
+  padding-left: 22px;
+  margin-bottom: 0.5em;
+}
+.article-page .article-body .heading-content-text ul > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.68em;
+  width: 7px;
+  height: 7px;
+  background-color: var(--text-strong);
+}
+.article-page .article-body .heading-content-text ol {
+  list-style: none;
+  padding-left: 0;
+  counter-reset: folio-ol;
+}
+.article-page .article-body .heading-content-text ol > li {
+  position: relative;
+  padding-left: 40px;
+  margin-bottom: 0.6em;
+  counter-increment: folio-ol;
+}
+.article-page .article-body .heading-content-text ol > li::before {
+  content: counter(folio-ol, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: -0.05em;
+  font-family: var(--heading-font-family);
+  font-size: 1.375em;
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  line-height: 1;
+}
+/* pull quotes */
+.article-page .article-body blockquote {
+  margin: 1.6em 0;
+  padding: 20px 0;
+  border: 0 !important;
+  border-block: 1px solid var(--line) !important;
+  background: none !important;
+  font-family: var(--heading-font-family);
+  font-size: clamp(1.75rem, 2.8vw, 2.5rem) !important;
+  font-stretch: var(--folio-stretch);
+  font-style: normal !important;
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+.article-page .article-body blockquote p {
+  margin: 0;
+  font: inherit;
+}
+/* images inside the article: full container width, square-cornered */
+.article-page .article-body .image.entry-type img {
+  width: 100%;
+  border-radius: 0 !important;
+}
+/* comments and the end bar sit on the same 4 / 7 grid */
+.article-page .article-column {
+  max-width: none;
+}
+@media (min-width: 1024px) {
+  .article-page .article-column > * {
+    margin-left: calc((100% + 40px) / 3);
+  }
+}
+.article-page .article-comments :is(.tw-card, [class*="rounded"], .bg-white) {
+  border-radius: var(--radius-base) !important;
+  box-shadow: none !important;
+}
+.article-page .article-end {
+  padding-block: 24px;
+  border-block: 1px solid var(--line);
+}
+@layer components {
+  .article-page .article-column.article-column,
+  .article-page > .container > .article-end.article-end {
+    max-width: none !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+  }
+  @media (min-width: 1024px) {
+    .article-page > .container > .article-end.article-end {
+      margin-left: calc((100% + 40px) / 3) !important;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------- portfolio and product titles */
+.portfolio-title,
+.product-title {
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.028em;
+  text-transform: uppercase;
+}
+.portfolio-title {
+  font-size: clamp(3rem, 8vw, 8rem);
+}
+.product-title {
+  font-size: clamp(2.5rem, 4.6vw, 4.5rem);
+}
+:is(.portfolio-head, .product-info) :is(.article-pill, [class*="tag"], [class*="chip"]) {
+  border-radius: var(--radius-base);
+}
+
+/* ---------------------------------------------------------------- FAQ on the grid
+   The simple accordion (templates/_blocks/accordion.twig: w-full max-w-4xl mx-auto) sits
+   on columns 5–12 under the section head instead of a narrow centred column */
+.entry-type.accordion .container .w-full.max-w-4xl.mx-auto {
+  max-width: none;
+}
+@media (min-width: 1024px) {
+  .entry-type.accordion .container .w-full.max-w-4xl.mx-auto {
+    width: auto;
+    margin-left: calc((100% + 24px) / 3);
+    margin-right: 0;
+  }
+}
+
+/* ---------------------------------------------------------------- newsletter band title */
+.newsletter-section :is(h2, h3).font-heading {
+  font-size: clamp(2.5rem, 5.6vw, 5.5rem);
+  font-stretch: var(--folio-stretch);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.028em;
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------- heading + content
+   Always left, whatever its CMS alignment (the template sets text-align inline) */
+.heading-content > .container {
+  align-items: flex-start !important;
+}
+.heading-content :is(.heading-content-title, .heading-content-text) {
+  margin-left: 0 !important;
+  text-align: left !important;
+}
+
+/* ---------------------------------------------------------------- listing filter
+   (_components/listing-filter.twig, blog and shop): a ruled toolbar, not a pill */
+.blog-filter-bar {
+  padding: 16px 0;
+  border: 0;
+  border-block: 1px solid var(--line);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.blog-filter-bar :is(input, select, .tw-btn) {
+  border-radius: var(--radius-base) !important;
+}
+.blog-filter-bar :is(input, select) {
+  border: 1px solid var(--text-strong);
+  background-color: var(--surface-alt);
+}
+
+/* ---------------------------------------------------------------- critique fixes (2026-11-02)
+   Long-form measure: article and case-study body text at 68ch at most */
+.article-body :is(p, ul, ol, h2, h3, h4, blockquote, dl) {
+  max-width: 68ch;
+}
+/* Placeholders at body-muted contrast (5.7:1 on Stone, 7.7:1 on Paper), not Dust */
+::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+/* Pricing: icons on the featured (dark) plan were Ink on Carbon; "not included" crosses
+   were Dust. Meaningful marks get readable colours; the decorative disc bullet goes. */
+.tw-card.ring :is(.text-accent, .text-success, .text-primary),
+[class*="pricing"] .bg-surface-dark :is(.text-accent, .text-success, .text-primary) {
+  color: var(--on-dark) !important;
+}
+:is(.tw-card, [class*="pricing"]) .ti-x {
+  color: var(--text-muted) !important;
+}
+.tw-card.ring .ti-x {
+  color: var(--on-dark-muted) !important;
+}
+:is(.tw-card, [class*="pricing"]) .ti-disc {
+  display: none;
+}
+/* Leftover soft shapes and decorative yellow the review found */
+.hero-eyebrow,
+.share-btn,
+[class*="share"] > button,
+.product-info .rounded-full,
+.portfolio-head .rounded-full,
+#offcanvasRight button.rounded-full,
+.back-to-top,
+#backToTop,
+[class*="rounded-[50%]"] {
+  border-radius: var(--radius-base) !important;
+}
+main [class*="bg-primary/10"],
+main .bg-primary\/10 {
+  border: 1px solid var(--text-strong);
+  background-color: transparent !important;
+}
+.swiper-pagination-bullet {
+  width: 18px !important;
+  height: 2px !important;
+  border-radius: 0 !important;
+  background-color: var(--text-strong) !important;
+  opacity: 0.25;
+}
+.swiper-pagination-bullet-active {
+  width: 36px !important;
+  opacity: 1;
+}
+[data-theme="dark"] .swiper-pagination-bullet {
+  background-color: var(--on-dark) !important;
+}
+.footer-main img[src*="card"],
+.footer-main img[alt*="ard"] {
+  filter: grayscale(1);
+}
+/* Services list view speaks the same slab language as the grid view's index rows */
+.service-list-title {
+  text-transform: uppercase;
+}
+/* Custom items keep no card fill inside the index layout (it left the number flush) */
+.services-gridView .service-card {
+  background-color: transparent !important;
+}
+/* Pull quote: wider measure so it reads as a full-width moment */
+.testimonials-section .grid > :first-child :is(.testimonial-quote, .testimonial-quote p) {
+  max-width: 28ch;
+}
+/* Phones: process numerals and service rows sized for 390px */
+@media (max-width: 767.98px) {
+  .ourProcess :has(> .w-20.h-20)::before {
+    font-size: 3.5rem;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+  }
+  .services-gridView .service-card {
+    grid-template-columns: 28px minmax(0, 1fr) 20px;
+    gap: 8px 12px;
+  }
+}
+
+/* ---------------------------------------------------------------- custom service items
+   The CMS badge ("01") is replaced by the row's own counter in the index layout */
+.services-gridView .service-card-eyebrow {
+  display: none;
+}
+
+/* ---------------------------------------------------------------- desktop dropdown
+   A full-width Carbon panel under the header: the sub-pages as numbered condensed caps
+   in columns. The menu items let go of their positioning so the panel spans the header. */
+@media (min-width: 1024px) {
+  #menuNav,
+  #menuNav .simple-rp-menu,
+  #menuNav .simple-rp-menu > .menu-ul,
+  #menuNav .simple-rp-menu > .menu-ul > li.dropdown {
+    position: static !important;
+  }
+}

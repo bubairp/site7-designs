@@ -1,0 +1,56 @@
+{#- Folio: hero layout 3 (overrides templates/_includes/hero-banner/sliderLayout3.twig; same
+	fields, DESIGN.md §7). On Stone instead of over the photo: eyebrow, an uppercase display
+	slab with the slide's image set inline between its words (Yllw's move), lead, check list,
+	buttons; then the media as a full-bleed plate below. The inline image needs an image (not a
+	video) and a heading of two words or more; otherwise the heading prints as written.
+	A slide colour set in the CMS still fills the slide. -#}
+{% import "_macros/images" as images %}
+{% import '_components/ctaButton' as buttons %}
+{% set multi = heroBannerSliders|length > 1 %}
+<section class="hero-folio hero-layout relative w-full" data-theme="light">
+	<div class="{{ multi ? 'swiper' : '' }}" {% if multi %}data-swiper-options='{"effect": "fade","fadeEffect": {"crossFade": true},"speed": 900,"autoplay": {"delay": 7000,"disableOnInteraction": false},"pagination": {"el": ".swiper-pagination","clickable": true}}'{% endif %}>
+		<div class="{{ multi ? 'swiper-wrapper' : '' }}">
+			{% for slide in heroBannerSliders %}
+				{% set bgColor = (slide.colorLibrary.one().colorcode ?? null)|roleColor %}
+				{% set media = slide.imageVideo.one() ?? null %}
+				{% set headingTag = loop.first ? 'h1' : 'h2' %}
+				{% set words = slide.heading|striptags|trim|split(' ')|filter(w => w|length) %}
+				{% set inline = media and media.kind == 'image' and words|length >= 2 %}
+				<div class="{{ multi ? 'swiper-slide' : '' }} hero-folio-slide" {% if bgColor %}style="background-color: {{ bgColor }};"{% endif %}>
+					<div class="container mx-auto px-4 hero-folio-inner">
+						{% if slide.displayTitle and slide.subtitle|length %}
+							<span class="hero-eyebrow">{{ slide.subtitle }}</span>
+						{% endif %}
+						{% if inline %}
+							{% set mid = (words|length / 2)|round(0, 'ceil') %}
+							{# aria-label keeps the heading's text whole for screen readers and search
+							   (the image sits between the two halves) #}
+							<{{ headingTag }} class="hero-title folio-slab" aria-label="{{ words|join(' ') }}">
+								<span class="folio-line" aria-hidden="true">{{ words|slice(0, mid)|join(' ') }}&#32;</span>
+								<span class="folio-inline-media" aria-hidden="true"><img src="{{ images.bgImageUrl(media, 640)|trim }}" alt="" {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}></span>
+								<span class="folio-line" aria-hidden="true">&#32;{{ words|slice(mid)|join(' ') }}</span>
+							</{{ headingTag }}>
+						{% else %}
+							<{{ headingTag }} class="hero-title folio-slab"><span class="folio-line">{{ slide.heading|raw }}</span></{{ headingTag }}>
+						{% endif %}
+						<div class="hero-folio-foot">
+							{% if slide.switchOffDes and slide.description|length %}
+								<div class="hero-lead">{{ slide.description }}</div>
+							{% endif %}
+							{% if slide.button|length %}
+								<div class="hero-actions">{{ buttons.renderButton(slide.button.all()) }}</div>
+							{% endif %}
+						</div>
+						{% include "_includes/hero-banner/_list" with { items: (slide.displayCheckList ?? false) ? (slide.checkListShowTable ?? []) : [] } %}
+					</div>
+					{% if media or slide.bgImageVideoMobile.one() %}
+						<div class="hero-folio-plate">
+							{% include "_includes/hero-banner/_media-pair" with { width: 1920, eager: loop.first } %}
+						</div>
+					{% endif %}
+				</div>
+			{% endfor %}
+		</div>
+		{% if multi %}<div class="swiper-pagination hero-pagination"></div>{% endif %}
+	</div>
+</section>

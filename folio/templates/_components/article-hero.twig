@@ -1,0 +1,33 @@
+{#- Folio: article header for blog posts and case studies (overrides
+	templates/_components/article-hero.twig; same params, DESIGN.md §7b). Left-aligned on
+	Stone: breadcrumb, a meta row (pills / date as small caps), the title as an uppercase
+	slab, then the lead and the byline under an Ink rule; the cover runs full-bleed below
+	as a plate (folio.js drifts it).
+
+	Params: element, eyebrow, title, lead, meta, image (see the Theme's file) -#}
+{% import "_macros/images" as images %}
+
+<header class="article-hero folio-article {{ image ? 'has-cover' : 'no-cover' }}">
+	<div class="container mx-auto px-4">
+		{% include "_components/breadcrumbs" with { inline: true, element: element } %}
+		{% if eyebrow ?? false %}
+			<div class="folio-article-eyebrow">{{ eyebrow|raw }}</div>
+		{% endif %}
+		<h1 class="article-title folio-article-title">{{ title }}</h1>
+		{% if (lead ?? false) or (meta ?? false) %}
+			<div class="folio-article-foot">
+				{% if lead ?? false %}
+					<p class="article-lead folio-article-lead">{{ lead }}</p>
+				{% endif %}
+				{% if meta ?? false %}
+					<div class="article-meta folio-article-meta">{{ meta|raw }}</div>
+				{% endif %}
+			</div>
+		{% endif %}
+	</div>
+	{% if image %}
+		<figure class="folio-article-cover">
+			<img src="{{ images.bgImageUrl(image, 2000)|trim }}" alt="{{ image.alt ?? title }}" fetchpriority="high">
+		</figure>
+	{% endif %}
+</header>
